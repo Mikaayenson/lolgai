@@ -1,0 +1,151 @@
+Name: GPT4All
+Id: gpt4all
+Category: desktop
+Vendor: Nomic AI
+Description: Qt 6.8-based local LLM desktop app by Nomic AI. No Electron helper processes.
+  Local API server on port 4891.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - gpt4all
+  - gpt4all.exe
+  - GPT4All
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://docs.gpt4all.io/index.html
+  OfficialUrl: https://github.com/nomic-ai/gpt4all
+  CliExecutable: gpt4all
+  Framework: qt
+  InstallationPaths:
+  - /Applications/gpt4all/bin/gpt4all.app
+  - ~/Library/Application Support/nomic.ai/GPT4All/
+  - ~/.local/share/nomic.ai/GPT4All/
+  - '%LOCALAPPDATA%\\nomic.ai\\GPT4All\\'
+  ConfigDirs:
+    macOS: ~/Library/Application Support/nomic.ai/GPT4All/
+    Linux: ~/.local/share/nomic.ai/GPT4All/
+    Windows: '%LOCALAPPDATA%\\nomic.ai\\GPT4All\\'
+  Packages:
+    winget:
+    - NomicAI.GPT4All
+    brew_cask:
+    - gpt4all
+Commands:
+- Command: open -a "GPT4All"
+  Description: Launch desktop app (macOS)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: macOS
+- Command: Start-Process "gpt4all"
+  Description: Launch desktop app (Windows)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: Windows
+- Command: open -a GPT4All --args "$HOME/.ssh/id_ed25519"
+  Description: Script-launched GPT4All with sensitive file context (macOS)
+  Category: Execute
+  Privileges: User
+  MitreID: T1204
+  Usage: abuse
+  Platform: macOS
+DetectionOpportunities:
+- Id: gpt4all-process
+  Name: gpt4all process
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: gpt4all
+    Reliability: medium
+    Platform: all
+  - Rank: 2
+    Field: process.name
+    Value: GPT4All
+    Reliability: medium
+    Platform: macOS
+  FalsePositiveGuidance: Enrich with ranked attribution signals via PR.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: C
+  LastVerified: '2026-07-19'
+  Source: docs.gpt4all.io + nomic-ai/gpt4all README + local codesign probe
+  EmpiricalNotes: 'Lab macOS arm64: GPT4All v3.10 at /Applications/gpt4all/bin/gpt4all.app;
+    codesign Identifier=gpt4all TeamId=6P9A8WD2QJ. Windows ARM64 partially verified
+    2026-04-25 — winget NomicAI.GPT4All ships x64-only (Prism). Data paths use nomic.ai/GPT4All
+    namespace. Local API port 4891 (localhost only).'
+Artifacts:
+  Network:
+  - Domains:
+    - localhost
+    Description: Local API server (port 4891, localhost only). OpenAI-compatible subset.
+    Ports:
+    - 4891
+  - Domains:
+    - gpt4all.io
+    Description: Model downloads (https://gpt4all.io/models/gguf/)
+  - Domains:
+    - huggingface.co
+    Description: Alternative model downloads
+  Logs:
+  - Path: ~/Library/Application Support/nomic.ai/GPT4All/logs/
+    Notes: App logs (macOS)
+    Platform: macOS
+  - Path: '%LOCALAPPDATA%\\nomic.ai\\GPT4All\\logs\\'
+    Notes: App logs (Windows)
+    Platform: Windows
+  - Path: ~/.local/share/nomic.ai/GPT4All/logs/
+    Notes: App logs (Linux)
+    Platform: Linux
+  Sessions:
+  - Path: ~/Library/Application Support/nomic.ai/GPT4All/
+    Notes: Chat history and local model cache (macOS)
+    Platform: macOS
+  - Path: '%LOCALAPPDATA%\\nomic.ai\\GPT4All\\'
+    Notes: Chat history and local model cache (Windows)
+    Platform: Windows
+  - Path: ~/.local/share/nomic.ai/GPT4All/
+    Notes: Chat history and local model cache (Linux)
+    Platform: Linux
+Signing:
+  macOS:
+    Depth: full
+    UsableForAttribution: true
+    SigningId: gpt4all
+    TeamId: 6P9A8WD2QJ
+    BundleId: gpt4all
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: true
+Resources:
+- Link: https://docs.gpt4all.io/index.html
+  Title: Official documentation
+- Link: https://github.com/nomic-ai/gpt4all
+  Title: GitHub repository
+Uuid: ee73cb78-e80a-57e8-b0fa-0d406a0be9d0
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Fixed inconsistent log/session paths to nomic.ai/GPT4All namespace; removed
+    duplicate localhost:4891 network entry and invented VS Code User/ profile paths.

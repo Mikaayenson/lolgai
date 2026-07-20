@@ -1,0 +1,126 @@
+Name: Fooocus
+Id: fooocus
+Category: image_gen
+Vendor: lllyasviel (OSS)
+Description: Offline SDXL image generator with Gradio UI. Distributed as a git clone
+  or Windows release archive; entry points are `entry_with_update.py` (git pull +
+  launch) or `run.bat` on Windows. No PyPI package or global binary.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - entry_with_update.py
+  - launch.py
+  - run.bat
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://github.com/lllyasviel/Fooocus
+  OfficialUrl: https://github.com/lllyasviel/Fooocus
+  CliExecutable: entry_with_update.py
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths:
+  - ~/Fooocus/
+  - '%USERPROFILE%\Fooocus\'
+Commands:
+- Command: python entry_with_update.py --help
+  Description: Show Fooocus launcher CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: python entry_with_update.py
+  Description: Launch Fooocus Gradio UI on localhost
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: python entry_with_update.py --listen
+  Description: Fooocus Gradio listen mode exposes workflow API on LAN
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: fooocus-attribution
+  Name: Fooocus python launcher
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.args
+    Value: entry_with_update.py
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.args
+    Value: launch.py
+    Reliability: high
+    Platform: all
+  - Rank: 3
+    Field: process.name
+    Value: run.bat
+    Reliability: medium
+    Platform: windows
+  FalsePositiveGuidance: python + launch.py is generic — corroborate with cwd under
+    Fooocus/ or models/checkpoints paths.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: Fooocus README CLI reference
+  EmpiricalNotes: No global fooocus binary; attribution is python running entry_with_update.py
+    or launch.py from clone dir. --listen documented for LAN bind. Lab Fooocus clone
+    with entry_with_update.py under ~/genai-tools/Fooocus (2026-07-19 full install
+    pass).
+Artifacts:
+  Disk:
+  - Path: Fooocus/models/checkpoints/
+    Notes: Downloaded SDXL checkpoints (default models dir)
+  - Path: Fooocus/models/inpaint/
+    Notes: Inpaint patch models
+  Network:
+  - Domains:
+    - huggingface.co
+    Description: Model and inpaint patch downloads
+  - Domains:
+    - github.com
+    Description: Release and git updates via entry_with_update.py
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/lllyasviel/Fooocus
+  Title: GitHub repository (official source)
+- Link: https://github.com/lllyasviel/Fooocus/releases
+  Title: Windows release downloads
+Uuid: 26911267-e8c2-5896-9699-f7239f160f87
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Removed invented ~/.fooocus/ paths and fake process.name fooocus attribution;
+    commands from README CLI section.

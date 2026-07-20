@@ -1,0 +1,93 @@
+Name: whisper.cpp
+Id: whisper-cpp
+Category: speech
+Vendor: ggml-org (OSS)
+Description: C/C++ Whisper ASR. Homebrew formula `whisper-cpp` installs `whisper-cli`
+  binary (repo moved from ggerganov to ggml-org). Requires separate GGML model files.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - whisper-cli
+  - whisper-cli.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://github.com/ggml-org/whisper.cpp
+  CliExecutable: whisper-cli
+  Framework: native_binary
+  Packages:
+    brew:
+    - whisper-cpp
+Commands:
+- Command: whisper-cli --help
+  Description: Show whisper.cpp CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: whisper-cli -m models/ggml-base.en.bin -f audio.wav -otxt
+  Description: Transcribe audio file to text
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+DetectionOpportunities:
+- Id: whisper-cpp-attribution
+  Name: whisper-cli attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: whisper-cli
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where whisper.cpp is installed. Corroborate
+    with path and -m model argument.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: 'Homebrew whisper-cpp formula ships whisper-cli (not whisper-cpp
+    on PATH). Linux lab PATH probe 2026-07-19. Removed invented ~/.whisper-cpp/ config
+    dir. VerificationLevel demoted to documented (2026-07-18 audit: thin empirical
+    evidence). Primary CLI or desktop binary empirically present on lab PATH or documented
+    install footprint (2026-07-19 revalidation).'
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/ggml-org/whisper.cpp
+  Title: whisper.cpp repository
+- Link: https://huggingface.co/ggerganov/whisper.cpp/tree/main
+  Title: GGML model files
+Uuid: 3ef0bdfa-c4bb-5fd3-95e3-9548ca818c34
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Repo canonical URL is ggml-org/whisper.cpp; brew binary is whisper-cli.
+Artifacts:
+  Disk:
+  - Path: models/ggml-*.bin
+    Notes: User-downloaded GGML model weights (not bundled by brew)

@@ -1,0 +1,171 @@
+Name: AnythingLLM
+Id: anythingllm
+Category: desktop
+Vendor: Mintplex Labs
+Description: All-in-one local RAG/chat desktop app with optional Docker server deployment.
+  Desktop process AnythingLLMDesktop bundles Node server, document collector, and
+  embedded Ollama (binds :11434). Agent skills in storage/plugins/; beta computer-use
+  automation agent. High-risk per AIRQ (Exposed Giants, AIRQ 3.08).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - AnythingLLMDesktop
+  - AnythingLLMDesktop.exe
+  - ollama
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - Local
+  Website: https://anythingllm.com/
+  OfficialUrl: https://anythingllm.com/
+  Framework: electron
+  HelperProcesses:
+  - node
+  - node.exe
+  InstallationPaths:
+  - /Applications/AnythingLLM.app
+  - ~/Library/Application Support/anythingllm-desktop/
+  - ~/.config/anythingllm-desktop/
+  - '%APPDATA%\anythingllm-desktop\'
+  - '%LOCALAPPDATA%\Programs\anythingllm-desktop\'
+  ContextFiles:
+  - storage/plugins/
+  - storage/anythingllm.db
+  ConfigDirs:
+    macOS: ~/Library/Application Support/anythingllm-desktop/
+    Linux: ~/.config/anythingllm-desktop/
+    Windows: '%APPDATA%\anythingllm-desktop\'
+  Packages:
+    winget:
+    - Mintplex-Labs.AnythingLLM
+    brew_cask:
+    - anythingllm
+Commands:
+- Command: open -a AnythingLLM
+  Description: Launch desktop app (macOS)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: macOS
+- Command: Start-Process "AnythingLLMDesktop"
+  Description: Launch desktop app (Windows)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: Windows
+- Command: Start-Process "$env:LOCALAPPDATA\Programs\anythingllm-desktop\AnythingLLMDesktop.exe"
+    -ArgumentList "$env:USERPROFILE\.aws\credentials"
+  Description: Launch AnythingLLM onto credential path (Windows)
+  Category: Execute
+  Privileges: User
+  MitreID: T1204
+  Usage: abuse
+  Platform: Windows
+DetectionOpportunities:
+- Id: anythingllm-attribution
+  Name: AnythingLLMDesktop attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: AnythingLLMDesktop
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.args
+    Value: '*anythingllm-desktop*'
+    Reliability: medium
+    Platform: all
+    Notes: Config/storage path in command line or cwd
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: Storage paths from official desktop docs (docs.anythingllm.com/installation-desktop/storage).
+    Lab PATH probe 2026-07-19 — AnythingLLMDesktop not on PATH on macOS/Linux/Windows
+    lab hosts (bundled ollama child may appear separately). Desktop attribution is
+    docs-sourced; Docker/server deploy is a separate surface not covered by desktop
+    binaries here. Primary CLI or desktop binary empirically present on lab PATH or
+    documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - 127.0.0.1
+    Description: Embedded Ollama when booted by desktop app
+    Ports:
+    - 11434
+  - Domains:
+    - 127.0.0.1
+    Description: Document collector service (desktop)
+    Ports:
+    - 8888
+  - Domains:
+    - anythingllm.com
+    Description: Project site / hosted instance
+  - Domains:
+    - huggingface.co
+    Description: Model downloads
+  ConfigFiles:
+  - Path: storage/plugins/
+    Notes: Context/instructions file
+  - Path: storage/anythingllm.db
+    Notes: Context/instructions file
+  Skills:
+  - Path: storage/plugins/plugin entry
+    Notes: Skills (workspaceDir)
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+    Notes: Desktop bundle signing not empirically captured on lab host
+  Windows:
+    Depth: none
+    UsableForAttribution: false
+    Notes: AnythingLLMDesktop Authenticode not captured; bundled ollama child may
+      show Ollama Inc. separately
+Resources:
+- Link: https://anythingllm.com/
+  Title: Official site
+- Link: https://github.com/Mintplex-Labs/anything-llm
+  Title: GitHub repository
+- Link: https://docs.anythingllm.com/installation-desktop/storage
+  Title: Desktop storage locations
+- Link: https://docs.anythingllm.com/installation-desktop/overview
+  Title: Desktop installation overview
+- Link: https://airq.adversa.ai/agent/anythingllm
+  Title: AIRQ security profile
+Uuid: da6f2fa6-cbd7-5e34-91af-304c11e97aed
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  Skills:
+    Supported: true
+    WorkspaceDirs:
+    - storage/plugins/
+    GlobalDirs:
+    - storage/plugins/
+    SkillFile: plugin entry
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - third_party
+  Notes: Storage paths from official desktop docs; process name from GitHub issues.

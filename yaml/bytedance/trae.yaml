@@ -1,0 +1,197 @@
+Name: TRAE
+Id: trae
+Category: ide_agent
+Vendor: ByteDance
+Description: ByteDance's AI-native IDE (Electron-based). Multi-LLM (OpenAI, Anthropic,
+  Doubao, Azure, Gemini), free tier including GPT-4o, Claude-3.5-Sonnet, DeepSeek.
+  SOLO autonomous mode for end-to-end workflows. International (trae.ai) and China
+  (trae.cn) variants.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - Trae
+  - trae
+  - Trae.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  Website: https://www.trae.ai/
+  Framework: electron
+  HelperProcesses:
+  - Electron
+  - Trae Helper
+  - Trae Helper (Plugin)
+  - Trae Helper (GPU)
+  - Trae Helper (Renderer)
+  InstallationPaths:
+  - /Applications/Trae.app
+  - /Applications/Trae.app/Contents/Resources/app/bin/trae
+  - ~/Library/Application Support/Trae/
+  - ~/.config/Trae/
+  - '%APPDATA%\Trae\'
+  ContextFiles:
+  - .trae/
+  ConfigDirs:
+    macOS: ~/Library/Application Support/Trae/
+    Linux: ~/.config/Trae/
+    Windows: '%APPDATA%\Trae\'
+  Packages:
+    winget:
+    - ByteDance.Trae
+    brew_cask:
+    - trae
+Commands:
+- Command: trae --goto file.txt:10
+  Description: Open file at line via bundled VS Code-style CLI
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: Trae .
+  Description: Open project in IDE
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: Trae --help
+  Description: Show IDE CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: open -a Trae --args "$HOME/.ssh"
+  Description: Script-launched Trae IDE onto SSH key directory (macOS)
+  Category: Execute
+  Privileges: User
+  MitreID: T1204
+  Usage: abuse
+  Platform: macOS
+- Command: Trae mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: Trae mcp add registers attacker-controlled filesystem MCP server on
+    host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: trae-attribution
+  Name: Trae attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: Trae Helper (Plugin)
+    Reliability: medium
+    Platform: macOS
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: A
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: macOS Apple Silicon empirically verified 2026-07-19 — Trae 3.5.53
+    (bundle com.trae.app). TeamIdentifier=79M8227NKH (SPRING (SG) PTE. LTD.). Bundled
+    CLI at Contents/Resources/app/bin/trae supports --goto/--diff/--merge (VS Code
+    OSS fork). Windows winget install blocked over SSH in prior lab pass; Windows
+    metadata remains docs-sourced. Primary CLI or desktop binary empirically present
+    on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - trae.ai
+    Description: TRAE international service
+  - Domains:
+    - trae.cn
+    Description: TRAE China service
+  - Description: Multi-LLM backends
+    Domains: []
+    Notes: (provider-dependent)
+  ConfigFiles:
+  - Path: .trae/
+    Notes: Context/instructions file
+  - Path: ~/Library/Application Support/Trae/mcp.json (macOS)
+    Notes: MCP server configuration
+  - Path: .trae/mcp.json
+    Notes: MCP server configuration
+  Logs:
+  - Path: ~/Library/Application Support/Trae/logs/
+    Notes: App logs (macOS)
+    Platform: macOS
+  - Path: '%APPDATA%\Trae\logs\'
+    Notes: App logs (Windows)
+    Platform: Windows
+  - Path: ~/.config/Trae/logs/
+    Notes: App logs (Linux XDG)
+    Platform: Linux
+  Sessions:
+  - Path: ~/Library/Application Support/Trae/User/
+    Notes: VS Code-compatible user profile
+    Platform: macOS
+  - Path: '%APPDATA%\Trae\User\'
+    Notes: VS Code-compatible user profile
+    Platform: Windows
+  MCP:
+  - Path: ~/Library/Application Support/Trae/mcp.json (macOS)
+    Notes: MCP server configuration
+  - Path: .trae/mcp.json
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: full
+    UsableForAttribution: true
+    SigningId: com.trae.app
+    TeamId: 79M8227NKH
+    BundleId: com.trae.app
+    Notes: Same TeamIdentifier as TRAE SOLO (com.trae.solo.app); attribute by bundleId,
+      not teamId.
+Resources:
+- Link: https://www.trae.ai/
+  Title: TRAE international site
+- Link: https://www.trae.ai/download
+  Title: TRAE download page
+- Link: https://github.com/bytedance/TRAE-agent
+  Title: Trae Agent GitHub repository
+Uuid: 0a7924fb-6f47-5cc7-a73e-553166b3463c
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    ConfigPaths:
+    - ~/Library/Application Support/Trae/mcp.json (macOS)
+    - .trae/mcp.json
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: 'macOS Apple Silicon empirically verified 2026-04-25 — Trae 3.5.53. Bundle
+    ID com.trae.app, exec=Electron (generic), TeamIdentifier=79M8227NKH (SPRING (SG)
+    PTE. LTD. — Singapore-incorporated ByteDance signer). Bundled CLI wrappers in
+    Contents/Resources/app/bin/: code, marscode, trae. VS Code OSS fork (vscode-webview/vscode-file
+    schemes, basil.mojom services, code.lock). Windows winget install (ByteDance.Trae)
+    blocked over SSH (no interactive session token); detection metadata for Windows
+    still based on official doc.'

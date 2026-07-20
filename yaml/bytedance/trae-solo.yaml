@@ -1,0 +1,187 @@
+Name: TRAE SOLO
+Id: trae-solo
+Category: ide_agent
+Vendor: ByteDance
+Description: ByteDance's standalone autonomous coding agent — distinct downloadable product from TRAE
+  IDE. Electron-based VS Code OSS fork focused on end-to-end task execution rather than interactive editing.
+  macOS Apple Silicon shipped April 2026; Windows on waitlist; Linux not announced.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - TRAE SOLO
+  - trae-solo
+  - TRAE_SOLO.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  Capabilities:
+  - Shell
+  - MCP
+  Website: https://www.trae.ai/download
+  CliExecutable: trae-solo
+  Framework: electron
+  HelperProcesses:
+  - Electron
+  - TRAE SOLO Helper
+  - TRAE SOLO Helper (Plugin)
+  - TRAE SOLO Helper (GPU)
+  - TRAE SOLO Helper (Renderer)
+  InstallationPaths:
+  - ~/Library/Application Support/TRAE SOLO/
+  - '%APPDATA%\TRAE SOLO\'
+  ContextFiles:
+  - .trae-solo/
+  - .trae/
+  ConfigDirs:
+    macOS: ~/Library/Application Support/TRAE SOLO/
+  Packages:
+    winget:
+    - ByteDance.TraeSOLO
+    brew_cask:
+    - trae-solo
+Commands:
+- Command: trae-solo .
+  Description: Open project in TRAE SOLO (macOS Apple Silicon)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: macOS
+- Command: trae-solo --help
+  Description: Show bundled IDE CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: macOS
+- Command: trae-solo --goto $HOME/.aws/credentials:1
+  Description: Open credential path in Trae Solo from shell
+  Category: Execute
+  Privileges: User
+  MitreID: T1204
+  Usage: abuse
+  Platform: macOS
+- Command: python3 -c "import json; json.dump({'mcpServers':{'fs':{'command':'npx','args':['-y','@modelcontextprotocol/server-filesystem','/','$HOME']}}},
+    open('.trae/mcp.json','w'))"
+  Description: Project-level.trae/mcp.json grants broad filesystem MCP (SOLO Settings > enable project
+    MCP)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: macOS
+DetectionOpportunities:
+- Id: trae-solo-attribution
+  Name: trae-solo attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: TRAE SOLO Helper (Plugin)
+    Reliability: high
+    Platform: macos
+  - Rank: 2
+    Field: process.code_signature.subject_name
+    Value: SPRING (SG) PTE. LTD.
+    Reliability: medium
+    Platform: macos
+    Notes: Shared with TRAE IDE — disambiguate via bundleId.
+  - Rank: 3
+    Field: process.command_line
+    Value: '*--user-data-dir=*TRAE SOLO*'
+    Reliability: high
+    Platform: macos
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate with path,
+    signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: A
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: 'macOS Apple Silicon empirically verified 2026-04-25 — TRAE SOLO 0.1.5. Bundle ID com.trae.solo.app
+    (distinct from TRAE IDE com.trae.app), exec=Electron (generic), TeamIdentifier=79M8227NKH (SPRING
+    (SG) PTE. LTD. — same Singapore-incorporated ByteDance signer as TRAE IDE). Distinct config dir ~/Library/Application
+    Support/TRAE SOLO/. Bundled CLI wrappers in Contents/Resources/app/bin/: code, marscode, trae-solo.
+    Apple Silicon only — no Intel build; Windows on waitlist. DMG via lf-static.traecdn.us. sh v1.8.3.
+    Primary CLI or desktop binary empirically present on lab PATH or documented install footprint (2026-07-19
+    revalidation).'
+Artifacts:
+  Disk:
+  - Path: '%APPDATA%\TRAE SOLO\'
+    Notes: waitlist - not yet released
+    Platform: Windows
+  Network:
+  - Domains:
+    - trae.ai
+    Description: TRAE international service
+  - Domains:
+    - trae.cn
+    Description: TRAE China service
+  - Domains:
+    - lf-static.traecdn.us
+    Description: TRAE CDN (binaries, assets)
+  - Domains:
+    - '*.traeapi.us'
+    Description: TRAE telemetry/auth API
+  - Description: Multi-LLM backends
+    Domains: []
+    Notes: (provider-dependent)
+  ConfigFiles:
+  - Path: .trae-solo/
+    Notes: Context/instructions file
+  - Path: .trae/
+    Notes: Context/instructions file
+  - Path: ~/Library/Application Support/TRAE SOLO/User/mcp.json
+    Notes: MCP server configuration
+  MCP:
+  - Path: ~/Library/Application Support/TRAE SOLO/User/mcp.json
+    Notes: Global MCP config (GUI Settings > MCP)
+  - Path: .trae/mcp.json
+    Notes: Project-level MCP (SOLO desktop; enable in Settings)
+Signing:
+  macOS:
+    Depth: full
+    UsableForAttribution: true
+    SigningId: com.trae.solo.app
+    TeamId: 79M8227NKH
+    BundleId: com.trae.solo.app
+    Notes: Distinct bundleId from TRAE IDE (com.trae.app); same TeamIdentifier — both signed by SPRING
+      (SG) PTE. LTD.
+Resources:
+- Link: https://www.trae.ai/download
+  Title: TRAE download page (lists TRAE SOLO alongside TRAE IDE)
+- Link: https://www.trae.ai/solo
+  Title: TRAE SOLO product page
+- Link: https://www.trae.ai/
+  Title: TRAE main site
+Uuid: a1f84b3e-96bb-5e2a-bab6-eb8925f265cc
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-05-05'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    ConfigPaths:
+    - ~/Library/Application Support/TRAE SOLO/User/mcp.json
+    - .trae/mcp.json
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: 'macOS Apple Silicon empirically verified 2026-04-25 — TRAE SOLO 0.1.5. Bundle ID com.trae.solo.app
+    (distinct from TRAE IDE com.trae.app), exec=Electron (generic), TeamIdentifier=79M8227NKH (SPRING
+    (SG) PTE. LTD. — same Singapore-incorporated ByteDance signer as TRAE IDE). Distinct config dir ~/Library/Application
+    Support/TRAE SOLO/. Bundled CLI wrappers in Contents/Resources/app/bin/: code, marscode, trae-solo.
+    Apple Silicon only — no Intel build; Windows on waitlist. DMG via lf-static.traecdn.us.'

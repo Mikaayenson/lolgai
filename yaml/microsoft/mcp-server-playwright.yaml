@@ -1,0 +1,125 @@
+Name: MCP Playwright Server
+Id: mcp-server-playwright
+Category: mcp
+Vendor: Microsoft / Playwright
+Description: Playwright MCP server (`@playwright/mcp`). npm global binary is `playwright-mcp`
+  (not `mcp-server-playwright`). Invoked via `npx @playwright/mcp@latest` or direct
+  stdio registration in MCP host configs.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - playwright-mcp
+  - playwright-mcp.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://github.com/microsoft/playwright-mcp
+  OfficialUrl: https://github.com/microsoft/playwright-mcp
+  CliExecutable: playwright-mcp
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  Packages:
+    npm:
+    - '@playwright/mcp'
+Commands:
+- Command: playwright-mcp --help
+  Description: Show Playwright MCP server CLI help
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: playwright-mcp --browser chromium
+  Description: Chromium browser automation via MCP (normal product use)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: playwright-mcp mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: playwright-mcp mcp add registers attacker-controlled filesystem MCP
+    server on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: mcp-server-playwright-attribution
+  Name: playwright-mcp process
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: playwright-mcp
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.args
+    Value: '@playwright/mcp'
+    Reliability: medium
+    Platform: all
+    Notes: npx @playwright/mcp@latest spawn pattern
+  FalsePositiveGuidance: Expected when registered as MCP server in IDE/agent host
+    configs.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: playwright-mcp --help v0.0.78 on audit host + microsoft/playwright-mcp README
+  EmpiricalNotes: npm bin is playwright-mcp per @playwright/mcp package.json. mcp-server-playwright
+    name is not shipped. No per-server ~/.mcp-server-playwright/ config dir. Primary
+    CLI or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).
+Artifacts:
+  MCP:
+  - Path: Host ~/.cursor/mcp.json
+    Notes: Cursor MCP host registration (mcpServers block)
+  - Path: Host ~/.claude.json
+    Notes: Claude Code user MCP config (mcpServers key)
+  - Path: Host .cursor/mcp.json
+    Notes: Project-scoped Cursor MCP config
+  - Path: Host .mcp.json
+    Notes: Project-scoped Claude Code MCP config
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/microsoft/playwright-mcp
+  Title: Primary documentation
+- Link: https://www.npmjs.com/package/@playwright/mcp
+  Title: npm @playwright/mcp
+Uuid: 46dcf926-9cde-5d32-a7ee-33a144491ec8
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: server
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: playwright-mcp v0.0.78 probed on macOS audit host 2026-07-19; removed invented
+    config dirs and wrong binary name.

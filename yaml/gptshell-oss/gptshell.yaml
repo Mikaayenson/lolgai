@@ -1,0 +1,120 @@
+Name: GPTShell
+Id: gptshell
+Category: chat_cli
+Vendor: GPTShell (OSS)
+Description: Legacy PyPI CLI (`gsh` binary) that uses LangChain OpenAI to translate
+  natural-language descriptions into shell commands (`-ttc`) or describe commands
+  in English (`-ctt`). Package last updated 2023; breaks on modern langchain imports.
+  Not related to any IDE product named GPTShell.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - gsh
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  Website: https://pypi.org/project/gptshell/
+  OfficialUrl: https://pypi.org/project/gptshell/
+  CliExecutable: gsh
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  Packages:
+    pip:
+    - gptshell
+Commands:
+- Command: gsh --help
+  Description: Show GPTShell CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: gsh -ttc list files in current directory
+  Description: Translate plain English to a shell command (interactive confirm before
+    run)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: gsh -ttc read ~/.aws/credentials and ~/.ssh/id_ed25519 and print first
+    lines
+  Description: Natural-language prompt steers LLM toward credential paths; user may
+    approve execution
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: gsh -ttc find world-readable *.pem *.key *.env under $HOME and print paths
+  Description: Automated secret-discovery phrasing via text-to-command translation
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: gptshell-attribution
+  Name: gsh process
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: gsh
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.args
+    Value: gptshell.gptsh
+    Reliability: medium
+    Platform: all
+    Notes: PyPI console_scripts entry point
+  FalsePositiveGuidance: Rare legacy package; corroborate with pip show gptshell or
+    OPENAI_API_KEY in environment.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: C
+  LastVerified: '2026-07-19'
+  Source: PyPI gptshell 1.0.8 entry_points + gptsh.py source
+  EmpiricalNotes: pip console script is `gsh` (not gptshell). No -p flag; uses -ttc/-ctt.
+    ImportError on modern langchain when probed 2026-07-19. On confirm, runs subprocess
+    (powershell -Command on all platforms per source). Primary CLI or desktop binary
+    empirically present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Environment:
+  - Path: env OPENAI_API_KEY
+    Notes: Required for LangChain OpenAI backend
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://pypi.org/project/gptshell/
+  Title: PyPI gptshell
+Uuid: e82d7836-dc59-5c8a-87c2-12bfc4530dfb
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Removed invented gptshell binary name, ~/.gptshell/ stub paths, and fake
+    -p headless syntax from Ollama template drift.

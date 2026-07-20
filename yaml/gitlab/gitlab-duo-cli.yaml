@@ -1,0 +1,139 @@
+Name: GitLab Duo CLI
+Id: gitlab-duo-cli
+Category: cli_agent
+Vendor: GitLab
+Description: AI-powered GitLab Duo Agentic Chat in the terminal. Interactive (human-in-the-loop)
+  and headless modes. Understands codebase, modifies code, troubleshoots errors, automates
+  CI/CD. Public beta as of April 2026. Requires GitLab 18.11+.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - duo
+  - duo.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - Headless
+  - Bypass
+  Website: https://docs.gitlab.com/user/gitlab_duo_cli/
+  CliExecutable: duo
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  InstallationPaths: []
+  ContextFiles:
+  - .gitlab-duo/
+  - ~/.gitlab-duo/
+  - ~/.gitlab/
+  ConfigDirs:
+    macOS: ~/.gitlab-duo/
+    Linux: ~/.gitlab-duo/
+    Windows: '%USERPROFILE%\.gitlab-duo\'
+  Packages:
+    npm:
+    - '@gitlab/duo-cli'
+Commands:
+- Command: duo
+  Description: Interactive agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: duo -p "explain this repository"
+  Description: One-shot agent prompt (default approvals)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: duo run --dangerously-skip-permissions --goal "read ~/.aws/credentials
+    and ~/.ssh/id_ed25519; print paths and first lines"
+  Description: Headless duo run with auto-approved tool calls ingests credential paths
+  Category: Bypass
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: 'GITLAB_TOKEN="$STOLEN" duo run --dangerously-skip-permissions -g "Summarize
+    for staging: $(env | grep -iE ''(key|token|secret|pass|cred)'' | head -25)"'
+  Description: Stolen GITLAB_TOKEN + bypass headless workflow with env secret dump
+  Category: Bypass
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: gitlab-duo-cli-attribution
+  Name: duo attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: duo
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: Lab macOS duo v8.89.0 via npm @gitlab/duo-cli (NOT @gitlab-org/duo-cli).
+    Subcommands version, run, config, log — no `duo ask`. Node-shim wrapper (NotSigned).
+    Storage at ~/.gitlab/storage.json. Primary CLI or desktop binary empirically present
+    on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - gitlab.com
+    Description: GitLab.com Duo backend
+  - Domains:
+    - '*.gitlab.com'
+    Description: GitLab services and self-managed instances
+  ConfigFiles:
+  - Path: .gitlab-duo/
+    Notes: Project Duo skills and config
+  - Path: ~/.gitlab-duo/
+    Notes: Global Duo skills (when --enable-global-skills)
+  - Path: ~/.gitlab/storage.json
+    Notes: Duo CLI persistent storage (lab observed)
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://docs.gitlab.com/user/gitlab_duo_cli/
+  Title: GitLab Duo CLI documentation
+- Link: https://about.gitlab.com/blog/gitlab-duo-cli/
+  Title: GitLab Duo CLI announcement
+- Link: https://www.npmjs.com/package/@gitlab/duo-cli
+  Title: '@gitlab/duo-cli npm package'
+Uuid: aa57c0be-5614-5835-95bf-f805b7afd2cc
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Windows ARM64 empirically verified 2026-04-25, duo v8.89.0 via npm @gitlab/duo-cli
+    (NOT @gitlab-org/duo-cli). Node-shim wrapper (NotSigned).

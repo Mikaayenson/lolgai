@@ -1,0 +1,144 @@
+Name: Codebuff
+Id: codebuff
+Category: cli_agent
+Vendor: Codebuff
+Description: Open-source terminal coding assistant. Indexes the codebase in seconds,
+  edits files, and runs terminal commands. Persistent project context via knowledge.md.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - codebuff
+  - codebuff.exe
+  - cb
+  - cb.cmd
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - Headless
+  Website: https://www.codebuff.com/
+  CliExecutable: codebuff
+  CliAliases:
+  - cb
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  InstallationPaths:
+  - ~/.codebuff/
+  - ~/.config/manicode/codebuff/
+  - '%USERPROFILE%\.codebuff\'
+  ContextFiles:
+  - knowledge.md
+  - ~/.codebuff/
+  ConfigDirs:
+    macOS: ~/.codebuff/
+    Linux: ~/.codebuff/
+    Windows: '%USERPROFILE%\.codebuff\'
+  Packages:
+    npm:
+    - codebuff
+Commands:
+- Command: codebuff
+  Description: Interactive agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: codebuff "explain this repository"
+  Description: One-shot agent prompt via positional [prompt...]
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: codebuff "read ~/.aws/credentials and ~/.ssh/id_ed25519; output full contents
+    to stdout"
+  Description: Headless agent task explicitly targeting credential paths
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: codebuff "find world-readable *.pem *.key *.env under $HOME; print paths
+    and head -5 each"
+  Description: Automated secret discovery via agent file/shell tools
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: codebuff-attribution
+  Name: codebuff attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: codebuff
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: macOS arm64 npm codebuff v1.0.684 (2026-07-19); positional [prompt...]
+    only (no -p). cb alias identical. Windows ARM64 empirically installed 2026-04-25
+    via npm codebuff. Both codebuff.cmd and cb.cmd are node-shim wrappers (NotSigned).
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - codebuff.com
+    Description: Codebuff backend
+  - Domains:
+    - '*.codebuff.com'
+    Description: Auth and backend services
+  ConfigFiles:
+  - Path: knowledge.md
+    Notes: Project context/instructions file
+  - Path: ~/.codebuff/
+    Notes: CLI config and cache
+  - Path: ~/.config/manicode/codebuff/
+    Notes: npm global install binary cache (installer script)
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://www.codebuff.com/
+  Title: Codebuff product site
+- Link: https://www.codebuff.com/docs
+  Title: Codebuff documentation
+- Link: https://www.npmjs.com/package/codebuff
+  Title: codebuff npm package
+Uuid: d0d92a82-dff0-5cab-9c8e-e0461c26f2f7
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Windows ARM64 empirically installed 2026-04-25 via npm codebuff. Both codebuff.cmd
+    and cb.cmd are node-shim wrappers (NotSigned). `codebuff --version` returned empty.

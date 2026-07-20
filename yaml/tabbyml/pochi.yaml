@@ -1,0 +1,180 @@
+Name: Pochi
+Id: pochi
+Category: cli_agent
+Vendor: TabbyML
+Description: Open-source AI coding agent by TabbyML. Install `@getpochi/cli` (not
+  the unrelated npm `pochi@0.0.2` pet-adoption stub). VS Code extension and CLI share
+  auth in ~/.pochi/config.jsonc. Parallel agents, Git worktrees, MCP via `pochi mcp`.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - pochi
+  - pochi.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://docs.getpochi.com/
+  OfficialUrl: https://www.getpochi.com/
+  CliExecutable: pochi
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - Code Helper (Plugin)
+  InstallationPaths:
+  - ~/.pochi/
+  ContextFiles:
+  - .pochi/
+  - ~/.pochi/
+  ConfigDirs:
+    macOS: ~/.pochi/
+    Linux: ~/.pochi/
+    Windows: '%USERPROFILE%\\.pochi\\'
+  Packages:
+    npm:
+    - '@getpochi/cli'
+Commands:
+- Command: pochi
+  Description: Interactive agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: pochi -p "explain this repository"
+  Description: One-shot agent prompt (--prompt)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: pochi mcp list
+  Description: List configured MCP servers
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: pochi -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; output full contents
+    to stdout"
+  Description: Headless agent task explicitly targeting credential paths
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: pochi -p "find world-readable *.pem *.key *.env under $HOME; print paths
+    and head -5 each"
+  Description: Automated secret discovery via agent file/shell tools
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: pochi mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: pochi mcp add registers attacker-controlled filesystem MCP server on
+    host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: pochi-attribution
+  Name: pochi attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: pochi
+    Reliability: high
+    Platform: all
+    Notes: Distinguish @getpochi/cli from unrelated npm pochi@0.0.2 stub
+  - Rank: 2
+    Field: process.command_line
+    Value: '*@getpochi/cli*'
+    Reliability: high
+    Platform: all
+  - Rank: 3
+    Field: process.parent.name
+    Value: node
+    Reliability: medium
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where Pochi CLI is installed. Corroborate
+    with ~/.pochi/config.jsonc and getpochi.com network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: docs.getpochi.com/cli + npx @getpochi/cli v0.6.20 --help
+  EmpiricalNotes: npx @getpochi/cli v0.6.20 --help on lab macOS arm64. Uses `-p`/`--prompt`
+    (no `run` subcommand). Auth in ~/.pochi/config.jsonc per docs. Unrelated npm `pochi@0.0.2`
+    on PATH is a different package. Primary CLI or desktop binary empirically present
+    on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - getpochi.com
+    Description: Pochi backend / auth / install script
+  - Domains:
+    - '*.getpochi.com'
+    Description: Pochi cloud services
+  ConfigFiles:
+  - Path: ~/.pochi/config.jsonc
+    Notes: Shared CLI + VS Code extension credentials and model config
+  - Path: .pochi/
+    Notes: Project-scoped context
+  MCP:
+  - Path: ~/.pochi/config.jsonc
+    Notes: MCP server configuration (via pochi mcp)
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://docs.getpochi.com/
+  Title: Pochi documentation
+- Link: https://docs.getpochi.com/cli/
+  Title: Pochi CLI documentation
+- Link: https://github.com/tabbyML/pochi
+  Title: Pochi GitHub repository
+- Link: https://www.npmjs.com/package/@getpochi/cli
+  Title: npm @getpochi/cli
+Uuid: aa444c5f-80cd-5061-b84e-21c4ee320dbc
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - http
+    ConfigPaths:
+    - ~/.pochi/config.jsonc
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: npx @getpochi/cli v0.6.20 --help lab probe 2026-07-19; npm package corrected
+    from bare `pochi`.

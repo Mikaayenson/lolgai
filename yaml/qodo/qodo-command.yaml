@@ -1,0 +1,179 @@
+Name: Qodo Command
+Id: qodo-command
+Category: cli_agent
+Vendor: Qodo
+Description: CLI for building, managing, and running AI agents. Interactive chat,
+  custom agent configuration, web UI mode, and webhook (HTTP API) mode. Successor
+  to deprecated @qodo/gen package. Headless prompts use positional `qodo <prompt>`
+  or `qodo run <command>` — `-p` is `--port`, not prompt.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - qodo
+  - qodo.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://docs.qodo.ai/qodo-command
+  OfficialUrl: https://docs.qodo.ai/qodo-command
+  CliExecutable: qodo
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  InstallationPaths:
+  - ~/.qodo/
+  - '%USERPROFILE%\.qodo\'
+  ContextFiles:
+  - .qodo/
+  - ~/.qodo/
+  ConfigDirs:
+    macOS: ~/.qodo/
+    Linux: ~/.qodo/
+    Windows: '%USERPROFILE%\.qodo\'
+  Packages:
+    npm:
+    - '@qodo/command'
+Commands:
+- Command: qodo
+  Description: Interactive Qodo agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: qodo "explain this repository"
+  Description: One-shot agent prompt (default approvals)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: qodo run "read ~/.aws/credentials and ~/.ssh/id_ed25519; output full contents
+    to stdout"
+  Description: Headless agent task explicitly targeting credential paths
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: qodo run "find world-readable *.pem *.key *.env under $HOME; print paths
+    and head -5 each"
+  Description: Automated secret discovery via agent file/shell tools
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: qodo mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: qodo mcp add registers attacker-controlled filesystem MCP server on
+    host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: qodo-command-attribution
+  Name: qodo attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: qodo
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: node
+    Reliability: medium
+    Platform: all
+    Notes: npm @qodo/command shim
+  FalsePositiveGuidance: Expected on hosts where Qodo Command is installed. Corroborate
+    with ~/.qodo/ config paths.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: qodo --help v0.36.0 (@qodo/command) on audit host
+  EmpiricalNotes: qodo v0.36.0 via npm. `-p` is --port (server modes), not prompt.
+    Subcommands run, chat, login, models, list-mcp, --ui, --webhook, --mcp confirmed.
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - '*.qodo.ai'
+    Description: Qodo backend / auth
+  - Description: Multi-LLM backends
+    Domains: []
+    Notes: (provider-dependent)
+  ConfigFiles:
+  - Path: .qodo/
+    Notes: Project agent configuration
+  - Path: ~/.qodo/
+    Notes: User agent configuration
+  - Path: ~/.qodo/agents.toml
+    Notes: Agent and MCP definitions
+  - Path: .qodo/agents.toml
+    Notes: Project agent and MCP definitions
+  MCP:
+  - Path: ~/.qodo/agents.toml
+    Notes: MCP server configuration
+  - Path: .qodo/agents.toml
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://docs.qodo.ai/qodo-command
+  Title: Qodo Command documentation
+- Link: https://github.com/qodo-ai/qodo-gen-cli
+  Title: Qodo Command GitHub repository
+- Link: https://www.npmjs.com/package/@qodo/command
+  Title: '@qodo/command npm package'
+Uuid: fc051ac4-2a84-5b2c-8782-529cf51386fc
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+ExtensionIds:
+  vscode:
+  - qodoai.qodo-gen
+  jetbrains:
+  - com.codium.intellij
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - http
+    ConfigPaths:
+    - ~/.qodo/agents.toml
+    - .qodo/agents.toml
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: qodo v0.36.0 probed on macOS audit host 2026-07-19; fixed -p misattribution
+    from category template drift.

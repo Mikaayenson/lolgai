@@ -1,0 +1,50 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: pip install pyyaml jsonschema
+      - name: Validate YAML
+        run: python bin/validate.py
+      - name: Build API
+        run: python bin/site.py
+      - name: Catalog health summary
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          s = json.loads(Path("website/public/api/stats.json").read_text())
+          tools = s.get("tools", 0)
+          strong = s.get("with_strong_attribution", 0)
+          strong_pct = s.get("with_strong_attribution_pct", 0)
+          any_attr = s.get("with_attribution", 0)
+          any_pct = s.get("with_attribution_pct", 0)
+          verified = s.get("verified", 0)
+          cats = s.get("categories", 0)
+          print("## Catalog health")
+          print(f"Tools tracked:        {tools}")
+          print(f"Categories:           {cats}")
+          print(f"Verified:             {verified} of {tools}")
+          print(
+              f"Strong attribution:   {strong_pct}% "
+              f"({strong} of {tools} · signing / path / env)"
+          )
+          print(
+              f"Any attribution:      {any_pct}% "
+              f"({any_attr} of {tools} · excludes lone process.name stubs)"
+          )
+          print()
+          print("Strong attribution is a CI / maintainer metric — not shown on the public hero.")
+          print("Full JSON: website/public/api/stats.json")
+          PY

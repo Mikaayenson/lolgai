@@ -1,0 +1,104 @@
+Name: Text Generation Inference
+Id: tgi
+Category: local_llm
+Vendor: Hugging Face
+Description: Hugging Face TGI launcher (`text-generation-launcher`), commonly run
+  via Docker image ghcr.io/huggingface/text-generation-inference. Flag-style CLI —
+  no serve/run subcommands.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - text-generation-launcher
+  - text-generation-launcher.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://huggingface.co/docs/text-generation-inference
+  OfficialUrl: https://huggingface.co/docs/text-generation-inference
+  CliExecutable: text-generation-launcher
+  Framework: native_binary
+Commands:
+- Command: text-generation-launcher --model-id meta-llama/Llama-3.2-3B
+  Description: Start TGI server (default hostname 0.0.0.0, port 3000)
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: text-generation-launcher --model-id meta-llama/Llama-3.2-3B --hostname
+    0.0.0.0 --port 8080
+  Description: Text Generation Inference server explicitly bound on all interfaces
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: tgi-attribution
+  Name: text-generation-launcher attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: text-generation-launcher
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: text-generation-launcher
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: huggingface.co/docs/text-generation-inference launcher reference
+  EmpiricalNotes: Not on local PATH; documented-only. Removed invented ~/.tgi/ config
+    stubs and generic serve/run templates. Primary CLI or desktop binary empirically
+    present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - 0.0.0.0
+    Description: Default listen hostname per HF launcher docs
+    Ports:
+    - 3000
+  - Domains:
+    - huggingface.co
+    Description: Model weight download (default hub cache)
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://huggingface.co/docs/text-generation-inference
+  Title: Primary documentation
+- Link: https://huggingface.co/docs/text-generation-inference/en/basic_tutorials/launcher
+  Title: Launcher CLI arguments
+Uuid: c3d108b9-e71d-56c4-bfc8-ddc0e29c53f3
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: TGI uses --model-id/--hostname/--port flags. Default hostname 0.0.0.0 and
+    port 3000 per official launcher docs.

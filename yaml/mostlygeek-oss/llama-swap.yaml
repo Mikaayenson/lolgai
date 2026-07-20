@@ -1,0 +1,112 @@
+Name: llama-swap
+Id: llama-swap
+Category: local_llm
+Vendor: mostlygeek (OSS)
+OfficialUrl: https://github.com/mostlygeek/llama-swap
+Description: Multi-model OpenAI/Anthropic-compatible proxy that hot-swaps llama.cpp
+  and other inference backends. Single Go binary with `-config` and `-listen` flags
+  (no serve/run subcommands).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - llama-swap
+  - llama-swap.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://github.com/mostlygeek/llama-swap
+  CliExecutable: llama-swap
+  Framework: go_cli
+  Packages:
+    brew:
+    - mostlygeek/llama-swap/llama-swap
+Commands:
+- Command: llama-swap --config config.yaml --listen localhost:8080
+  Description: Start multi-model proxy on localhost (default listen :8080 if omitted)
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: llama-swap --help
+  Description: Show llama-swap flag help (-config, -listen)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: llama-swap --config /tmp/evil-swap.yaml --listen 0.0.0.0:8080
+  Description: Swap config points backends at attacker-controlled model paths or 0.0.0.0
+    binds
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: llama-swap-attribution
+  Name: llama-swap attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: llama-swap
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: llama-swap
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: mostlygeek/llama-swap README (llama-swap --config … --listen …; no serve/run
+    subcommands)
+  EmpiricalNotes: llama-swap --help on macOS arm64 shows only -config and -listen
+    flags. Prior catalog used Ollama-style serve/run template drift. Primary CLI or
+    desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - localhost
+    Description: Default HTTP listen (configurable via -listen; default :8080)
+    Ports:
+    - 8080
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/mostlygeek/llama-swap
+  Title: Primary documentation
+Uuid: 3a263379-7c2a-5d00-bf12-48d5cb78fe58
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: CLI verified locally (llama-swap --help). Config is a user-supplied YAML
+    path, not a fixed dot-directory.

@@ -1,0 +1,141 @@
+Name: ElevenLabs Agents CLI
+Id: elevenlabs
+Category: cli_agent
+Vendor: ElevenLabs
+Description: ElevenLabs `@elevenlabs/cli` npm package — agents-as-code CLI for init/push/manage
+  of ElevenLabs conversational agents. Separate from the Python `elevenlabs` SDK (library-only;
+  no console script on PyPI).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - elevenlabs
+  - elevenlabs.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Headless
+  Website: https://elevenlabs.io/docs/agents-platform/overview
+  CliExecutable: elevenlabs
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  InstallationPaths:
+  - ~/.elevenlabs/
+  - '%USERPROFILE%\\.elevenlabs\\'
+  ConfigDirs:
+    macOS: ~/.elevenlabs/
+    Linux: ~/.elevenlabs/
+    Windows: '%USERPROFILE%\\.elevenlabs\\'
+  Packages:
+    npm:
+    - '@elevenlabs/cli'
+    pip:
+    - elevenlabs
+Commands:
+- Command: elevenlabs
+  Description: Interactive agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: elevenlabs -p "explain this repository"
+  Description: One-shot agent prompt (default approvals)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: ELEVENLABS_API_KEY="$STOLEN" elevenlabs agents push
+  Description: Stolen ElevenLabs key pushes attacker-controlled agent config to cloud
+    workspace
+  Category: Headless
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+- Command: elevenlabs -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths
+    and first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent
+    context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: elevenlabs-attribution
+  Name: elevenlabs attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: elevenlabs
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.args
+    Value: '*@elevenlabs/cli*'
+    Reliability: medium
+    Platform: all
+    Notes: npm node shim; correlate command_line for agents push/auth
+  FalsePositiveGuidance: Expected on hosts using ElevenLabs Agents CLI. Correlate
+    with api.elevenlabs.io network and ~/.elevenlabs/ auth storage.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: local elevenlabs --help (v0.5.6) + @elevenlabs/cli README
+  EmpiricalNotes: macOS lab npm @elevenlabs/cli v0.5.6; modules auth/agents/tools/tests/components.
+    Prior pip-only TTS CLI and `text-to-speech` subcommand removed as inaccurate (PyPI
+    has no console script). Primary CLI or desktop binary empirically present on lab
+    PATH or documented install footprint (2026-07-19 revalidation).
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://elevenlabs.io/docs/agents-platform/overview
+  Title: ElevenLabs Agents platform docs
+- Link: https://www.npmjs.com/package/@elevenlabs/cli
+  Title: npm @elevenlabs/cli
+- Link: https://pypi.org/project/elevenlabs/
+  Title: PyPI elevenlabs (Python SDK, library-only)
+Uuid: 259bfc70-b67b-510d-971d-cc0feb3564fc
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: macOS npm @elevenlabs/cli v0.5.6 verified 2026-07-19. ~/.elevenlabs/ exists
+    on lab. PyPI elevenlabs has no CLI entry point.
+Artifacts:
+  Network:
+  - Domains:
+    - api.elevenlabs.io
+    - elevenlabs.io
+    Description: ElevenLabs Agents API and product site
+  ConfigFiles:
+  - Path: ~/.elevenlabs/
+    Notes: Auth/config storage (lab observed empty dir until login)
+  Environment:
+  - Path: env ELEVENLABS_API_KEY
+    Notes: API auth (login or env override)

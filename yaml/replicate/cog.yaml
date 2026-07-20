@@ -1,0 +1,108 @@
+Name: Cog
+Id: cog
+Category: cloud_mlops
+Vendor: Replicate
+Description: Replicate Cog — containerizes ML models for reproducible `cog predict` / `cog push` workflows.
+  Installed via official install.sh (native binary wrapping Docker); requires Docker. Not the unrelated
+  PyPI `cog` package.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - cog
+  - cog.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://github.com/replicate/cog
+  OfficialUrl: https://github.com/replicate/cog
+  CliExecutable: cog
+  Framework: native_binary
+  HelperProcesses:
+  - docker
+  InstallationPaths: []
+  Packages: {}
+Commands:
+- Command: cog --help
+  Description: Show MLOps CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: cog predict -i prompt="$(cat ~/.aws/credentials 2>/dev/null | head -c 1000) extract keys"
+  Description: Replicate Cog predict with credential blob in prompt input
+  Category: Execute
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: cog-attribution
+  Name: cog attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: cog
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: cog
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected where Replicate Cog builds or runs model containers. Corroborate with
+    cog.yaml project dirs and Docker child processes.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: github.com/replicate/cog + sh)
+  EmpiricalNotes: Lab Linux may have cog from install.sh or pip fallback. Removed invented ~/.cog/ config
+    stubs and unrelated PyPI cog package reference. No durable user config dir documented — project-local
+    cog.yaml only.
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/replicate/cog
+  Title: Cog repository
+- Link: https://github.com/replicate/cog/blob/main/docs/cli.md
+  Title: Cog CLI documentation
+- Link: https://replicate.com/docs
+  Title: Replicate platform docs
+Uuid: c0ab8e69-a3bf-52f7-b371-c857d52620da
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Install via replicate/cog install.sh; Docker dependency documented upstream.
+Artifacts:
+  Disk:
+  - Path: ./cog.yaml
+    Notes: Project-local Cog model definition (required for predict/push)
+  ConfigFiles:
+  - Path: cog.yaml
+    Notes: Model build/predict schema in project root
+  Environment:
+  - Path: env REPLICATE_API_TOKEN
+    Notes: Required for cog push to Replicate (sensitive)

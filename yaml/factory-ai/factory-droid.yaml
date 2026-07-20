@@ -1,0 +1,185 @@
+Name: Factory Droid CLI
+Id: factory-droid
+Category: cli_agent
+Vendor: Factory AI
+Description: Factory AI's terminal development agent. End-to-end feature development
+  with deep codebase understanding. Integrates with Jira, Notion, Slack. Interactive
+  REPL and non-interactive 'droid exec' modes.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - droid
+  - droid.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  - Bypass
+  Website: https://docs.factory.ai/cli/getting-started/overview
+  CliExecutable: droid
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  InstallationPaths:
+  - ~/.factory/
+  - '%USERPROFILE%\.factory\'
+  ContextFiles:
+  - .factory/
+  - ~/.factory/
+  ConfigDirs:
+    macOS: ~/.factory/
+    Linux: ~/.factory/
+    Windows: '%USERPROFILE%\.factory\'
+  Packages:
+    npm:
+    - droid
+    winget:
+    - FactoryAI.Factory
+    brew:
+    - factory
+Commands:
+- Command: droid
+  Description: Interactive Droid agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: droid exec "explain this repository"
+  Description: Non-interactive droid exec one-shot task
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: droid mcp list
+  Description: List configured MCP servers
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: droid exec "read ~/.aws/credentials and ~/.ssh/id_ed25519; output full
+    contents to stdout"
+  Description: Headless agent task explicitly targeting credential paths
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: droid exec --skip-permissions-unsafe "find world-readable *.pem *.key *.env
+    under $HOME; print paths and head -5 each"
+  Description: droid exec --skip-permissions-unsafe skips all permission checks (unsafe)
+  Category: Bypass
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: droid mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: droid mcp add registers attacker-controlled filesystem MCP server on
+    host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: factory-droid-attribution
+  Name: droid attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: droid
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: macOS lab droid v0.109.1 via npm global `droid` (2026-07-19). Headless
+    subcommand is `droid exec` (not `droid run` or `-p`). Windows ARM64 empirically
+    verified 2026-04-25; native Bun binary NotSigned. Config tree ~/.factory/ (cache/,
+    certs/, droids/, logs/, sessions/, telemetry/). Primary CLI or desktop binary
+    empirically present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - app.factory.ai
+    Description: Factory backend, install script, auth
+  - Domains:
+    - '*.factory.ai'
+    Description: Factory services
+  - Description: Underlying LLM providers
+    Domains: []
+    Notes: (provider-dependent)
+  ConfigFiles:
+  - Path: .factory/
+    Notes: Context/instructions file
+  - Path: ~/.factory/
+    Notes: Context/instructions file
+  - Path: ~/.factory/config.json
+    Notes: MCP server configuration
+  - Path: .factory/config.json
+    Notes: MCP server configuration
+  MCP:
+  - Path: ~/.factory/config.json
+    Notes: MCP server configuration
+  - Path: .factory/config.json
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://docs.factory.ai/cli/getting-started/overview
+  Title: Factory Droid CLI overview
+- Link: https://docs.factory.ai/cli/configuration/cli-reference
+  Title: Factory Droid CLI reference
+- Link: https://github.com/Factory-AI/factory
+  Title: Factory GitHub
+Uuid: 0c08776c-91b2-51f9-b170-547ec1058697
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - http
+    ConfigPaths:
+    - ~/.factory/config.json
+    - .factory/config.json
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Windows ARM64 empirically verified 2026-04-25, v0.109.1 via npm droid (top-level
+    package; pulls in @factory/cli-win32-arm64 on Windows). Native ARM64 Bun binary
+    droid/node_modules/@factory/cli-win32-arm64/bin/droid.exe (~162 MB, NotSigned).
+    Config tree %USERPROFILE%\.factory\ (cache/, certs/, droids/, logs/, sessions/,
+    telemetry/).

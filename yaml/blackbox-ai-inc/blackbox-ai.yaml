@@ -1,0 +1,186 @@
+Name: BLACKBOX AI VS Code Agent
+Id: blackbox-ai
+Category: ide_extension
+Vendor: Blackbox AI Inc.
+Description: VS Code coding agent with multi-agent execution. Ships a separate `blackbox`
+  CLI (`@blackbox_ai/blackbox-cli`) with `-p` headless mode and `blackbox mcp` host
+  commands alongside the blackboxapp.blackboxagent extension.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - blackbox
+  - blackbox.exe
+  - blackboxapp.blackboxagent
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  - Bypass
+  Website: https://docs.blackbox.ai/features/vscode-agent/introduction
+  CliExecutable: blackbox
+  Framework: vscode_extension
+  HelperProcesses:
+  - Code Helper (Plugin)
+  - Code Helper (Renderer)
+  - node
+  InstallationPaths:
+  - ~/.vscode/extensions/blackboxapp.blackboxagent-*/
+  - '%USERPROFILE%\.vscode\extensions\blackboxapp.blackboxagent-*\'
+  ContextFiles:
+  - .blackbox/
+  ConfigDirs:
+    macOS: ~/.vscode/extensions/blackboxapp.blackboxagent-*/
+    Linux: ~/.vscode/extensions/blackboxapp.blackboxagent-*/
+    Windows: '%USERPROFILE%\.vscode\extensions\blackboxapp.blackboxagent-*\'
+  Packages:
+    npm:
+    - '@blackbox_ai/blackbox-cli'
+Commands:
+- Command: blackbox --help
+  Description: Show Blackbox CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: blackbox -p "summarize this repository"
+  Description: One-shot Blackbox CLI prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: blackbox mcp list
+  Description: List configured MCP servers
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: blackbox -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print contents"
+  Description: Blackbox CLI -p prompt targets credential paths
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: blackbox --approval-mode yolo -p "dump env secrets to stdout"
+  Description: blackbox --approval-mode yolo auto-approves all tool actions
+  Category: Bypass
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+- Command: '# ~/.config/blackbox-ai/mcp.json — add attacker MCP server entry (config
+    file, not a shell one-liner)'
+  Description: Tampered MCP config grants broad filesystem MCP access (verify path
+    per vendor docs)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: blackbox-ai-attribution
+  Name: blackbox / blackboxagent attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: blackbox
+    Reliability: high
+    Platform: all
+    Notes: npm @blackbox_ai/blackbox-cli global shim
+  - Rank: 2
+    Field: process.command_line
+    Value: '*blackboxagent*'
+    Reliability: medium
+    Platform: all
+    Notes: VS Code extension path under ~/.vscode/extensions/blackboxapp.blackboxagent-*
+  FalsePositiveGuidance: Expected on hosts where Blackbox CLI or VS Code extension
+    is installed. Corroborate with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: macOS lab blackbox v1.0.2 via npm @blackbox_ai/blackbox-cli (2026-07-19).
+    `-p`, `mcp add|list|remove`, and `--approval-mode yolo` confirmed. VS Code extension
+    blackboxapp.blackboxagent empirically on Windows ARM64 2026-04-25. Primary CLI
+    or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - '*.blackbox.ai'
+    Description: Blackbox backend / auth / multi-agent orchestration
+  - Description: Frontier model providers per tier (Claude Opus, GPT-5.x, Gemini-3,
+      Grok-4, Llama, Mistral)
+    Domains: []
+    Notes: (provider-dependent)
+  ConfigFiles:
+  - Path: .blackbox/
+    Notes: Project context/instructions file (extension)
+  - Path: VS Code settings.json (Blackbox extension settings)
+    Notes: MCP server configuration (extension host)
+  MCP:
+  - Path: VS Code settings.json (Blackbox extension settings)
+    Notes: Extension MCP host registration
+  - Path: blackbox mcp add (CLI host config)
+    Notes: Blackbox CLI MCP server registration
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned npm/node shim for blackbox CLI
+Resources:
+- Link: https://docs.blackbox.ai/features/vscode-agent/introduction
+  Title: Blackbox AI VS Code agent introduction
+- Link: https://www.blackbox.ai/vs-code
+  Title: Blackbox AI VS Code product page
+- Link: https://marketplace.visualstudio.com/items?itemName=Blackboxapp.blackboxagent
+  Title: VS Code Marketplace listing
+- Link: https://www.npmjs.com/package/@blackbox_ai/blackbox-cli
+  Title: npm @blackbox_ai/blackbox-cli
+Uuid: d2b31de5-059e-5724-933c-675b602edddc
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-07-19'
+ExtensionIds:
+  vscode:
+  - blackboxapp.blackbox
+  - blackboxapp.blackboxagent
+  jetbrains:
+  - com.blackbox.ide
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    ConfigPaths:
+    - VS Code settings.json (Blackbox extension settings)
+    - blackbox mcp add (CLI)
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: macOS lab blackbox v1.0.2 via npm @blackbox_ai/blackbox-cli. VS Code extension
+    empirically on Windows ARM64 2026-04-25.

@@ -1,0 +1,65 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Packaging
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+.crush/
+.cursor/
+.claude/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Local config / scratch
+.maintainer-local/
+config/lab.local.yaml
+**/lab.local.yaml
+data/
+backends/
+models/
+detections/
+tmp/
+out/
+evidence/
+lab-evidence/
+
+# Generated / probe artifacts
+website/public/api/
+*-probe.json
+probe-summary-*.json
+*-inventory*.json
+gap-matrix-*.json
+enrich-report.json
+website/_os-preview*.html
+
+# Agent / tooling
+.aider.chat.history.md
+.aider*
+.vibe/
+node_modules/
+
+# Install helpers / weights / DBs
+*-doc-install.sh
+*-win-*-install.sh
+*.gguf
+*.safetensors
+weights/
+*.sqlite
+*.sqlite3

@@ -1,0 +1,163 @@
+Name: Command Code
+Id: command-code
+Category: cli_agent
+Vendor: Command Code
+Description: Coding agent CLI that continuously learns coding taste. npm package `command-code`
+  exposes `cmd`, `cmdc`, `command-code`, and `commandcode` binaries (same entrypoint).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - cmd
+  - cmd.exe
+  - cmdc
+  - cmdc.exe
+  - command-code
+  - command-code.exe
+  - commandcode
+  - commandcode.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  - Bypass
+  Website: https://www.npmjs.com/package/command-code
+  OfficialUrl: https://www.npmjs.com/package/command-code
+  CliExecutable: cmd
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  InstallationPaths:
+  - ~/.commandcode/
+  ConfigDirs:
+    macOS: ~/.commandcode/
+    Linux: ~/.commandcode/
+    Windows: '%USERPROFILE%\\.commandcode\\'
+  Packages:
+    npm:
+    - command-code
+Commands:
+- Command: cmd
+  Description: Interactive agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: cmd -p "explain this repository"
+  Description: One-shot agent prompt in print mode
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: cmd mcp list
+  Description: List configured MCP servers
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: cmd --yolo -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; output full
+    contents to stdout"
+  Description: Headless agent with permission bypass targeting credential paths
+  Category: Bypass
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: cmd -p "find world-readable *.pem *.key *.env under $HOME; print paths
+    and head -5 each"
+  Description: Automated secret discovery via agent file/shell tools
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: cmd mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: cmd mcp add registers attacker-controlled filesystem MCP server on
+    host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: command-code-attribution
+  Name: command-code attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: cmd
+    Reliability: high
+    Platform: all
+    Notes: Primary npm bin name; also command-code/cmdc shims
+  - Rank: 2
+    Field: process.name
+    Value: command-code
+    Reliability: high
+    Platform: all
+  - Rank: 3
+    Field: process.parent.name
+    Value: node
+    Reliability: medium
+    Platform: all
+    Notes: npm node shim wrapper
+  FalsePositiveGuidance: Expected on hosts where Command Code is installed. Corroborate
+    with ~/.commandcode/ and node parent.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: npm command-code v0.52.1 --help
+  EmpiricalNotes: 'npx command-code v0.52.1 on lab macOS arm64. Primary CLI is `cmd`;
+    `-p` print mode and `--yolo` bypass confirmed. Config dir ~/.commandcode/ created
+    on first run. No `run` subcommand. VerificationLevel demoted to documented (2026-07-18
+    audit: thin empirical evidence). Primary CLI or desktop binary empirically present
+    on lab PATH or documented install footprint (2026-07-19 revalidation).'
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://www.npmjs.com/package/command-code
+  Title: npm command-code
+Uuid: f76fb486-fc9d-5028-ad8d-f0d8017e37b2
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    ConfigPaths:
+    - ~/.commandcode/
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: npm metadata + npx --help v0.52.1 lab probe 2026-07-19.
+Artifacts:
+  Disk:
+  - Path: ~/.commandcode/
+    Notes: Auth/update state (updates.json observed on lab first run)
+    Platform: macOS

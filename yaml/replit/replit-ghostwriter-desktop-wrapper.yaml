@@ -1,0 +1,151 @@
+Name: Replit Desktop
+Id: replit-ghostwriter-desktop-wrapper
+Category: desktop
+Vendor: Replit
+Description: Electron desktop wrapper for the Replit web IDE (github.com/replit/desktop).
+  Local footprint only — Ghostwriter AI runs server-side on replit.com. No standalone
+  shell CLI; launch via desktop bundle.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - Replit
+  - Replit.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://docs.replit.com/platforms/desktop-app
+  OfficialUrl: https://replit.com/
+  Framework: electron
+  HelperProcesses:
+  - Replit Helper
+  - Replit Helper (Renderer)
+  - Replit Helper (GPU)
+  - Replit Helper (Plugin)
+  InstallationPaths:
+  - /Applications/Replit.app
+  - ~/Library/Application Support/Replit/
+  - ~/.config/Replit/
+  - '%APPDATA%\Replit\'
+  ConfigDirs:
+    macOS: ~/Library/Application Support/Replit/
+    Linux: ~/.config/Replit/
+    Windows: '%APPDATA%\Replit\'
+  Packages:
+    github_release:
+    - replit/desktop
+Commands:
+- Command: open -a Replit
+  Description: Launch Replit desktop app (macOS)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: macOS
+- Command: Start-Process Replit
+  Description: Launch Replit desktop app (Windows)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: Windows
+- Command: open -a Replit --args "$HOME/.ssh"
+  Description: Script-launched Replit desktop with SSH key directory as argument (macOS)
+  Category: Execute
+  Privileges: User
+  MitreID: T1204
+  Usage: abuse
+  Platform: macOS
+DetectionOpportunities:
+- Id: replit-ghostwriter-desktop-wrapper-process
+  Name: Replit process
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: Replit
+    Reliability: high
+    Platform: all
+    FalsePositiveGuidance: Expected on hosts where Replit Desktop is installed. Corroborate
+      with bundle path.
+  - Rank: 2
+    Field: process.executable
+    Value: '*Replit.app/Contents/MacOS/Replit'
+    Reliability: medium
+    Platform: macOS
+    FalsePositiveGuidance: Install path varies by OS; treat as a strong hint, not
+      a sole match.
+  FalsePositiveGuidance: Enrich with ranked attribution signals via PR.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: 'Replit Desktop v1.0.14 empirically present on macOS (bundle com.electron.replit).
+    `--help` launches the GUI (no CLI help). Prior `replit --command` narrative removed
+    — not supported. VerificationLevel demoted to documented (2026-07-18 audit: thin
+    empirical evidence). Replit Desktop wrapper binary empirically present on lab
+    Windows; launch via desktop bundle not PATH shim.'
+Artifacts:
+  Network:
+  - Domains:
+    - replit.com
+    Description: Primary platform
+  - Domains:
+    - '*.replit.dev'
+    Description: Hosted repl domains
+  - Domains:
+    - '*.replit.app'
+    Description: Current deployment format
+  - Domains:
+    - '*.repl.co'
+    Description: Legacy deployment format
+  Logs:
+  - Path: ~/Library/Application Support/Replit/logs/
+    Notes: App logs (macOS)
+    Platform: macOS
+  - Path: '%APPDATA%\Replit\logs\'
+    Notes: App logs (Windows)
+    Platform: Windows
+  - Path: ~/.config/Replit/logs/
+    Notes: App logs (Linux XDG)
+    Platform: Linux
+  Sessions:
+  - Path: ~/Library/Application Support/Replit/User/
+    Notes: VS Code-compatible user profile
+    Platform: macOS
+  - Path: '%APPDATA%\Replit\User\'
+    Notes: VS Code-compatible user profile
+    Platform: Windows
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+    BundleId: com.electron.replit
+Resources:
+- Link: https://docs.replit.com/platforms/desktop-app
+  Title: Desktop app documentation
+- Link: https://github.com/replit/desktop
+  Title: Desktop app GitHub repository
+- Link: https://docs.replit.com/replitai/mcp/overview
+  Title: Replit MCP overview (cloud-side)
+Uuid: fe550b86-4aed-5f26-89a4-5b2d0e392616
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: macOS bundle verified locally; Ghostwriter AI is cloud-side per Replit docs.

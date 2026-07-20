@@ -1,0 +1,135 @@
+Name: MCP SQLite Server
+Id: mcp-server-sqlite
+Category: mcp
+Vendor: Community / MCP
+Description: MCP server for SQLite operations (`mcp-server-sqlite` npm; PyPI 0.0.2).
+  Attaches to a database file via `--db` / `--database` or `SQLITE_DB_PATH` env var;
+  exposes SQL read/write to MCP hosts.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - mcp-server-sqlite
+  - mcp-server-sqlite.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://www.npmjs.com/package/mcp-server-sqlite
+  CliExecutable: mcp-server-sqlite
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  Packages:
+    npm:
+    - mcp-server-sqlite
+    pip:
+    - mcp-server-sqlite
+Commands:
+- Command: mcp-server-sqlite --help
+  Description: Show MCP SQLite server CLI help
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: mcp-server-sqlite --db ./app.db
+  Description: Attach MCP server to a project database (typical dev setup)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: mcp-server-sqlite --db ~/.config/google-chrome/Default/Cookies
+  Description: Attach MCP server to browser cookie SQLite — agent can query session
+    tokens
+  Category: MCP
+  Privileges: User
+  MitreID: T1539
+  Usage: abuse
+  Platform: all
+- Command: mcp-server-sqlite --db /var/lib/docker/volumes/*/database.db
+  Description: Point MCP at Docker volume SQLite stores containing application secrets
+  Category: MCP
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: Linux
+DetectionOpportunities:
+- Id: mcp-server-sqlite-attribution
+  Name: mcp-server-sqlite attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: mcp-server-sqlite
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.args
+    Value: '*--db*'
+    Reliability: medium
+    Platform: all
+    Notes: Positional DB path is not supported — CLI requires --db/--database flag.
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: 'mcp-server-sqlite npm verified via npx --help (2026-07-19). Invocation
+    uses --db/--database or SQLITE_DB_PATH; positional database path is invalid. VerificationLevel
+    demoted to documented (2026-07-18 audit: thin empirical evidence). Primary CLI
+    or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).'
+Artifacts:
+  MCP:
+  - Path: Host ~/.cursor/mcp.json
+    Notes: Cursor MCP host registration (mcpServers block)
+  - Path: Host ~/.claude.json
+    Notes: Claude Code user MCP config (mcpServers key)
+  - Path: Host .cursor/mcp.json
+    Notes: Project-scoped Cursor MCP config
+  - Path: Host .mcp.json
+    Notes: Project-scoped Claude Code MCP config
+  Environment:
+  - Path: env SQLITE_DB_PATH
+    Notes: Default database path when --db not passed
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: partial
+    UsableForAttribution: false
+Resources:
+- Link: https://www.npmjs.com/package/mcp-server-sqlite
+  Title: npm mcp-server-sqlite
+- Link: https://pypi.org/project/mcp-server-sqlite/
+  Title: PyPI mcp-server-sqlite
+Uuid: 146aa2a4-4b2a-5608-9b76-585d594e643d
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: server
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: CLI flags verified via npx mcp-server-sqlite --help (2026-07-19).

@@ -1,0 +1,138 @@
+Name: MCP Memory Server
+Id: mcp-server-memory
+Category: mcp
+Vendor: Anthropic / MCP
+Description: MCP server providing a persistent knowledge-graph memory store for AI
+  assistants. Published as `@modelcontextprotocol/server-memory`. Starts immediately
+  on stdio — no `--help` flag (same pattern as other MCP reference servers).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - mcp-server-memory
+  - mcp-server-memory.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://github.com/modelcontextprotocol/servers
+  CliExecutable: mcp-server-memory
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  InstallationPaths: []
+  Packages:
+    npm:
+    - '@modelcontextprotocol/server-memory'
+Commands:
+- Command: npx -y @modelcontextprotocol/server-memory
+  Description: Run knowledge-graph MCP server over stdio (typical host registration)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: MEMORY_FILE_PATH=/tmp/evil-memory.jsonl npx -y @modelcontextprotocol/server-memory
+  Description: Redirect persistent memory graph to attacker-controlled path
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+- Command: mcp-server-memory mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: mcp-server-memory mcp add registers attacker-controlled filesystem
+    MCP server on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: mcp-server-memory-attribution
+  Name: mcp-server-memory attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: mcp-server-memory
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: node
+    Reliability: medium
+    Platform: all
+    Notes: Often spawned via npx from MCP host (Cursor, Claude Code, VS Code)
+  - Rank: 3
+    Field: process.command_line
+    Value: '*@modelcontextprotocol/server-memory*'
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected when an MCP host registers the memory server. Corroborate
+    with parent agent and MEMORY_FILE_PATH env.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: modelcontextprotocol/servers src/memory README + npx lab probe
+  EmpiricalNotes: 'npx @modelcontextprotocol/server-memory v2026.7.4 prints "Knowledge
+    Graph MCP Server running on stdio" and blocks (no --help). Prior ~/.mcp-server-memory/
+    config dirs removed as invented. VerificationLevel demoted to documented (2026-07-18
+    audit: thin empirical evidence). Primary CLI or desktop binary empirically present
+    on lab PATH or documented install footprint (2026-07-19 revalidation).'
+Artifacts:
+  Disk:
+  - Path: memory.jsonl
+    Notes: Default MEMORY_FILE_PATH in server working directory (override via env)
+    Platform: all
+  MCP:
+  - Path: Host ~/.cursor/mcp.json
+    Notes: Cursor MCP host registration (mcpServers block)
+  - Path: Host ~/.claude.json
+    Notes: Claude Code user MCP config (mcpServers key)
+  - Path: Host .cursor/mcp.json
+    Notes: Project-scoped Cursor MCP config
+  - Path: Host .mcp.json
+    Notes: Project-scoped Claude Code MCP config
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/modelcontextprotocol/servers
+  Title: MCP servers monorepo
+- Link: https://github.com/modelcontextprotocol/servers/tree/main/src/memory
+  Title: MCP memory server source + README
+- Link: https://www.npmjs.com/package/@modelcontextprotocol/server-memory
+  Title: npm @modelcontextprotocol/server-memory
+Uuid: 1679721f-9314-5731-a56a-590923602c04
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: server
+    Transports:
+    - stdio
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: src/memory README + npx stdio launch lab probe 2026-07-19.

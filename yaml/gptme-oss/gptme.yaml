@@ -1,0 +1,161 @@
+Name: GPTMe
+Id: gptme
+Category: chat_cli
+Vendor: gptme (OSS)
+Description: Agentic chat CLI with tools (shell, browser, files, MCP). pip/pipx install
+  `gptme`; config at ~/.config/gptme/.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - gptme
+  - gptme.exe
+  - gptme-mcp-server
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  - Bypass
+  Website: https://github.com/gptme/gptme
+  OfficialUrl: https://gptme.org/
+  CliExecutable: gptme
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths:
+  - ~/.config/gptme/
+  ConfigDirs:
+    macOS: ~/.config/gptme/
+    Linux: ~/.config/gptme/
+    Windows: '%APPDATA%\\gptme\\'
+  Packages:
+    pip:
+    - gptme
+Commands:
+- Command: gptme
+  Description: Interactive chat CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: gptme "hello"
+  Description: One-shot prompt (positional; chains with `-` separator)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: gptme -n -y "summarize this repo"
+  Description: Non-interactive mode with confirmations skipped (-n implies -y)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: gptme -n -y "run cat ~/.aws/credentials ~/.ssh/id_ed25519 and print output"
+  Description: Non-interactive -n -y auto-approves shell tool runs without confirmation;
+    reads credential files
+  Category: Bypass
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: gptme mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: gptme mcp add registers attacker-controlled filesystem MCP server on
+    host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+- Command: gptme -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths and
+    first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent
+    context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: gptme-attribution
+  Name: gptme attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: gptme
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: gptme
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where gptme is installed. Corroborate with
+    ~/.config/gptme/ and provider network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: gptme.org docs + pip gptme v0.32.1 --help
+  EmpiricalNotes: pip gptme v0.32.1 --help on lab macOS arm64. Positional prompts
+    (not `-p`); `-n`/`-y` for headless bypass. Creates ~/.config/gptme/config.toml
+    on first run. MCP via `-t mcp` tool and `gptme-mcp-server` entry point. Primary
+    CLI or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/gptme/gptme
+  Title: Primary documentation
+- Link: https://gptme.org/docs/
+  Title: gptme documentation
+- Link: https://pypi.org/project/gptme/
+  Title: PyPI gptme
+Uuid: 9ca2564c-10c3-513a-80af-dab8f6310818
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    ConfigPaths:
+    - ~/.config/gptme/
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: pip install + --help v0.32.1 lab probe 2026-07-19.
+Artifacts:
+  Disk:
+  - Path: ~/.config/gptme/config.toml
+    Notes: Main config created on first run
+    Platform: macOS
+  - Path: ~/.config/gptme/
+    Notes: Conversation logs and workspace state
+    Platform: all

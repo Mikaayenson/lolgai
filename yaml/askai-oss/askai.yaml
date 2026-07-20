@@ -1,0 +1,120 @@
+Name: AskAI
+Id: askai
+Category: chat_cli
+Vendor: Max Fischer
+Description: Simple terminal OpenAI GPT helper (`askai` PyPI package by maxvfischer).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - askai
+  - askai.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://pypi.org/project/askai/
+  CliExecutable: askai
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths:
+  - ~/.askai/
+  ConfigDirs:
+    macOS: ~/.askai/
+    Linux: ~/.askai/
+    Windows: '%USERPROFILE%\\.askai\\'
+  Packages:
+    pip:
+    - askai
+Commands:
+- Command: askai init
+  Description: Initialize config and store OpenAI API key at ~/.askai/key
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: askai
+  Description: Interactive chat CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: askai "hello"
+  Description: One-shot prompt (positional question string)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: cat ~/.aws/credentials | askai "extract all access keys, secret keys, and passwords from stdin"
+  Description: Pipe credential file into CLI via stdin for cloud exfil/staging through model response
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: askai-attribution
+  Name: askai attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: askai
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: askai
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate with path, signing, and network.
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.askai/
+    Notes: Default config directory (created by askai init)
+  AuthTokens:
+  - Path: ~/.askai/key
+    Notes: OpenAI API key stored locally after askai init
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: github.com/maxvfischer/askai README (PyPI 1.0.5)
+  EmpiricalNotes: Config dir ~/.askai/ and API key at ~/.askai/key from official README; no lab binary observation yet (2026-07-19).
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/maxvfischer/askai
+  Title: askai GitHub repository
+- Link: https://pypi.org/project/askai/
+  Title: PyPI askai
+OfficialUrl: https://github.com/maxvfischer/askai
+Uuid: 63fffa4f-14a8-5fd4-ad1e-2189d85e25a0
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Added 2026-07-17 to align personal registry with GenAI installer endpoint-scope catalog ( 8.3). Binary names verified
+    against npm/PyPI/brew where available; deepen with empirical signing/network data as needed.

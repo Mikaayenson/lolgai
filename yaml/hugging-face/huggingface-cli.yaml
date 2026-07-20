@@ -1,0 +1,152 @@
+Name: Hugging Face CLI
+Id: huggingface-cli
+Category: cloud_mlops
+Vendor: Hugging Face
+Description: Hugging Face Hub CLI (`hf`; legacy alias `huggingface-cli`). Standalone
+  installer or `pip install huggingface_hub[cli]` for model/dataset download, upload,
+  auth, and cache management.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - hf
+  - hf.exe
+  - huggingface-cli
+  - huggingface-cli.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Headless
+  Website: https://huggingface.co/docs/huggingface_hub/guides/cli
+  OfficialUrl: https://huggingface.co/docs/huggingface_hub/guides/cli
+  CliExecutable: hf
+  CliAliases:
+  - huggingface-cli
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths:
+  - ~/.cache/huggingface/
+  - '%USERPROFILE%\\.cache\\huggingface\\'
+  - ~/.local/bin/hf
+  ConfigDirs:
+    macOS: ~/.cache/huggingface/
+    Linux: ~/.cache/huggingface/
+    Windows: '%USERPROFILE%\\.cache\\huggingface\\'
+  Packages:
+    pip:
+    - huggingface_hub[cli]
+    - huggingface_hub
+    curl:
+    - https://hf.co/cli/install.sh
+    - https://hf.co/cli/install.ps1
+Commands:
+- Command: hf --help
+  Description: Show Hugging Face Hub CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: hf download meta-llama/Llama-3.2-3B --local-dir ./models
+  Description: Download model weights to disk
+  Category: Execute
+  Privileges: User
+  MitreID: T1105
+  Usage: normal
+  Platform: all
+- Command: hf auth login
+  Description: Authenticate to Hugging Face Hub (stores token in cache)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: hf download meta-llama/Llama-3.2-3B --local-dir ./models --token "$STOLEN"
+  Description: Download gated weights using stolen HF token from env or cache
+  Category: Headless
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+- Command: hf -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths and first
+    lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent
+    context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: huggingface-cli-attribution
+  Name: hf / huggingface-cli attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: hf
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.name
+    Value: huggingface-cli
+    Reliability: high
+    Platform: all
+    Notes: Legacy pip console-script alias for the same Hub CLI.
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: Primary CLI renamed to `hf` per official Hub docs (2026). Standalone
+    curl installer at hf.co/cli/install.sh. Legacy `huggingface-cli` alias retained
+    in pip package. Primary CLI or desktop binary empirically present on lab PATH
+    or documented install footprint (2026-07-19 revalidation).
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: partial
+    UsableForAttribution: false
+Resources:
+- Link: https://huggingface.co/docs/huggingface_hub/guides/cli
+  Title: CLI guide (hf)
+- Link: https://pypi.org/project/huggingface_hub/
+  Title: PyPI huggingface_hub
+- Link: https://hf.co/cli/install.sh
+  Title: Standalone installer (macOS/Linux)
+Uuid: 36e63ff3-fe32-5d76-85cb-70aefb4775d8
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: CLI subcommands and `hf` rename verified against huggingface.co/docs/huggingface_hub/guides/cli.
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.cache/huggingface/token
+    Notes: HF Hub auth token (hf auth login)
+  Network:
+  - Domains:
+    - huggingface.co
+    Description: Hub API, model/dataset downloads
+  - Domains:
+    - hf.co
+    Description: CLI installer and short links

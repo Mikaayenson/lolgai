@@ -1,0 +1,147 @@
+Name: Open WebUI
+Id: open-webui
+Category: local_llm
+Vendor: Open WebUI (OSS)
+Description: Self-hosted AI chat/RAG web UI (successor to Ollama WebUI). Primary distribution
+  is Docker (`ghcr.io/open-webui/open-webui`). Source installs run `python -m uvicorn
+  open_webui.main:app`. Workspace Tools and admin Functions execute arbitrary Python
+  on the server process — high blast radius per AIRQ (Exposed Giants, AIRQ 5.07).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - open-webui
+  - docker
+  - python
+  - python3
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - Local
+  Website: https://github.com/open-webui/open-webui
+  OfficialUrl: https://docs.openwebui.com/
+  CliExecutable: docker
+  Framework: python_daemon
+  HelperProcesses:
+  - python
+  - python3
+  - uvicorn
+  InstallationPaths:
+  - Docker volume open-webui:/app/backend/data
+  ConfigDirs:
+    macOS: Docker volume open-webui:/app/backend/data or backend/data/ in clone
+    Linux: Docker volume open-webui:/app/backend/data or backend/data/ in clone
+    Windows: Docker volume open-webui:/app/backend/data or backend/data/ in clone
+  Packages:
+    pip:
+    - open-webui
+Commands:
+- Command: docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui
+    ghcr.io/open-webui/open-webui:main
+  Description: Start Open WebUI container on localhost
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: python -m uvicorn open_webui.main:app --host 127.0.0.1 --port 8080
+  Description: Run Open WebUI from pip/source on localhost
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: python -m uvicorn open_webui.main:app --host 0.0.0.0 --port 8080
+  Description: Open WebUI bound on all interfaces
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: open-webui-attribution
+  Name: open_webui uvicorn module
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.args
+    Value: open_webui.main:app
+    Reliability: medium
+    Platform: all
+    Notes: uvicorn module path when run from source or visible in container args
+  - Rank: 2
+    Field: process.args
+    Value: open-webui/open-webui
+    Reliability: medium
+    Platform: all
+    Notes: Docker image name in container create/run
+  - Rank: 3
+    Field: process.name
+    Value: docker
+    Reliability: low
+    Platform: all
+    Notes: Corroborate with ghcr.io/open-webui/open-webui image
+  FalsePositiveGuidance: uvicorn is shared — corroborate with open_webui.main:app
+    or open-webui volume mount.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: docs.openwebui.com quick start + GitHub README
+  EmpiricalNotes: Removed Ollama-template uvicorn serve / run llama3.2 commands. Docker
+    quick start maps host :3000 to container :8080. Primary CLI or desktop binary
+    empirically present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - 127.0.0.1
+    Description: Default backend HTTP (container :8080; typical Docker maps host :3000)
+    Ports:
+    - 8080
+  - Domains:
+    - huggingface.co
+    Description: Model and embedding downloads
+  - Domains:
+    - openwebui.com
+    Description: Project docs and site
+  Disk:
+  - Path: open-webui Docker volume /app/backend/data
+    Notes: Persistent UI data, users, and uploaded files
+  Environment:
+  - Path: env WEBUI_SECRET_KEY
+    Notes: Session signing secret
+  - Path: env OPENAI_API_KEY
+    Notes: Upstream LLM provider auth
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/open-webui/open-webui
+  Title: GitHub repository
+- Link: https://docs.openwebui.com/getting-started/quick-start/
+  Title: Quick start (Docker + Python)
+- Link: https://airq.adversa.ai/agent/open-webui
+  Title: AIRQ security profile
+Uuid: 7f5269e3-29d3-5c50-8310-4f1a22b88ff4
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - third_party
+  Notes: Docker and uvicorn launch patterns from docs.openwebui.com; not running on
+    audit host.

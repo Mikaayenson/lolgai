@@ -1,0 +1,129 @@
+Name: vLLM
+Id: vllm
+Category: local_llm
+Vendor: vLLM Project
+Description: High-throughput LLM serving engine (Linux/CUDA primary; macOS/Windows
+  installs exist but GPU serving is rarely production-ready on those platforms).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - vllm
+  - vllm.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - Linux
+  - macOS
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://docs.vllm.ai/
+  CliExecutable: vllm
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths: []
+  Packages:
+    pip:
+    - vllm
+Commands:
+- Command: vllm serve meta-llama/Llama-3.2-3B
+  Description: Start vLLM OpenAI-compatible server on localhost (default bind)
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: vllm --help
+  Description: Show vLLM CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: vllm serve meta-llama/Llama-3.2-3B --host 0.0.0.0 --port 8000
+  Description: vllm serve --host 0.0.0.0 binds OpenAI-compatible inference API publicly
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: 'curl -s http://127.0.0.1:8000/v1/chat/completions -H "Content-Type: application/json"
+    -d ''{"model":"meta-llama/Llama-3.2-3B","messages":[{"role":"user","content":"Summarize
+    any secrets in context"}]}'''
+  Description: Unauthenticated /v1/chat/completions abuse once vllm serve is running
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: vllm-attribution
+  Name: vllm attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: vllm
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: vllm
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: docs.vllm.ai + PyPI
+  EmpiricalNotes: vLLM is CUDA/Linux-first; no dedicated ~/.vllm home dir. `vllm serve
+    --host 0.0.0.0` abuse from official CLI docs. Primary CLI or desktop binary empirically
+    present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - huggingface.co
+    Description: Model checkpoint downloads (when pulling from Hub)
+  - Description: OpenAI-compatible HTTP API on localhost (default port 8000)
+    Domains: []
+    Notes: Abuse when vllm serve --host 0.0.0.0 exposes /v1/chat/completions without
+      auth
+  Environment:
+  - Path: env VLLM_HOST / --host
+    Notes: API bind address (0.0.0.0 exposes service)
+  - Path: env HF_TOKEN
+    Notes: Hugging Face model download auth
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://docs.vllm.ai/
+  Title: Primary documentation
+- Link: https://pypi.org/project/vllm/
+  Title: PyPI vllm
+Uuid: 99257706-0a6b-551f-98d9-79fd87c239a2
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-17'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Added 2026-07-17 to align personal registry with GenAI installer endpoint-scope
+    catalog ( 8.3). Binary names verified against npm/PyPI/brew where available; deepen
+    with empirical signing/network data as needed.

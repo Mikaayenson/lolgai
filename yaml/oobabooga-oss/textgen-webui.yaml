@@ -1,0 +1,153 @@
+Name: Text Generation WebUI (oobabooga)
+Id: textgen-webui
+Category: local_llm
+Vendor: oobabooga (OSS)
+Description: Python-based local LLM web UI with Gradio frontend. Launched via OS start
+  scripts (`start_linux.sh`, `start_macos.sh`, `start_windows.bat`) that bootstrap
+  conda and invoke `server.py`. Has built-in tool-calling via user_data/tools/ and
+  optional MCP via user_data/mcp.json. Zero telemetry. Git clone only — no PyPI package.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - server.py
+  - start_linux.sh
+  - start_macos.sh
+  - start_windows.bat
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  - MCP
+  Website: https://github.com/oobabooga/text-generation-webui
+  OfficialUrl: https://github.com/oobabooga/text-generation-webui
+  CliExecutable: server.py
+  Framework: python_daemon
+  HelperProcesses:
+  - python
+  - python3
+  - llama-server
+  InstallationPaths:
+  - ~/text-generation-webui/
+  - '%USERPROFILE%\text-generation-webui\'
+  ConfigDirs:
+    macOS: ~/text-generation-webui/user_data/
+    Linux: ~/text-generation-webui/user_data/
+    Windows: '%USERPROFILE%\text-generation-webui\user_data\'
+Commands:
+- Command: ./start_linux.sh
+  Description: Bootstrap and launch text-generation-webui on localhost (Linux)
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: python server.py --help
+  Description: Show server.py CLI flags
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: ./start_linux.sh --listen --api
+  Description: Gradio WebUI with API on all interfaces (Linux script) (Gradio --listen
+    binds 0.0.0.0 — unauthenticated LAN access)
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: Linux
+- Command: server.py mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: server.py mcp add registers attacker-controlled filesystem MCP server
+    on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: textgen-webui-process
+  Name: textgen-webui server.py
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.args
+    Value: server.py
+    Reliability: medium
+    Platform: all
+    Notes: Corroborate with cwd under text-generation-webui/
+  - Rank: 2
+    Field: process.args
+    Value: start_linux.sh
+    Reliability: medium
+    Platform: linux
+  - Rank: 3
+    Field: file.path
+    Value: user_data/mcp.json
+    Reliability: low
+    Platform: all
+    Notes: MCP stdio servers loaded when present
+  FalsePositiveGuidance: server.py name is generic — pair with text-generation-webui
+    install path or Gradio port 7860.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: C
+  LastVerified: '2026-07-19'
+  Source: text-generation-webui start_linux.sh + server.py
+  EmpiricalNotes: Removed Ollama-template server.py serve/run commands and fake process.name
+    textgen. start_linux.sh forwards flags to one_click.py/server.py; --listen and
+    --api are server.py flags. oobabooga clone with server.py at ~/text-generation-webui
+    (2026-07-19 full install pass).
+Artifacts:
+  Disk:
+  - Path: user_data/settings.yaml
+    Notes: Saved UI settings
+  - Path: user_data/mcp.json
+    Notes: MCP stdio server definitions (when enabled)
+  - Path: user_data/tools/
+    Notes: User tool-calling extensions
+  Network:
+  - Domains:
+    - 127.0.0.1
+    Description: Gradio web UI (default port 7860 via --listen-port)
+    Ports:
+    - 7860
+  - Domains:
+    - 127.0.0.1
+    Description: OpenAI-compatible API (--api; default port 5000, env OPENEDAI_PORT)
+    Ports:
+    - 5000
+  - Domains:
+    - huggingface.co
+    Description: Model downloads
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/oobabooga/text-generation-webui
+  Title: GitHub repository
+- Link: https://github.com/oobabooga/text-generation-webui/wiki/12-%E2%80%90-OpenAI-API
+  Title: OpenAI-compatible API documentation
+Uuid: 6f723822-22e6-5aeb-adbb-b6a39b7020b1
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: start_linux.sh and server.py reviewed 2026-07-19; removed nonexistent pip
+    package and template drift commands.

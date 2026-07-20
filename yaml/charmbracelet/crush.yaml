@@ -1,0 +1,163 @@
+Name: Charmbracelet Crush
+Id: crush
+Category: cli_agent
+Vendor: Charmbracelet
+Description: Glamorous terminal AI coding agent. Multi-model LLM switching, session-based
+  context, LSP integration. Distributed cross-platform (macOS, Linux, Windows, BSDs,
+  Android) via Homebrew tap, npm (@charmland/crush), Go install, scoop, winget, and
+  Arch AUR.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - crush
+  - crush.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://github.com/charmbracelet/crush
+  OfficialUrl: https://charmbracelet-crush.mintlify.app/
+  CliExecutable: crush
+  Framework: go_cli
+  InstallationPaths: []
+  ContextFiles:
+  - .crush/
+  - ~/.config/crush/
+  ConfigDirs:
+    macOS: ~/.config/crush/
+    Linux: ~/.config/crush/
+    Windows: '%APPDATA%\crush\'
+  Packages:
+    npm:
+    - '@charmland/crush'
+    winget:
+    - Charmbracelet.Crush
+    brew:
+    - charm/charm/crush
+Commands:
+- Command: crush
+  Description: Interactive Crush agent session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: crush run "explain this repository"
+  Description: One-shot Crush prompt via run subcommand
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: crush --yolo
+  Description: Charm Crush interactive session with YOLO auto-approve (global flag)
+  Category: Bypass
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+- Command: crush run "apply dependency upgrades without approval prompts"
+  Description: Headless crush run (provider-dependent tool approvals)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+- Command: crush mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: crush mcp add registers attacker-controlled filesystem MCP server on
+    host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: crush-attribution
+  Name: crush attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: crush
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: crush --help v0.62.x; charmbracelet-crush.mintlify.app
+  EmpiricalNotes: Windows ARM64 empirically verified 2026-04-25 via npm @charmland/crush
+    (not @charmbracelet). Native Go binary node_modules/@charmland/crush/bin/crush.exe
+    (~74 MB, NotSigned). Headless mode uses crush run; --yolo is interactive-only.
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Description: BYOK to OpenAI, Anthropic, Groq, Ollama, etc.
+    Domains: []
+    Notes: (provider-dependent)
+  ConfigFiles:
+  - Path: .crush/
+    Notes: Project data directory (--data-dir override)
+  - Path: ~/.config/crush/
+    Notes: Global config root
+  - Path: ~/.config/crush/config.json
+    Notes: MCP server configuration
+  - Path: .crush/config.json
+    Notes: MCP server configuration
+  MCP:
+  - Path: ~/.config/crush/config.json
+    Notes: MCP server configuration
+  - Path: .crush/config.json
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://github.com/charmbracelet/crush
+  Title: Crush GitHub repository
+- Link: https://charmbracelet-crush.mintlify.app/
+  Title: Crush product site / docs
+Uuid: c0d23687-769e-51dc-9675-76991e29466f
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - http
+    ConfigPaths:
+    - ~/.config/crush/config.json
+    - .crush/config.json
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  - official_source
+  Notes: npm package is @charmland/crush. crush run for headless; crush --yolo for
+    interactive auto-approve only.

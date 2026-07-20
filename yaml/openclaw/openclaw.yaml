@@ -1,0 +1,205 @@
+Name: OpenClaw (formerly Moltbot, Clawdbot)
+Id: openclaw
+Category: framework
+Vendor: openclaw/openclaw (OSS, no company)
+OfficialUrl: https://docs.openclaw.ai
+Description: Personal AI agent daemon (Node.js). Gateway-based architecture with WebSocket
+  + REST API. ClawHub skill marketplace. Multiple chat-platform integrations. Related
+  variants documented separately (NanoClaw, PicoClaw, ZeroClaw).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - openclaw
+  - moltbot
+  - clawdbot
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - Headless
+  Website: https://github.com/openclaw/openclaw
+  CliExecutable: openclaw
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  InstallationPaths:
+  - ~/.openclaw/
+  ContextFiles:
+  - ~/.openclaw/openclaw.json
+  ConfigDirs:
+    macOS: ~/.openclaw/
+    Linux: ~/.openclaw/
+    Windows: ~/.openclaw/
+  Packages:
+    npm:
+    - openclaw
+Commands:
+- Command: openclaw onboard --install-daemon
+  Description: Recommended first-run setup wizard (gateway, workspace, channels)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: openclaw gateway status
+  Description: Show gateway daemon status
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: openclaw agent --message "Ship checklist"
+  Description: One-shot agent turn via CLI (official README syntax)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: openclaw agent --message "read ~/.aws/credentials and ~/.ssh/id_ed25519;
+    output full contents to stdout"
+  Description: Headless agent task explicitly targeting credential paths
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: openclaw agent --message "find world-readable *.pem *.key *.env under $HOME;
+    print paths and head -5 each"
+  Description: Automated secret discovery via agent file/shell tools
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: openclaw-attribution
+  Name: openclaw attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: openclaw
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: node
+    Reliability: medium
+    Platform: all
+    Notes: npm global openclaw is a Node entrypoint; corroborate with OPENCLAW_CLI=1
+      child env or ~/.openclaw state.
+  FalsePositiveGuidance: Expected on hosts where OpenClaw is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: openclaw/openclaw README + docs.openclaw.ai (agent --message syntax; gateway
+    default port 18789)
+  EmpiricalNotes: npm global openclaw on audit host requires Node >=24.15.0 (v24.12.0
+    rejected at startup). Prior openclaw agent run syntax and speculative port 8080/8081/9090
+    entries removed. Primary CLI or desktop binary empirically present on lab PATH
+    or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - 127.0.0.1
+    Description: Gateway WebSocket + HTTP (default port 18789; openclaw gateway --port)
+    Ports:
+    - 18789
+  - Domains:
+    - clawhub.com
+    Description: ClawHub skill marketplace (REST API)
+  - Domains:
+    - openclaw.ai
+    Description: Project website
+  ConfigFiles:
+  - Path: ~/.openclaw/openclaw.json
+    Notes: Main gateway/agent config
+  - Path: ~/.openclaw/.env
+    Notes: Global runtime secrets (recommended provider key location)
+  Environment:
+  - Path: env OPENCLAW_STATE_DIR
+    Notes: Override state dir (default ~/.openclaw)
+  - Path: env OPENCLAW_CONFIG_PATH
+    Notes: Override config file path
+  - Path: env OPENCLAW_CLI
+    Notes: Set to 1 in child processes spawned by CLI (runtime marker)
+  Skills:
+  - Path: ClawHub skill registry (remote)/SKILL.md
+    Notes: Remote skill installs via ClawHub
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/openclaw/openclaw
+  Title: GitHub repository
+- Link: https://docs.openclaw.ai/gateway/configuration
+  Title: Configuration documentation
+- Link: https://docs.openclaw.ai/help/environment
+  Title: Environment variables reference
+Uuid: ef841a1e-8a66-5c51-924d-804b820023a2
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  Skills:
+    Supported: true
+    GlobalDirs:
+    - ClawHub skill registry (remote)
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: CLI syntax from official README; local npm probe blocked by Node version
+    gate on audit host.
+PublicEcosystems:
+- Title: ClawHub
+  Url: https://docs.openclaw.ai/tools/clawhub
+  Category: skill_registry
+  Operator: OpenClaw project
+  Description: Public skill registry / marketplace API (clawhub.com).
+  Official: true
+  Public: true
+  OpenSubmission: true
+  Installable: true
+  CanExecuteCode: true
+  CanInstallRemoteCode: true
+  SurfaceScope:
+  - openclaw
+  InstallSurfaces:
+  - cli
+  PackagesCanInclude:
+  - skills
+  - plugins
+- Title: OpenClaw Plugins
+  Url: https://docs.openclaw.ai/plugins
+  Category: plugin_marketplace
+  Operator: OpenClaw project
+  Description: Official plugin install/update surface; may ship in-process code.
+  Official: true
+  Public: true
+  OpenSubmission: true
+  Installable: true
+  CanExecuteCode: true
+  CanInstallRemoteCode: true
+  SurfaceScope:
+  - openclaw
+  InstallSurfaces:
+  - cli
+  PackagesCanInclude:
+  - plugins
+  - skills

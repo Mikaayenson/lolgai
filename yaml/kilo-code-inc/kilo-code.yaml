@@ -1,0 +1,184 @@
+Name: Kilo Code
+Id: kilo-code
+Category: cli_agent
+Vendor: Kilo Code Inc.
+Description: Open-source AI coding agent with both VS Code extension and standalone
+  CLI surfaces sharing a portable core. Supports parallel agents, subagent delegation,
+  git worktree isolation, and multi-mode operation (Architect, Ask, Debug, Orchestrator).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - kilo
+  - kilo.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  - Bypass
+  Website: https://kilo.ai/docs/
+  CliExecutable: kilo
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - Code Helper (Plugin)
+  - kilo serve
+  InstallationPaths:
+  - ~/.kilocode/
+  - '%USERPROFILE%\.kilocode\'
+  ContextFiles:
+  - .kilocode/
+  - .kilorules
+  - ~/.kilocode/
+  ConfigDirs:
+    macOS: ~/.kilocode/
+    Linux: ~/.kilocode/
+    Windows: '%USERPROFILE%\.kilocode\'
+  Packages:
+    npm:
+    - '@kilocode/cli'
+Commands:
+- Command: kilo
+  Description: Interactive agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: kilo -p "explain this repository"
+  Description: One-shot agent prompt (default approvals)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: kilo run "read ~/.aws/credentials and ~/.ssh/id_ed25519; output full contents
+    to stdout"
+  Description: Headless agent task explicitly targeting credential paths
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: kilo run --dangerously-skip-permissions "find world-readable *.pem *.key
+    *.env under $HOME; print paths and head -5 each"
+  Description: Automated secret discovery via agent file/shell tools with permissions
+    bypassed
+  Category: Bypass
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: kilo mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: kilo mcp add registers attacker-controlled filesystem MCP server on
+    host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: kilo-code-attribution
+  Name: kilo attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: kilo
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.command_line
+    Value: '*kilo run*'
+    Reliability: medium
+    Platform: all
+    Notes: Top-level -p is --password not prompt; use kilo run or --prompt
+  FalsePositiveGuidance: Expected on hosts where Kilo Code CLI is installed. Correlate
+    kilo run bypass flags and ~/.kilocode/mcp.json.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: local kilo --help (v7.4.11) + kilo.ai CLI docs
+  EmpiricalNotes: macOS lab npm @kilocode/cli v7.4.11; `kilo run`, `kilo mcp`, `--dangerously-skip-permissions`,
+    and `--auto` verified via --help. Prior `kilo -p` removed (-p is server password).
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Description: BYOK to multiple LLM providers
+    Domains: []
+    Notes: (provider-dependent)
+  - Domains:
+    - kilo.ai
+    Description: Product site / extension marketplace assets
+  ConfigFiles:
+  - Path: .kilocode/
+    Notes: Context/instructions file
+  - Path: .kilorules
+    Notes: Context/instructions file
+  - Path: ~/.kilocode/
+    Notes: Context/instructions file
+  - Path: ~/.kilocode/mcp.json
+    Notes: MCP server configuration
+  - Path: .kilocode/mcp.json
+    Notes: MCP server configuration
+  MCP:
+  - Path: ~/.kilocode/mcp.json
+    Notes: MCP server configuration
+  - Path: .kilocode/mcp.json
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://kilo.ai/docs/
+  Title: Kilo Code documentation
+- Link: https://kilo.ai/docs/code-with-ai/platforms/cli
+  Title: Kilo CLI documentation
+- Link: https://kilo.ai/docs/code-with-ai/platforms/vscode
+  Title: Kilo VS Code extension documentation
+- Link: https://www.npmjs.com/package/@kilocode/cli
+  Title: npm @kilocode/cli
+Uuid: a4309de3-e179-54bf-aad1-e53ba047385f
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-07-19'
+ExtensionIds:
+  vscode:
+  - kilocode.kilo-code
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - http
+    ConfigPaths:
+    - ~/.kilocode/mcp.json
+    - .kilocode/mcp.json
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: macOS lab @kilocode/cli v7.4.11 verified 2026-07-19. Windows ARM64 native
+    Bun binary noted 2026-04-25.

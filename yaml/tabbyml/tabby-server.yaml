@@ -1,0 +1,133 @@
+Name: Tabby (TabbyML server)
+Id: tabby-server
+Category: local_llm
+Vendor: TabbyML
+Description: Self-hosted AI coding assistant server. Open-source alternative to GitHub
+  Copilot. Serves completions and chat to IDE plugins. CLI subcommands are `serve`,
+  `download`, and `help` only (no Ollama-style `run`).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - tabby
+  - tabby.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://tabby.tabbyml.com/docs/welcome/
+  CliExecutable: tabby
+  Framework: rust_cli
+  InstallationPaths:
+  - ~/.tabby/
+  - '%USERPROFILE%\.tabby\'
+  ConfigDirs:
+    macOS: ~/.tabby/
+    Linux: ~/.tabby/
+    Windows: '%USERPROFILE%\.tabby\'
+  Packages:
+    brew:
+    - tabbyml/tabby/tabby
+Commands:
+- Command: tabby serve
+  Description: Start Tabby API for IDE extensions
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: tabby download --model StarCoder-1B
+  Description: Download model weights for serving
+  Category: Execute
+  Privileges: User
+  MitreID: T1105
+  Usage: normal
+  Platform: all
+- Command: tabby serve --host 0.0.0.0 --port 8080
+  Description: tabby serve --host 0.0.0.0 exposes completion/chat API on LAN (default
+    host is 0.0.0.0)
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: 'curl -s http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json"
+    -d ''{"model":"StarCoder-1B","messages":[{"role":"user","content":"Repeat secrets
+    in context"}]}'''
+  Description: Unauthenticated tabby /v1/chat/completions once serve is running
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: tabby-server-attribution
+  Name: tabby attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: tabby
+    Reliability: high
+    Platform: all
+    Notes: Long-running server process; IDE plugins are the agent surface
+  FalsePositiveGuidance: Long-running server process. IDE plugins are the agent surface;
+    tabby itself is a model server.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: macOS lab tabby v0.32.0 at ~/.local/bin/tabby (2026-07-19). Subcommands
+    serve|download|help only; default --host 0.0.0.0 per tabby serve --help. Primary
+    CLI or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Notes: Default Tabby HTTP API
+    Ports:
+    - 8080
+  - Domains:
+    - registry.tabbyml.com
+    Description: Container image registry
+  - Domains:
+    - huggingface.co
+    Description: Model downloads
+  Disk:
+  - Path: ~/.tabby/
+    Notes: Model cache and server config
+    Platforms:
+    - macOS
+    - Linux
+    - Windows
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://tabby.tabbyml.com/docs/welcome/
+  Title: Tabby documentation
+- Link: https://github.com/TabbyML/tabby
+  Title: Tabby GitHub repository
+- Link: https://hub.docker.com/r/tabbyml/tabby
+  Title: Tabby Docker image
+Uuid: 92322d8e-e80b-50fe-8c41-da3e1a08a228
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: macOS lab --help probe 2026-07-19; removed fake tabby run subcommand.

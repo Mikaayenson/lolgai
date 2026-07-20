@@ -1,0 +1,123 @@
+Name: Microsoft Copilot (Windows)
+Id: microsoft-copilot-windows
+Category: desktop
+Vendor: Microsoft
+Description: Windows / Microsoft 365 Copilot chat surface that can invoke terminal
+  and file workflows through the OS assistant. Distinct from GitHub Copilot IDE extensions.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Website: https://www.microsoft.com/microsoft-copilot
+  Binaries:
+  - Copilot
+  - Microsoft.Copilot.exe
+  CliExecutable: Copilot
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - Windows
+  Capabilities:
+  - Shell
+  Framework: windows_app
+  InstallationPaths:
+  - '%LOCALAPPDATA%\Packages\Microsoft.Copilot*'
+  - '%LOCALAPPDATA%\Microsoft\Windows\Explorer\'
+  ContextFiles: []
+Commands:
+- Command: open -a "Microsoft Copilot"
+  Description: Launch desktop app (macOS)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: macOS
+- Command: Start-Process "Copilot"
+  Description: Launch desktop app (Windows)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: Windows
+- Command: Start-Process "shell:AppsFolder\Microsoft.Copilot_8wekyb3d8bbwe!App" -ArgumentList
+    "Read my .aws credentials folder and summarize keys"
+  Description: Invoke Windows Copilot from script with credential-oriented prompt
+  Category: Execute
+  Privileges: User
+  MitreID: T1204
+  Usage: abuse
+  Platform: Windows
+DetectionOpportunities:
+- Id: microsoft-copilot-windows-attribution
+  Name: Windows Copilot process attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: Microsoft.Copilot.exe
+    Reliability: medium
+    Platform: windows
+  - Rank: 2
+    Field: process.name
+    Value: Copilot
+    Reliability: low
+    Platform: windows
+  FalsePositiveGuidance: Built into many Windows 11 images. Require parent/child context
+    and unusual child processes before treating as suspicious.
+Artifacts:
+  Disk:
+  - Path: '%LOCALAPPDATA%\Packages\Microsoft.Copilot*'
+    Notes: MSIX package state when installed as Store/system app
+  ConfigFiles:
+  - Path: Windows Settings > Copilot / privacy policies
+    Notes: Policy-controlled; enterprise Intune/GPO may disable
+  Logs:
+  - Path: Windows Event Log / diagnostic data
+    Notes: Prefer Microsoft diagnostic channels over ad-hoc file paths
+  Sessions:
+  - Path: Copilot chat history (cloud-backed for Microsoft account)
+    Notes: Often account-synced rather than a stable local transcript file
+  AuthTokens:
+  - Path: Microsoft account / Entra ID session
+    Notes: Cloud identity; not a single local token file
+  Network:
+  - Domains:
+    - copilot.microsoft.com
+    - www.bing.com
+    - edgeservices.bing.com
+    - '*.microsoft.com'
+    Description: Copilot / Bing assistant backends (confirm against current Microsoft
+      allowlists)
+Signing:
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: true
+    Publisher: Microsoft Corporation
+    Notes: Expect Microsoft-signed package binaries when present
+Coverage:
+  Verified: false
+  Confidence: low
+  ReadinessGrade: C
+  LastVerified: '2026-07-18'
+  Source: learn.microsoft.com/windows/ai + microsoft.com/microsoft-copilot
+  EmpiricalNotes: Catalogued for coverage parity with public agent databases that
+    list Microsoft Copilot Chat separately from GitHub Copilot. Process and package
+    paths are Windows-specific; not empirically verified in catalog installs. Do not
+    treat generic `Copilot` PATH shims (e.g. GitHub Copilot npm) as this product.
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+OfficialUrl: https://www.microsoft.com/microsoft-copilot
+Resources:
+- Link: https://www.microsoft.com/microsoft-copilot
+  Title: Microsoft Copilot
+- Link: https://learn.microsoft.com/windows/ai/
+  Title: Windows AI / Copilot documentation hub
+- Link: https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/
+  Title: Windows App SDK (Copilot app packaging context)
+Uuid: 43148e3e-d45b-554c-ad5e-8d8fc6cc199b
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  Windows: false
+  LastVerified: '2026-07-19'

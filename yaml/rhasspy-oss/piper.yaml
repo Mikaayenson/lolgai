@@ -1,0 +1,112 @@
+Name: Piper TTS
+Id: piper
+Category: speech
+Vendor: rhasspy (OSS)
+Description: Fast local neural TTS (`piper-tts` PyPI wrapper around ONNX piper binary).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - piper
+  - piper.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://github.com/rhasspy/piper
+  OfficialUrl: https://pypi.org/project/piper-tts/
+  CliExecutable: piper
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  ConfigDirs:
+    macOS: ~/.local/share/piper/
+    Linux: ~/.local/share/piper/
+    Windows: '%LOCALAPPDATA%\\piper\\'
+  Packages:
+    pip:
+    - piper-tts
+Commands:
+- Command: piper --help
+  Description: Show speech CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: echo "$(cat ~/.aws/credentials 2>/dev/null | head -c 200)" | piper -m en_US-lessac-medium
+    -f /tmp/leak.wav
+  Description: TTS encodes stolen credential snippet into audio (side-channel staging)
+  Category: Execute
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: piper-attribution
+  Name: piper attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: piper
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: python
+    Reliability: medium
+    Platform: all
+    Notes: piper-tts console script is a Python wrapper
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: piper-tts PyPI + local piper --help
+  EmpiricalNotes: 'CLI flags are -m MODEL -f OUTPUT (--model/--output_file accepted
+    as aliases). piper-tts installs a Python console script. Lab uv run piper --help
+    2026-07-19. Removed invented ~/.piper/ ConfigDirs — use --data-dir or ~/.local/share/piper
+    for models. VerificationLevel demoted to documented (2026-07-18 audit: thin empirical
+    evidence). Primary CLI or desktop binary empirically present on lab PATH or documented
+    install footprint (2026-07-19 revalidation).'
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/rhasspy/piper
+  Title: Primary documentation
+- Link: https://pypi.org/project/piper-tts/
+  Title: PyPI piper-tts
+Uuid: 34610440-4872-54dc-8342-818fe46ae778
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Artifacts:
+  Disk:
+  - Path: ~/.local/share/piper/
+    Notes: Default ONNX voice models when --data-dir not specified (Linux/macOS)
+  - Path: '%LOCALAPPDATA%\\piper\\'
+    Notes: Default model cache (Windows)
+    Platform: Windows
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: Fixed abuse recipe CLI flags; added model cache artifact paths.

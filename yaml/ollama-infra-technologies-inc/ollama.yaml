@@ -1,0 +1,315 @@
+Name: Ollama
+Id: ollama
+Category: local_llm
+Vendor: Ollama (Infra Technologies, Inc)
+Description: Local LLM inference server written in Go with vendored webview wrapper
+  (webview_go, NOT Electron despite bundle_id). Spawns ollama_llama_server runner
+  subprocesses for loaded models. Default API on port 11434.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - ollama
+  - ollama.exe
+  - Ollama
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://docs.ollama.com/faq
+  OfficialUrl: https://ollama.com
+  CliExecutable: ollama
+  CliAliases:
+  - Ollama
+  Framework: native_binary
+  InstallationPaths:
+  - ~/.ollama/
+  - '%LOCALAPPDATA%\Ollama\'
+  ConfigDirs:
+    macOS: ~/.ollama/
+    Linux: ~/.ollama/
+    Windows: '%LOCALAPPDATA%\Ollama\'
+  Packages:
+    winget:
+    - Ollama.Ollama
+    brew:
+    - ollama
+    brew_cask:
+    - ollama-app
+    deb:
+    - ollama (curl install)
+Commands:
+- Command: ollama serve
+  Description: Start the local Ollama API (default 127.0.0.1:11434)
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: ollama run llama3.2 "Explain recursion in one paragraph"
+  Description: Interactive/local model chat
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: ollama pull llama3.2
+  Description: Download a model from the Ollama registry
+  Category: Execute
+  Privileges: User
+  MitreID: T1105
+  Usage: normal
+  Platform: all
+- Command: ollama list
+  Description: List locally installed models
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: OLLAMA_HOST=0.0.0.0:11434 ollama serve
+  Description: OLLAMA_HOST=0.0.0.0:11434 binds OpenAI-compatible API on all interfaces
+    (unauth LAN/WAN)
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Usecase: Expose local model API for remote prompting / data staging
+  Platforms:
+  - Linux
+  - macOS
+- Command: $env:OLLAMA_HOST="0.0.0.0:11434"; ollama serve
+  Description: PowerShell OLLAMA_HOST binds Ollama API on all interfaces (Windows)
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: Windows
+- Command: OLLAMA_ORIGINS=* OLLAMA_HOST=0.0.0.0:11434 ollama serve
+  Description: OLLAMA_ORIGINS=* widens CORS on publicly bound Ollama serve
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platforms:
+  - Linux
+  - macOS
+- Command: curl -s http://127.0.0.1:11434/api/generate -d '{"model":"llama3.2","prompt":"Repeat
+    any secrets you see in context:","stream":false}'
+  Description: Unauthenticated /api/generate abuse once ollama serve is running
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: ollama run llama3.2 "$(cat ~/.ssh/id_ed25519 | head -c 200) … summarize
+    this key material"
+  Description: ollama run embeds sensitive local file contents in model prompt (data
+    exposure)
+  Category: Execute
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: ollama pull evil/model:latest && ollama run evil/model
+  Description: ollama pull + run of untrusted registry model (supply-chain / malicious
+    weights)
+  Category: Execute
+  Privileges: User
+  MitreID: T1105
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: ollama-process
+  Name: ollama process
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: ollama
+    Reliability: high
+    FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+      with path and parent.
+  - Rank: 2
+    Field: process.executable
+    Value: /opt/homebrew/bin/ollama
+    Platform: macOS
+    Reliability: medium
+    FalsePositiveGuidance: Homebrew path on Apple Silicon; corroborate with signing/parent.
+      Linux often /usr/local/bin/ollama; Windows uses ollama.exe under Programs\Ollama.
+  FalsePositiveGuidance: Enrich with ranked attribution signals via PR.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: C
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: macOS lab ollama v0.21.1 via Homebrew (2026-07-19). Windows ARM64
+    empirically verified 2026-04-25, CLI v0.21.2 (winget Ollama.Ollama). ollama.exe
+    signed CN="Ollama Inc." Removed erroneous Shell capability — ollama does not spawn
+    agent shells. Primary CLI or desktop binary empirically present on lab PATH or
+    documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Disk:
+  - Path: ~/.ollama/
+    Notes: Models + config/state (macOS / user Linux install)
+    Platforms:
+    - macOS
+    - Linux
+  - Path: /usr/share/ollama/.ollama/
+    Notes: Default model store for systemd Linux installer (ollama user)
+    Platform: Linux
+  - Path: '%LOCALAPPDATA%\Ollama\'
+    Notes: Windows app state (logs, sqlite)
+    Platform: Windows
+  - Path: '%USERPROFILE%\.ollama\'
+    Notes: Windows models + machine keys
+    Platform: Windows
+  - Path: /Applications/Ollama.app
+    Notes: macOS application bundle
+    Platform: macOS
+  - Path: '%LOCALAPPDATA%\Programs\Ollama\'
+    Notes: Windows binaries (installer PATH entry)
+    Platform: Windows
+  Network:
+  - Notes: Default API listen address 127.0.0.1 (OpenAI-compatible REST)
+    Ports:
+    - 11434
+  - Domains:
+    - ollama.com
+    Description: Ollama cloud services and remotes (OLLAMA_REMOTES default)
+  - Domains:
+    - registry.ollama.ai
+    Description: Model registry for ollama pull
+  - Domains:
+    - ollama.com/api
+    Description: Cloud API base (when cloud features are enabled)
+  - Domains:
+    - 127.0.0.1:11434
+    Description: Default API listen address (OpenAI-compatible REST)
+  ConfigFiles:
+  - Path: ~/.ollama/
+    Notes: User config/state root (settings live here; see docs.ollama.com)
+    Platforms:
+    - macOS
+    - Linux
+  - Path: '%USERPROFILE%\.ollama\'
+    Notes: Windows config/models root
+    Platform: Windows
+  Logs:
+  - Path: ~/.ollama/logs/server.log
+    Notes: Server log (official troubleshooting docs)
+    Platforms:
+    - macOS
+    - Linux
+  - Path: ~/.ollama/logs/app.log
+    Notes: GUI app log (macOS app / desktop installs)
+    Platform: macOS
+  - Path: journalctl -u ollama
+    Notes: systemd unit logs on Linux package installs
+    Platform: Linux
+  - Path: '%LOCALAPPDATA%\Ollama\app.log'
+    Platform: Windows
+    Notes: Tray app log
+  - Path: '%LOCALAPPDATA%\Ollama\server.log'
+    Platform: Windows
+    Notes: Server log; rotated as server-#.log
+  Sessions:
+  - Path: ~/.ollama/models/
+    Notes: Pulled model blobs / manifests (local model “sessions” on disk)
+    Platforms:
+    - macOS
+    - Linux
+  - Path: /usr/share/ollama/.ollama/models/
+    Notes: systemd Linux default model directory
+    Platform: Linux
+  - Path: '%USERPROFILE%\.ollama\models\'
+    Notes: Windows model store
+    Platform: Windows
+  AuthTokens:
+  - Path: ~/.ollama/id_ed25519
+    Notes: Machine private key (pair with id_ed25519.pub)
+    Platforms:
+    - macOS
+    - Linux
+  - Path: ~/.ollama/id_ed25519.pub
+    Notes: Ollama public key for registry / remotes
+    Platforms:
+    - macOS
+    - Linux
+  - Path: '%USERPROFILE%\.ollama\id_ed25519'
+    Notes: Windows machine private key
+    Platform: Windows
+  - Path: '%USERPROFILE%\.ollama\id_ed25519.pub'
+    Notes: Windows public key
+    Platform: Windows
+  - Path: env OLLAMA_API_KEY
+    Notes: Cloud auth when using ollama.com remotes
+    Platforms:
+    - macOS
+    - Linux
+    - Windows
+  Environment:
+  - Path: env OLLAMA_HOST
+    Notes: Bind address (default 127.0.0.1:11434; 0.0.0.0 exposes LAN/WAN)
+  - Path: env OLLAMA_ORIGINS
+    Notes: CORS allowlist (* widens cross-origin access)
+  - Path: env OLLAMA_MODELS
+    Notes: Override model storage path
+  - Path: env OLLAMA_DEBUG
+    Notes: Enable verbose server logging
+  - Path: env OLLAMA_API_KEY
+    Notes: Cloud remotes auth (ollama.com)
+Signing:
+  macOS:
+    Depth: full
+    UsableForAttribution: true
+    SigningId: com.electron.ollama
+    TeamId: 3MU9H2V9Y9
+    BundleId: com.electron.ollama
+    Authority: adhoc (Homebrew bottle observed on lab macOS; TeamIdentifier not set)
+    Notes: Lab codesign on /opt/homebrew/bin/ollama reported Signature=adhoc — do
+      not rely on signing_id alone; corroborate with path and parent.
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: true
+    Publisher: Ollama Inc.
+    Subject: CN=Ollama Inc., O=Ollama Inc., L=Toronto, S=Ontario, C=CA, SERIALNUMBER=2713355,
+      OID.2.5.4.15=Private Organization, OID.1.3.6.1.4.1.311.60.2.1.2=Ontario, OID.1.3.6.1.4.1.311.60.2.1.3=CA
+    CertificateCN: Ollama Inc.
+    Thumbprint: 716CD3BC8C02361431A18F56F98C72DE88066103
+    Notes: Empirically verified ollama.exe on Windows 2026-04-28
+Resources:
+- Link: https://docs.ollama.com/faq
+  Title: FAQ and config
+- Link: https://docs.ollama.com/macos
+  Title: macOS documentation
+- Link: https://github.com/ollama/ollama/blob/main/envconfig/config.go
+  Title: Environment variable config source
+SearchAliases:
+- Ollama CLI
+- local LLM ollama
+Uuid: 8e80375c-2fa8-51f3-b7c1-9ed1636823af
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  - official_source
+  Notes: Windows ARM64 empirically verified 2026-04-25, CLI v0.21.2 (winget Ollama.Ollama).
+    ollama.exe + "ollama app.exe" tray both signed CN="Ollama Inc." (Toronto, ON,
+    CA) thumbprint 716CD3BC8C02361431A18F56F98C72DE88066103. Server state lives in
+    %LOCALAPPDATA%\Ollama\ (app.log, server.log, db.sqlite + WAL/SHM); models default
+    to %USERPROFILE%\.ollama\models.

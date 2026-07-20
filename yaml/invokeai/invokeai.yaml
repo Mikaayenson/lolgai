@@ -1,0 +1,127 @@
+Name: InvokeAI
+Id: invokeai
+Category: image_gen
+Vendor: InvokeAI
+Description: Creative image generation platform. CLI entrypoints include `invokeai`
+  (installer) and `invokeai-web` (web UI server).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - invokeai
+  - invokeai.exe
+  - invokeai-web
+  - invokeai-web.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://invoke.ai/
+  CliExecutable: invokeai-web
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths:
+  - ~/.invokeai/
+  ConfigDirs:
+    macOS: ~/.invokeai/
+    Linux: ~/.invokeai/
+    Windows: '%USERPROFILE%\\.invokeai\\'
+  Packages:
+    pip:
+    - invokeai
+Commands:
+- Command: invokeai-web
+  Description: Start InvokeAI web UI server (default 127.0.0.1:9090)
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: INVOKEAI_HOST=0.0.0.0 INVOKEAI_PORT=9090 invokeai-web
+  Description: InvokeAI web UI public bind via env (no --host/--port CLI in v4+)
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: invokeai-attribution
+  Name: invokeai attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: invokeai-web
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.name
+    Value: invokeai
+    Reliability: medium
+    Platform: all
+  - Rank: 3
+    Field: process.parent.name
+    Value: invokeai-web
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: invoke.ai configuration docs + PyPI invokeai
+  EmpiricalNotes: invokeai-web accepts --root/--config only; host/port via invokeai.yaml
+    or INVOKEAI_HOST/INVOKEAI_PORT env (invoke.ai configuration docs). No lab binary
+    on audit host (2026-07-19). Primary CLI or desktop binary empirically present
+    on lab PATH or documented install footprint (2026-07-19 revalidation).
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://invoke.ai/
+  Title: InvokeAI documentation
+- Link: https://invoke.ai/configuration/invokeai-yaml/
+  Title: invokeai.yaml configuration reference
+- Link: https://pypi.org/project/invokeai/
+  Title: PyPI invokeai
+OfficialUrl: https://invoke.ai/
+Uuid: 8589a196-0ae7-5520-aef5-4b16c79f7f15
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-17'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: invokeai-web host/port from official configuration docs; deepen with lab
+    signing when installed.
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.invokeai/invokeai.yaml
+    Notes: Primary runtime config (INVOKEAI_ROOT); host defaults 127.0.0.1:9090
+  Disk:
+  - Path: ~/.invokeai/
+    Notes: Default INVOKEAI_ROOT (models, outputs, config)
+  Network:
+  - Domains:
+    - localhost
+    Description: Default web UI/API bind
+    Ports:
+    - 9090

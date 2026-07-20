@@ -1,0 +1,134 @@
+Name: Google Jules Tools (CLI)
+Id: google-jules-tools
+Category: cli_agent
+Vendor: Google
+Description: Command-line companion for Google's async coding agent Jules. TUI dashboard,
+  remote session management, and repo-level operations. Authenticates with Google
+  account; sessions execute on Google's cloud infrastructure (low local endpoint footprint
+  beyond the CLI itself).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - jules
+  - jules.exe
+  Agentic: true
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://jules.google/docs/cli/reference/
+  CliExecutable: jules
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  InstallationPaths:
+  - ~/.jules/
+  - '%USERPROFILE%\.jules\'
+  ContextFiles:
+  - .jules/
+  - ~/.jules/
+  ConfigDirs:
+    macOS: ~/.jules/
+    Linux: ~/.jules/
+    Windows: '%USERPROFILE%\.jules\'
+  Packages:
+    npm:
+    - '@google/jules'
+Commands:
+- Command: jules
+  Description: Interactive agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: jules -p "explain this repository"
+  Description: One-shot agent prompt (default approvals)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: jules remote new --repo . --session "read ~/.aws/credentials and open a
+    PR summarizing every secret found"
+  Description: Google Jules remote agent with repo access tasked to hunt credential
+    files
+  Category: Headless
+  Privileges: User
+  MitreID: T1102
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: google-jules-tools-attribution
+  Name: jules attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: jules
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.command_line
+    Value: '*jules remote new*'
+    Reliability: medium
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where Jules CLI is installed. Correlate
+    with jules.google network and ~/.jules/ cache after login.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: local jules --help (v0.1.42) + jules.google CLI reference
+  EmpiricalNotes: macOS lab npm @google/jules v0.1.42; `jules version` works (not
+    `--version`). Subcommands new/remote/teleport/login. Prior `jules -p` and `jules
+    remote run` removed as hallucinated. Primary CLI or desktop binary empirically
+    present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - jules.google
+    Description: Jules service
+  - Domains:
+    - '*.googleapis.com'
+    Description: Google identity and backend
+  ConfigFiles:
+  - Path: ~/.jules/
+    Notes: Jules cache/config (lab observed ~/.jules/cache/)
+  - Path: .jules/
+    Notes: Project-scoped Jules context
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://jules.google/docs/cli/reference/
+  Title: Jules Tools CLI reference
+- Link: https://developers.googleblog.com/en/meet-jules-tools-a-command-line-companion-for-googles-async-coding-agent
+  Title: Google Developers Blog announcement
+- Link: https://www.npmjs.com/package/@google/jules
+  Title: npm @google/jules
+Uuid: a69dda93-630f-5992-ae09-3f488b8d400e
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: macOS lab v0.1.42 verified 2026-07-19 via jules --help and jules version.
+    Windows ARM64 npm install noted 2026-04-25.

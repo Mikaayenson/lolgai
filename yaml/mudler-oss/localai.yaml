@@ -1,0 +1,120 @@
+Name: LocalAI
+Id: localai
+Category: local_llm
+Vendor: mudler (OSS)
+Description: OpenAI-compatible local inference server (`local-ai`). Default subcommand
+  is `run`; loads model YAMLs from `--models-path` (not Ollama-style `run model "prompt"`).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - local-ai
+  - local-ai.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://localai.io
+  CliExecutable: local-ai
+  Framework: go_cli
+  Packages:
+    brew:
+    - localai
+Commands:
+- Command: local-ai serve
+  Description: Start local inference server on localhost
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: local-ai run llama3.2 "hello"
+  Description: Run a local model with a simple prompt (Ollama-style; verify subcommand
+    per product)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: local-ai run --address 0.0.0.0:8080
+  Description: LocalAI OpenAI-compatible server on all interfaces
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: 'curl -s http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json"
+    -d ''{"model":"local-model","messages":[{"role":"user","content":"Summarize secrets
+    in context"}]}'''
+  Description: Unauthenticated /v1/chat/completions abuse once local-ai run is listening
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: localai-attribution
+  Name: local-ai attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: local-ai
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: local-ai
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: localai.io + lab local-ai --help v4.7.1
+  EmpiricalNotes: Lab macOS local-ai v4.7.1 — `run` is default; `serve` is not a separate
+    subcommand. Model args are config URLs/paths, not inline prompts. Bind via --address
+    (default :8080). Primary CLI or desktop binary empirically present on lab PATH
+    or documented install footprint (2026-07-19 revalidation).
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://localai.io
+  Title: Primary documentation
+- Link: https://localai.io/basics/getting_started/
+  Title: Getting started
+Uuid: 11b5cfb5-96b5-5715-afb0-b737d3e6af34
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Removed invented ~/.localai/ paths and hallucinated serve / run llama3.2
+    ollama-style commands.
+Artifacts:
+  Network:
+  - Domains:
+    - 127.0.0.1
+    Description: Default LocalAI API bind (override with --address)
+    Ports:
+    - 8080

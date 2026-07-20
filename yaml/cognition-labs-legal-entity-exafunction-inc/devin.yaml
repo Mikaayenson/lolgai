@@ -1,0 +1,221 @@
+Name: Devin
+Id: devin
+Category: cli_agent
+Vendor: 'Cognition Labs (legal entity: Exafunction, Inc.)'
+Description: Autonomous AI software engineer. Originally cloud-only; now also ships a local CLI ('Devin for Terminal') and
+  an ACP server. Local CLI is a single statically-linked Rust binary (~110 MB) signed by Exafunction, Inc. (Team ID 83Z2LHX6XW).
+  Cognition acquired Windsurf in July 2025; Devin CLI subprocesses still spawn the Windsurf shell wrapper.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - devin
+  - devin.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://docs.devin.ai/get-started/devin-intro
+  CliExecutable: devin
+  Framework: rust_cli
+  InstallationPaths:
+  - ~/.config/devin/
+  - '%APPDATA%\devin\'
+  ContextFiles:
+  - .devin/skills/
+  - .agents/skills/
+  - ~/.config/devin/skills/
+  - ~/.agents/skills/
+  - .cursorrules
+  - .cursor/rules/*.md
+  - .windsurf/rules/*.md
+  ConfigDirs:
+    macOS: ~/.config/devin/
+    Linux: ~/.config/devin/
+    Windows: '%APPDATA%\devin\'
+Commands:
+- Command: devin
+  Description: Interactive agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: devin -p "explain this repository"
+  Description: One-shot print-mode prompt (-p/--print for non-interactive)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: devin mcp list
+  Description: List configured MCP servers
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: devin -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; output full contents to stdout"
+  Description: Headless print-mode agent task explicitly targeting credential paths
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: devin -p "find world-readable *.pem *.key *.env under $HOME; print paths and head -5 each"
+  Description: Automated secret discovery via headless print-mode agent tools
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: devin mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem / $HOME
+  Description: devin mcp add registers attacker filesystem MCP server
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: devin-attribution
+  Name: devin attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: devin
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.code_signature.team_id
+    Value: 83Z2LHX6XW
+    Reliability: high
+    Platform: macos
+  - Rank: 3
+    Field: process.code_signature.subject_name
+    Value: Exafunction, Inc.
+    Reliability: high
+    Platform: windows
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: A
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: Empirically verified on macOS arm64 + Windows 11 ARM64 (2026-04-26). Devin for Terminal CLI installed and
+    inspected; signed by Exafunction, Inc. (Team ID 83Z2LHX6XW). sh v1.9.1 inventory. exe. Authenticode Valid; publisher Exafunction,
+    Inc. Primary CLI or desktop binary empirically present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - app.devin.ai
+    Description: Primary web interface
+  - Domains:
+    - devin.ai
+    Description: Main domain
+  - Domains:
+    - cli.devin.ai
+    Description: CLI install + auth + telemetry
+  - Domains:
+    - static.devin.ai
+    Description: CLI binary CDN (Windows PowerShell installer)
+  - Domains:
+    - api.devin.ai
+    Description: Devin API endpoint
+  - Domains:
+    - mcp.devin.ai
+    Description: Devin MCP server (Streamable HTTP)
+  - Domains:
+    - mcp.deepwiki.com
+    Description: DeepWiki MCP server
+  - Domains:
+    - cli.devinenterprise.com
+    Description: Enterprise CLI install fallback
+  - Domains:
+    - static.windsurf.com
+    Description: Windsurf CLI fallback (post-Cognition acquisition)
+  - Domains:
+    - cli.windsurf.com
+    Description: Windsurf CLI namespace re-use
+  ConfigFiles:
+  - Path: .devin/skills/
+    Notes: Context/instructions file
+  - Path: .agents/skills/
+    Notes: Context/instructions file
+  - Path: ~/.config/devin/skills/
+    Notes: Context/instructions file
+  - Path: ~/.agents/skills/
+    Notes: Context/instructions file
+  - Path: .cursorrules
+    Notes: Context/instructions file
+  - Path: .cursor/rules/*.md
+    Notes: Context/instructions file
+  - Path: .windsurf/rules/*.md
+    Notes: Context/instructions file
+  Skills:
+  - Path: .devin/skills/SKILL.md
+    Notes: Skills (workspaceDir)
+  - Path: ~/.config/devin/skills/SKILL.md
+    Notes: Skills (globalDir)
+  - Path: .agents/skills/SKILL.md
+    Notes: Skills (altWorkspaceDir)
+Signing:
+  macOS:
+    Depth: full
+    UsableForAttribution: true
+    SigningId: devin
+    TeamId: 83Z2LHX6XW
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: true
+    Publisher: Exafunction, Inc.
+    Notes: Empirically verified 2026-07-18 on CN="Exafunction, Inc.", O="Exafunction, Inc.", L=Mountain View, S=California,
+      C=US
+Resources:
+- Link: https://docs.devin.ai/get-started/devin-intro
+  Title: Official documentation
+- Link: https://docs.devin.ai/work-with-devin/devin-mcp
+  Title: Devin MCP server
+- Link: https://cli.devin.ai/install.sh
+  Title: macOS / Linux CLI installer
+- Link: https://static.devin.ai/cli/setup.ps1
+  Title: Windows CLI installer
+Uuid: 95c58044-2d90-568d-8eb7-0b6af7270d3e
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-05-05'
+ExtensionIds:
+  vscode:
+  - cognition.devin
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - streamable_http
+  Skills:
+    Supported: true
+    WorkspaceDirs:
+    - .devin/skills/
+    GlobalDirs:
+    - ~/.config/devin/skills/
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Empirically verified on macOS arm64 + Windows 11 ARM64 (2026-04-26). Devin for Terminal CLI installed and inspected;
+    signed by Exafunction, Inc. (Team ID 83Z2LHX6XW).

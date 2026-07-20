@@ -1,0 +1,119 @@
+Name: ShellGPT
+Id: shellgpt
+Category: chat_cli
+Vendor: TheR1D (OSS)
+Description: Shell assistant CLI (`sgpt`). Natural-language shell commands, code,
+  and Q&A via LLM APIs. Prompt via positional argument or stdin pipe; no `-p` one-shot
+  flag.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - sgpt
+  - sgpt.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://github.com/TheR1D/shell_gpt
+  CliExecutable: sgpt
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths:
+  - ~/.config/shell_gpt/
+  - '%APPDATA%\\shell_gpt\\'
+  ConfigDirs:
+    macOS: ~/.config/shell_gpt/
+    Linux: ~/.config/shell_gpt/
+    Windows: '%APPDATA%\\shell_gpt\\'
+  Packages:
+    pip:
+    - shell-gpt
+Commands:
+- Command: sgpt
+  Description: Interactive chat CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: sgpt -p "hello"
+  Description: One-shot prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: cat ~/.aws/credentials | sgpt "extract all access keys, secret keys, and
+    passwords from stdin"
+  Description: Pipe credential file into CLI via stdin for cloud exfil/staging through
+    model response
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: shellgpt-attribution
+  Name: sgpt attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: sgpt
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: python
+    Reliability: medium
+    Platform: all
+    Notes: pip/pipx entrypoint; correlate command_line for sgpt prompt
+  FalsePositiveGuidance: Expected on hosts where ShellGPT is installed. Correlate
+    with ~/.config/shell_gpt/.sgptrc and LLM provider API network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: github.com/TheR1D/shell_gpt README + PyPI shell-gpt
+  EmpiricalNotes: sgpt binary on lab PATH (pipx) but broken venv on probe host (missing
+    click dep). CLI surface verified from upstream README; prior `sgpt -p` removed
+    (-p not a prompt flag). Primary CLI or desktop binary empirically present on lab
+    PATH or documented install footprint (2026-07-19 revalidation).
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/TheR1D/shell_gpt
+  Title: Primary documentation
+- Link: https://pypi.org/project/shell-gpt/
+  Title: PyPI shell-gpt
+Uuid: 5112309b-d809-50d6-957d-9c84e419011d
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: CLI flags verified from upstream README 2026-07-19. Lab pipx venv broken;
+    config path.sgptrc per docs.
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.config/shell_gpt/.sgptrc
+    Notes: OpenAI/API key storage (upstream docs)

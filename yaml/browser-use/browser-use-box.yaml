@@ -1,0 +1,169 @@
+Name: Browser Use Box (BUX)
+Id: browser-use-box
+Category: cli_agent
+Vendor: Browser Use
+Description: Self-hosted 24/7 Claude Code + Browser Use stack (browser-use/bux). Installed
+  via install.sh on Ubuntu 22.04+ VPS; runs as dedicated `bux` user with systemd units
+  bux-browser-keeper and bux-ttyd. Wraps Claude Code CLI with persistent Chromium
+  (browser-harness) and optional Telegram control. Not a macOS/Windows desktop app
+  — Linux VPS only.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - bux-browser-keeper
+  - bux-ttyd
+  - claude
+  - chromium
+  - python3
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - Linux
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  - Bypass
+  Website: https://github.com/browser-use/bux
+  OfficialUrl: https://browser-use.com/bux
+  CliExecutable: claude
+  Framework: python_daemon
+  HelperProcesses:
+  - python
+  - python3
+  - node
+  InstallationPaths:
+  - /home/bux/
+  ContextFiles:
+  - /home/bux/.claude/
+  - /home/bux/skills/
+  - agent/CLAUDE.md
+  ConfigDirs:
+    Linux: /home/bux/
+Commands:
+- Command: curl -fsSL https://raw.githubusercontent.com/browser-use/bux/main/install.sh
+    | sudo BROWSER_USE_API_KEY=bu_xxx bash
+  Description: One-line BUX installer on Ubuntu 22.04+ VPS
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: Linux
+- Command: systemctl is-active bux-browser-keeper bux-ttyd
+  Description: Verify BUX systemd services after install
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: Linux
+- Command: claude --dangerously-skip-permissions -p "use Browser Use to dump session
+    cookies to /tmp/c.json"
+  Description: Claude Code driving Browser Use for session theft
+  Category: Bypass
+  Privileges: User
+  MitreID: T1185
+  Usage: abuse
+  Platform: Linux
+- Command: claude mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: claude mcp add registers attacker-controlled filesystem MCP server
+    on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: browser-use-box-attribution
+  Name: BUX browser-keeper attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.args
+    Value: '*bux-browser-keeper*'
+    Reliability: medium
+    Platform: linux
+    Notes: systemd unit name in service logs/args
+  - Rank: 2
+    Field: process.parent.name
+    Value: claude
+    Reliability: high
+    Platform: linux
+    Notes: Claude Code is the primary agent loop inside BUX
+  - Rank: 3
+    Field: process.working_directory
+    Value: /home/bux
+    Reliability: medium
+    Platform: linux
+  FalsePositiveGuidance: Expected on self-hosted BUX VPS deployments. Corroborate
+    with /home/bux paths and cloud.browser-use.com network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: github.com/browser-use/bux README + install.md
+  EmpiricalNotes: Linux-only BUX stack (systemd bux-browser-keeper, bux-ttyd, /home/bux/).
+    Not lab-installed; paths and services from official README only (2026-07-19).
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+Artifacts:
+  Disk:
+  - Path: /home/bux/
+    Notes: BUX dedicated user home (Ubuntu VPS deploy)
+    Platform: Linux
+  Network:
+  - Domains:
+    - cloud.browser-use.com
+    Description: Browser Use Cloud API / persistent browser profiles
+  - Domains:
+    - browser-use.com
+    Description: Project site / BUX landing
+  - Domains:
+    - api.anthropic.com
+    Description: Claude Code backend (when logged in)
+  ConfigFiles:
+  - Path: /home/bux/.claude/
+    Notes: Claude Code config and session state
+  - Path: /home/bux/skills/
+    Notes: BUX skill policies loaded by Claude
+  - Path: agent/CLAUDE.md
+    Notes: Custom agent context (redeployed by install.sh)
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/browser-use/bux
+  Title: BUX repository
+- Link: https://github.com/browser-use/bux/blob/main/install.md
+  Title: BUX install guide
+- Link: https://browser-use.com/bux
+  Title: Browser Use Box landing page
+- Link: https://airq.adversa.ai/agent/browser-use-box
+  Title: AIRQ security profile
+Uuid: 1d0303ca-afac-5967-943f-9e1cfbd3e0e0
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Notes: Via Claude Code MCP inside the BUX agent loop
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - third_party
+  Notes: Service names and paths from browser-use/bux README; not empirically installed
+    on lab host.

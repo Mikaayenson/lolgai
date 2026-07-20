@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lolgai.local/schema/signing-platform.schema.json",
+  "title": "LOL-GAI Signing (per OS)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "Depth": {
+      "type": "string",
+      "enum": ["none", "partial", "adhoc", "shared_host", "full", "authenticode"]
+    },
+    "UsableForAttribution": { "type": "boolean" },
+    "SharedHostProduct": { "type": "string" },
+    "SigningId": { "type": "string", "description": "macOS codesign signing identifier" },
+    "TeamId": { "type": "string", "description": "Apple Team ID (10 chars)" },
+    "BundleId": { "type": "string" },
+    "Authority": { "type": "string", "description": "macOS codesign authority chain summary" },
+    "Publisher": { "type": "string", "description": "Windows Authenticode publisher display name" },
+    "Subject": { "type": "string", "description": "Windows Authenticode certificate subject DN" },
+    "CertificateCN": { "type": "string", "description": "Common Name extracted from Authenticode subject" },
+    "Thumbprint": {
+      "type": "string",
+      "pattern": "^[0-9A-Fa-f]{40}$",
+      "description": "Windows Authenticode cert SHA-1 thumbprint (40 hex chars)"
+    },
+    "Issuer": { "type": "string", "description": "Windows Authenticode certificate issuer DN" },
+    "Notes": { "type": "string" }
+  }
+}

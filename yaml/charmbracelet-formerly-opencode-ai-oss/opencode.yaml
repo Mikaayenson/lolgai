@@ -1,0 +1,191 @@
+Name: OpenCode
+Id: opencode
+Category: cli_agent
+Vendor: Anomaly Innovations (opencode.ai)
+Description: Open-source AI coding agent TUI from anomalyco/opencode (active; distinct
+  from Charm Crush). Distributed via npm (opencode-ai), Homebrew (anomalyco/tap/opencode),
+  and curl installer. Supports MCP host, headless `opencode run`, and experimental
+  server mode. Legacy opencode-ai/opencode repo is archived.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - opencode
+  - opencode.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://opencode.ai/docs/
+  OfficialUrl: https://opencode.ai/
+  CliExecutable: opencode
+  Framework: native_binary
+  InstallationPaths:
+  - ~/.local/share/opencode/
+  - ~/.config/opencode/
+  - $HOME/.opencode.json
+  - '%USERPROFILE%\.opencode.json'
+  ContextFiles:
+  - AGENTS.md
+  - CLAUDE.md
+  - .opencode.json
+  - ~/.config/opencode/AGENTS.md
+  - ~/.claude/CLAUDE.md
+  ConfigDirs:
+    macOS: ~/.config/opencode/
+    Linux: ~/.config/opencode/
+    Windows: '%APPDATA%\\opencode\\'
+  Packages:
+    npm:
+    - opencode-ai
+    brew:
+    - anomalyco/tap/opencode
+    curl:
+    - https://opencode.ai/install
+Commands:
+- Command: opencode
+  Description: Interactive agent TUI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: opencode run "explain this repository"
+  Description: Headless one-shot agent run via run subcommand
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: opencode --prompt "refactor auth module"
+  Description: Non-interactive prompt on root command (alternative to opencode run)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: opencode run "read ~/.aws/credentials and summarize keys"
+  Description: Headless opencode run can ingest credential paths when permissions
+    allow
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: opencode mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: opencode mcp add registers attacker-controlled filesystem MCP server
+    on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: opencode-attribution
+  Name: opencode attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: opencode
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: A
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: Active project anomalyco/opencode (v1.1.25 local probe 2026-07-19).
+    Distinct from Charm Crush (crush binary). No `--yes` flag on `opencode run`; headless
+    abuse uses run/--prompt with host permission model. Windows ARM64 npm opencode-ai
+    signing previously captured (Anomaly Innovations). Primary CLI or desktop binary
+    empirically present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Disk:
+  - Path: $HOME/.opencode.json
+  - Path: '%USERPROFILE%\.opencode.json'
+  - Path: ~/.local/share/opencode/
+  Network:
+  - Domains:
+    - app.opencode.ai
+    Description: Web UI assets
+  - Domains:
+    - api.opencode.ai
+    Description: GitHub integration (opt-in)
+  - Domains:
+    - opncd.ai
+    Description: Session sharing (opt-in)
+  ConfigFiles:
+  - Path: AGENTS.md
+    Notes: Context/instructions file
+  - Path: CLAUDE.md
+    Notes: Context/instructions file
+  - Path: .opencode.json
+    Notes: Context/instructions file
+  - Path: ~/.config/opencode/AGENTS.md
+    Notes: Context/instructions file
+  - Path: ~/.claude/CLAUDE.md
+    Notes: Context/instructions file
+  - Path: .opencode.json under mcpServers key
+    Notes: MCP server configuration
+  Sessions:
+  - Path: ~/.local/share/opencode/
+    Notes: OpenCode session/state (docs-sourced)
+  MCP:
+  - Path: .opencode.json under mcpServers key
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: true
+    Publisher: Anomaly Innovations, Inc
+    CertificateCN: Anomaly Innovations, Inc
+    Thumbprint: B1CD0C09C4A98224F6A48C18642A1A41B12C4EA5
+    Notes: Empirically verified opencode.exe ARM64 npm opencode-ai 2026-04-25
+Resources:
+- Link: https://opencode.ai/docs/
+  Title: Official documentation
+- Link: https://github.com/anomalyco/opencode
+  Title: Active GitHub repository
+- Link: https://github.com/opencode-ai/opencode
+  Title: Archived predecessor repository
+- Link: https://github.com/charmbracelet/crush
+  Title: Related project (Crush — separate binary)
+Uuid: 1d3d929c-4f22-58ad-813b-4cc9c7591907
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - sse
+    ConfigPaths:
+    - .opencode.json under mcpServers key
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Active anomalyco/opencode verified locally (v1.1.25 --help/run --help). Crush
+    is a separate Charmbracelet product.

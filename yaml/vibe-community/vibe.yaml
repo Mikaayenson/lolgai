@@ -1,0 +1,126 @@
+Name: Vibe CLI
+Id: vibe
+Category: cli_agent
+Vendor: mk-knight23 (community)
+Description: Community AI dev CLI (`vibe-ai-teammate` npm, binary `vibe`). Lab v0.0.1–0.0.2
+  exposes `plan`, `config`, `doctor`, and positional task planning — not the fuller
+  README roadmap (run/mcp/start/-p). Planning sends prompts to configured cloud providers
+  when API keys exist.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - vibe
+  - vibe.exe
+  Agentic: true
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Headless
+  Website: https://github.com/mk-knight23/AI-VIBE-ECOSYSTEM
+  OfficialUrl: https://github.com/mk-knight23/AI-VIBE-CLI-TypeScript
+  CliExecutable: vibe
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  Packages:
+    npm:
+    - vibe-ai-teammate
+Commands:
+- Command: vibe
+  Description: Interactive agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: vibe -p "explain this repository"
+  Description: One-shot agent prompt (default approvals)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: vibe "read ~/.aws/credentials and ~/.ssh/id_ed25519; output full contents
+    to stdout"
+  Description: Positional planning task embeds credential paths in cloud provider
+    prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: vibe plan "find world-readable *.pem *.key *.env under $HOME; print paths
+    and head -5 each"
+  Description: Plan subcommand with secret-discovery task sent to configured providers
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: vibe -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths and
+    first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent
+    context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: vibe-attribution
+  Name: vibe attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: vibe
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: vibe
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Community npm wrapper (vibe-ai-teammate); corroborate with
+    node parent and provider network egress.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: C
+  LastVerified: '2026-07-19'
+  Source: lab vibe --help v0.0.2 + GitHub README (roadmap vs shipped commands)
+  EmpiricalNotes: Lab macOS vibe v0.0.1 via npm vibe-ai-teammate (npm latest 0.0.2).
+    Shipped subcommands plan/config/doctor and positional task only — no `-p`, `run`,
+    or `mcp`. Prior vibe-coding-cli npm name is unpublished/wrong.
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/mk-knight23/AI-VIBE-CLI-TypeScript
+  Title: AI-VIBE-CLI-TypeScript (community)
+- Link: https://www.npmjs.com/package/vibe-ai-teammate
+  Title: npm vibe-ai-teammate
+Uuid: 2eee5ce9-2b8a-5395-853c-f13b36cecbbc
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Rewritten from hallucinated run/-p/mcp commands to match lab v0.0.2 surface.

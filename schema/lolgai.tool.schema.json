@@ -1,0 +1,358 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lolgai.local/schema/lolgai.tool.schema.json",
+  "title": "LOL-GAI Tool",
+  "type": "object",
+  "required": ["Name", "Id", "Category", "Details"],
+  "additionalProperties": true,
+  "properties": {
+    "Name": { "type": "string", "minLength": 1 },
+    "Id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "Category": { "type": "string" },
+    "SearchAliases": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Optional alternate names for site search; omit when none are verified"
+    },
+    "Vendor": { "type": "string" },
+    "OfficialUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Optional override for the primary official project link (homepage, org repo, or docs). When omitted, Details.Website and Resources are used."
+    },
+    "Description": { "type": "string" },
+    "Author": { "type": "string" },
+    "Contributors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Additional catalog entry authors beyond Author"
+    },
+    "Uuid": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Stable catalog identity (survives Id slug renames). Generate once and persist."
+    },
+    "Created": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Date this catalog entry was first added (YYYY-MM-DD)"
+    },
+    "Updated": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Date this entry was last substantively verified or edited (YYYY-MM-DD)"
+    },
+    "LastModified": {
+      "type": "string",
+      "description": "Deprecated alias for Updated — prefer Updated"
+    },
+    "VerificationLevel": {
+      "type": "string",
+      "enum": ["unverified", "documented", "observed"],
+      "description": "unverified = stub/not checked; documented = official docs or --help; observed = lab/host evidence (paths, signing, binary)"
+    },
+    "Details": {
+      "type": "object",
+      "required": ["Binaries"],
+      "properties": {
+        "Website": { "type": "string" },
+        "OfficialUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Optional Details-level override for official project link (same precedence as root OfficialUrl after root field)"
+        },
+        "CliAliases": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Verified alternate CLI binary or command names (e.g. ds for deepseek, agent for Cursor). Omit .exe variants."
+        },
+        "Binaries": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "CliExecutable": { "type": "string" },
+        "Framework": { "type": "string" },
+        "Agentic": { "type": "boolean" },
+        "SpawnsShells": { "type": "boolean" },
+        "Privileges": { "type": "string" },
+        "SupportedOS": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "Capabilities": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "InstallationPaths": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "Packages": { "type": "object" },
+        "ConfigDirs": {
+          "type": "object",
+          "description": "Per-OS config roots (macOS, Linux, Windows)",
+          "additionalProperties": { "type": "string" }
+        },
+        "ContextFiles": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "Integrations": {
+      "type": "object",
+      "description": "Structured MCP / Skills / Hooks metadata",
+      "properties": {
+        "MCP": { "type": "object" },
+        "Skills": { "type": "object" },
+        "Hooks": { "type": "object" }
+      }
+    },
+    "PublicEcosystems": {
+      "type": "array",
+      "description": "Vendor-documented public install/share surfaces (agent hubs, MCP registries, plugin marketplaces, extension galleries). Separate from local on-disk skills under Integrations.",
+      "items": {
+        "type": "object",
+        "required": ["Title", "Url", "Category"],
+        "properties": {
+          "Title": { "type": "string", "minLength": 1 },
+          "Url": { "type": "string", "format": "uri" },
+          "Category": {
+            "type": "string",
+            "description": "Surface kind: skill_catalog, plugin_marketplace, mcp_registry, extension_gallery, agent_hub, etc."
+          },
+          "Operator": { "type": "string" },
+          "Description": { "type": "string" },
+          "Official": { "type": "boolean" },
+          "Public": { "type": "boolean" },
+          "OpenSubmission": { "type": "boolean" },
+          "Installable": { "type": "boolean" },
+          "CanExecuteCode": { "type": "boolean" },
+          "CanInstallRemoteCode": { "type": "boolean" },
+          "SurfaceScope": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "InstallSurfaces": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "PackagesCanInclude": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "SourceRepo": { "type": "string", "format": "uri" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "DataProvenance": {
+      "type": "object",
+      "properties": {
+        "SourceTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["official_doc", "official_source", "empirical", "third_party"]
+          }
+        },
+        "Notes": { "type": "string" }
+      }
+    },
+    "UndocumentedEmpirical": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["Label", "Source"],
+        "properties": {
+          "Label": { "type": "string" },
+          "Source": { "type": "string" },
+          "Notes": { "type": "string" }
+        }
+      }
+    },
+    "VerifiedPlatforms": {
+      "type": "object",
+      "properties": {
+        "macOS": { "type": "boolean" },
+        "Linux": { "type": "boolean" },
+        "Windows": { "type": "boolean" },
+        "LastVerified": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      }
+    },
+    "ExtensionIds": {
+      "type": "object",
+      "properties": {
+        "vscode": { "type": "array", "items": { "type": "string" } },
+        "jetbrains": { "type": "array", "items": { "type": "string" } },
+        "browser": { "type": "array" }
+      }
+    },
+    "CustomAgents": {
+      "type": "object",
+      "properties": {
+        "WorkspaceDirs": { "type": "array", "items": { "type": "string" } },
+        "GlobalDirs": { "type": "array", "items": { "type": "string" } },
+        "AgentFile": { "type": "string" }
+      }
+    },
+    "Commands": {
+      "type": "array",
+      "minItems": 1,
+      "description": "At least one command entry (Usage: normal required when present; Usage: abuse optional — omit when no honest dual-use beyond normal operation)",
+      "items": {
+        "type": "object",
+        "required": ["Command", "Description", "Usage"],
+        "properties": {
+          "Command": { "type": "string" },
+          "Description": { "type": "string" },
+          "Usecase": { "type": "string" },
+          "Usage": {
+            "type": "string",
+            "enum": ["normal", "abuse"],
+            "description": "normal = legitimate everyday usage; abuse = living-off-the-land / dual-use recipe shown separately in the UI"
+          },
+          "Category": { "type": "string" },
+          "Privileges": { "type": "string" },
+          "MitreID": { "type": "string" },
+          "OperatingSystem": { "type": "string" },
+          "Platform": {
+            "type": "string",
+            "description": "Optional single-OS scope: macOS, Linux, Windows, all, or lowercase variants"
+          },
+          "Platforms": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Optional multi-OS scope when a command applies to several platforms but not all"
+          },
+          "Tags": { "type": "object" }
+        }
+      }
+    },
+    "DetectionOpportunities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Id": { "type": "string" },
+          "Name": { "type": "string" },
+          "AbuseCategory": { "type": "string" },
+          "AttributionSignals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["Field", "Value"],
+              "properties": {
+                "Rank": { "type": "integer", "minimum": 1 },
+                "Field": { "type": "string", "minLength": 1 },
+                "Value": { "type": "string" },
+                "Reliability": { "type": "string" },
+                "Platform": {
+                  "type": "string",
+                  "description": "Optional single-OS scope: macOS, Linux, Windows, all, or lowercase variants"
+                },
+                "Platforms": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Optional multi-OS scope when a signal applies to several platforms but not all"
+                },
+                "Notes": { "type": "string" },
+                "FalsePositiveGuidance": { "type": "string" }
+              },
+              "additionalProperties": true
+            }
+          },
+          "CommandLinePatterns": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "FalsePositiveGuidance": { "type": "string" }
+        }
+      }
+    },
+    "Artifacts": {
+      "type": "object",
+      "properties": {
+        "Disk": { "type": "array" },
+        "ConfigFiles": { "type": "array" },
+        "Logs": { "type": "array" },
+        "Sessions": { "type": "array" },
+        "AuthTokens": { "type": "array" },
+        "Hooks": { "type": "array" },
+        "Skills": { "type": "array" },
+        "MCP": { "type": "array" },
+        "Environment": { "type": "array" },
+        "Network": { "type": "array" }
+      }
+    },
+    "Signing": {
+      "type": "object",
+      "description": "Per-OS code signature / publisher attribution. Populate only verified endpoint-observable fields.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "Depth": {
+            "type": "string",
+            "enum": ["none", "partial", "adhoc", "shared_host", "full", "authenticode"]
+          },
+          "UsableForAttribution": { "type": "boolean" },
+          "SharedHostProduct": { "type": "string" },
+          "SigningId": { "type": "string" },
+          "TeamId": { "type": "string" },
+          "BundleId": { "type": "string" },
+          "Authority": { "type": "string" },
+          "Publisher": { "type": "string" },
+          "Subject": { "type": "string" },
+          "CertificateCN": { "type": "string" },
+          "Thumbprint": { "type": "string", "pattern": "^[0-9A-Fa-f]{40}$" },
+          "Issuer": { "type": "string" },
+          "Notes": { "type": "string" }
+        }
+      }
+    },
+    "Coverage": {
+      "type": "object",
+      "properties": {
+        "Verified": { "type": "boolean" },
+        "Confidence": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "ReadinessGrade": { "type": "string" },
+        "LastVerified": { "type": "string" },
+        "Source": { "type": "string" },
+        "EmpiricalNotes": { "type": "string" }
+      }
+    },
+    "Resources": { "type": "array" },
+    "Surfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Id": { "type": "string" },
+          "Label": { "type": "string" },
+          "Description": { "type": "string" },
+          "Framework": { "type": "string" },
+          "Binaries": { "type": "array", "items": { "type": "string" } },
+          "CliExecutable": { "type": "string" },
+          "HelperProcesses": { "type": "array", "items": { "type": "string" } },
+          "SpawnsShells": { "type": "boolean" },
+          "Agentic": { "type": "boolean" },
+          "ConfigDirs": { "type": "object" },
+          "Signing": { "type": "object" },
+          "Integrations": { "type": "object" }
+        }
+      }
+    },
+    "EmpiricalNotes": { "type": "string" }
+  }
+}

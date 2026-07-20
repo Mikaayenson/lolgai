@@ -1,0 +1,134 @@
+Name: LibreChat
+Id: librechat
+Category: local_llm
+Vendor: danny-avila (OSS)
+Description: Self-hosted ChatGPT-style web UI. Primary install is Docker Compose (`docker
+  compose up -d`) with MongoDB, Meilisearch, and RAG sidecars. Source installs use
+  `npm run backend` / `npm run backend:dev` — there is no global `librechat` binary
+  and no Ollama-style CLI subcommands.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - docker
+  - docker-compose
+  - node
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://www.librechat.ai/
+  OfficialUrl: https://www.librechat.ai/
+  CliExecutable: docker
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+Commands:
+- Command: docker compose up -d
+  Description: Start LibreChat stack from cloned repo
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: npm run backend:dev
+  Description: Start LibreChat API in development mode from source
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: HOST=0.0.0.0 PORT=3080 npm run backend
+  Description: LibreChat backend bound on all interfaces exposes chat UI + API without
+    auth hardening
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: librechat-docker-compose
+  Name: LibreChat docker footprint
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.command_line
+    Value: docker compose up
+    Reliability: medium
+    Platform: all
+    Notes: Corroborate with registry.librechat.ai images or container_name LibreChat
+  - Rank: 2
+    Field: process.args
+    Value: api/server/index.js
+    Reliability: medium
+    Platform: all
+    Notes: Source install via npm run backend
+  - Rank: 3
+    Field: network.destination.port
+    Value: '3080'
+    Reliability: low
+    Platform: all
+    Notes: Default PORT in.env — shared with other apps
+  FalsePositiveGuidance: Docker compose is generic — pair with LibreChat image names,./.env
+    bind mount, or /api/ paths.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: LibreChat package.json scripts + docker-compose.yml
+  EmpiricalNotes: Removed invented ~/.librechat/ paths and Ollama-template npm serve
+    / llama3.2 commands. Abuse HOST=0.0.0.0 matches npm run backend script. Primary
+    CLI or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).
+Artifacts:
+  ConfigFiles:
+  - Path: .env
+    Notes: LibreChat compose and backend configuration (bind-mounted into container)
+  Disk:
+  - Path: ./data-node/
+    Notes: MongoDB data volume (compose)
+  - Path: ./uploads/
+    Notes: User uploads directory
+  - Path: ./logs/
+    Notes: Application logs
+  Network:
+  - Domains:
+    - 127.0.0.1
+    Description: Default web UI/API (PORT from.env, commonly 3080)
+    Ports:
+    - 3080
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://www.librechat.ai/
+  Title: Primary documentation
+- Link: https://github.com/danny-avila/LibreChat
+  Title: GitHub repository
+- Link: https://www.librechat.ai/docs/local/docker
+  Title: Docker installation guide
+Uuid: 77c20e68-c703-54d8-8d3d-b5c5ca421508
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: package.json scripts and docker-compose.yml verified 2026-07-19; no lab compose
+    run on audit host.

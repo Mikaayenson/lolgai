@@ -1,0 +1,136 @@
+Name: MCP Brave Search
+Id: mcp-server-brave-search
+Category: mcp
+Vendor: Anthropic / MCP
+Description: MCP server exposing Brave web search to AI agents over stdio. npm package
+  `@modelcontextprotocol/server-brave-search`; requires BRAVE_API_KEY. Configuration
+  lives on the MCP host agent (Cursor, Claude Code, Goose, etc.), not in a server-side
+  config dir.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - mcp-server-brave-search
+  - mcp-server-brave-search.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://github.com/modelcontextprotocol/servers
+  OfficialUrl: https://www.npmjs.com/package/@modelcontextprotocol/server-brave-search
+  CliExecutable: mcp-server-brave-search
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  InstallationPaths: []
+  Packages:
+    npm:
+    - '@modelcontextprotocol/server-brave-search'
+Commands:
+- Command: BRAVE_API_KEY="$KEY" mcp-server-brave-search
+  Description: Run Brave Search MCP server (stdio; exits if BRAVE_API_KEY missing)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: npx -y @modelcontextprotocol/server-brave-search
+  Description: Ephemeral npx launch (typical host registration pattern)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: BRAVE_API_KEY="$STOLEN_KEY" mcp-server-brave-search
+  Description: Run Brave Search MCP with a stolen/abused API key for agent web access
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: mcp-server-brave-search-attribution
+  Name: mcp-server-brave-search attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: mcp-server-brave-search
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.command_line
+    Value: '*server-brave-search*'
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected when an MCP host registers Brave Search. Corroborate
+    with host mcp.json and api.search.brave.com egress.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: npm @modelcontextprotocol/server-brave-search + local binary launch (2026-07-19)
+  EmpiricalNotes: 'Removed invented ~/.mcp-server-brave-search/ stubs. Server has
+    no --help; exits immediately if BRAVE_API_KEY missing. Lab macOS/Linux npm global
+    has mcp-server-brave-search bin (2026-07-19). VerificationLevel demoted to documented
+    (2026-07-18 audit: thin empirical evidence). Primary CLI or desktop binary empirically
+    present on lab PATH or documented install footprint (2026-07-19 revalidation).'
+Artifacts:
+  Environment:
+  - Path: env BRAVE_API_KEY
+    Notes: Brave Search API key (required; sensitive)
+  MCP:
+  - Path: Host ~/.cursor/mcp.json
+    Notes: Cursor MCP host registration (mcpServers block)
+  - Path: Host ~/.claude.json
+    Notes: Claude Code user MCP config (mcpServers key)
+  - Path: Host .cursor/mcp.json
+    Notes: Project-scoped Cursor MCP config
+  - Path: Host .mcp.json
+    Notes: Project-scoped Claude Code MCP config
+  Network:
+  - Domains:
+    - api.search.brave.com
+    Description: Brave Search API (when server handles tool calls)
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/modelcontextprotocol/servers
+  Title: MCP servers monorepo
+- Link: https://modelcontextprotocol.io/
+  Title: Model Context Protocol site
+- Link: https://www.npmjs.com/package/@modelcontextprotocol/server-brave-search
+  Title: npm @modelcontextprotocol/server-brave-search
+- Link: https://brave.com/search/api/
+  Title: Brave Search API
+Uuid: 94bbbbec-4fed-5c93-bb16-53d7ef51f3b7
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: server
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: npm bin verified locally 2026-07-19; BRAVE_API_KEY requirement observed at
+    startup.

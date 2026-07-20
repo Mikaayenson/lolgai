@@ -1,0 +1,119 @@
+Name: ExLlama
+Id: exllama
+Category: local_llm
+Vendor: turboderp (OSS)
+Description: ExLlama v1 GPTQ inference library (GitHub turboderp/exllama). PyPI `exllama`
+  is a library import — lab installer adds an `exllama` shim, not an Ollama-style
+  CLI. Inference UIs are repo scripts such as `webui/app.py` (Flask) run via python
+  from a cloned checkout.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - exllama
+  - exllama.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://github.com/turboderp/exllama
+  OfficialUrl: https://github.com/turboderp/exllama
+  CliExecutable: exllama
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths: []
+  Packages:
+    pip:
+    - exllama
+Commands:
+- Command: python -c "import exllama"
+  Description: Verify ExLlama library import (lab shim wraps this)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: python webui/app.py --host 0.0.0.0:7862
+  Description: ExLlama web UI public bind (IP:PORT syntax)
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: exllama-attribution
+  Name: exllama / python inference attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.command_line
+    Value: '*webui/app.py*'
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.name
+    Value: python
+    Reliability: medium
+    Platform: all
+    Notes: Primary runtime; correlate command_line with exllama module path or webui/app.py
+  - Rank: 3
+    Field: process.name
+    Value: exllama
+    Reliability: low
+    Platform: all
+    Notes: Lab installer shim only — not an upstream product binary
+  FalsePositiveGuidance: Expected on hosts running ExLlama inference scripts from
+    a repo checkout. Distinguish from textgen-webui / exllamav2 forks via path and
+    command_line.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: github.com/turboderp/exllama webui/app.py argparse + install-genai-tools
+    exllama shim
+  EmpiricalNotes: Removed hallucinated `exllama serve` / `exllama run` commands. Abuse
+    uses verified webui/app.py `--host IP:PORT` syntax (default sessions_dir ~/exllama_sessions/).
+    Lab Linux may show exllama import shim on PATH.
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/turboderp/exllama
+  Title: ExLlama repository
+- Link: https://github.com/turboderp/exllama/tree/master/webui
+  Title: ExLlama web UI scripts
+- Link: https://pypi.org/project/exllama/
+  Title: PyPI exllama (library)
+Uuid: 307fb0bd-efe6-5cd9-a89a-704bd59143f4
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Artifacts:
+  Disk:
+  - Path: ~/exllama_sessions/
+    Notes: Default ExLlama webui session dir (--sessions_dir default in webui/app.py)
+  Sessions:
+  - Path: ~/exllama_sessions/
+    Notes: Web UI session storage when webui/app.py is used
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: webui/app.py argparse verified from upstream main branch 2026-07-19.

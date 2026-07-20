@@ -1,0 +1,127 @@
+Name: llama.cpp (llama-server / llama-cli)
+Id: llama-cpp
+Category: local_llm
+Vendor: ggml-org (OSS)
+Description: C/C++ local LLM inference tools. llama-server runs an OpenAI-compatible
+  HTTP API (default port 8080). llama-cli is the interactive CLI. Repo at ggml-org/llama.cpp
+  (formerly ggerganov/llama.cpp).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - llama-server
+  - llama-cli
+  - llama-quantize
+  - llama-bench
+  - llama-tts
+  - llama-tokenize
+  - llama-perplexity
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md
+  OfficialUrl: https://github.com/ggml-org/llama.cpp
+  CliExecutable: llama-server
+  Framework: cpp_native
+  Packages:
+    brew:
+    - llama.cpp
+Commands:
+- Command: llama-server -m model.gguf
+  Description: Start local inference HTTP server (default 127.0.0.1:8080)
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: llama-cli -m model.gguf -p "hello"
+  Description: Local one-shot inference from shell
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: llama-server -m model.gguf --host 0.0.0.0 --port 8080
+  Description: Expose local GGUF model HTTP API on all interfaces
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: llama-cli -m model.gguf -p "summarize sensitive file contents"
+  Description: Interactive/local inference from shell
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: llama-cpp-process
+  Name: llama-server process
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: llama-server
+    Reliability: high
+    FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+      with path and parent.
+  - Rank: 2
+    Field: process.executable
+    Value: /opt/homebrew/bin/llama-server
+    Reliability: medium
+    FalsePositiveGuidance: Install path varies by package manager and OS; treat as
+      a strong hint, not a sole match.
+  FalsePositiveGuidance: Enrich with ranked attribution signals via PR.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: C
+  LastVerified: '2026-07-19'
+  Source: llama-server --help (brew llama.cpp); ggml-org server README
+  EmpiricalNotes: No serve/run subcommands — llama-server uses flag-style CLI (-m,
+    --host, --port). brew llama.cpp on macOS arm64. Primary CLI or desktop binary
+    empirically present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - 127.0.0.1
+    Description: Default API listen address
+    Ports:
+    - 8080
+  ConfigFiles:
+  - Path: env LLAMA_CACHE
+    Notes: Model cache directory (official env)
+  - Path: '**/*.gguf'
+    Notes: Model weight files
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md
+  Title: Server documentation
+- Link: https://github.com/ggml-org/llama.cpp
+  Title: GitHub repository
+Uuid: 0be1f330-121f-5314-9015-7649b496a0aa
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  - official_source
+  Notes: Removed generic serve/run subcommand templates; verified flag-style llama-server/llama-cli
+    per local --help.

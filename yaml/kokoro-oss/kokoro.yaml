@@ -1,0 +1,114 @@
+Name: Kokoro TTS
+Id: kokoro
+Category: speech
+Vendor: hexgrad (OSS)
+Description: Kokoro-82M neural text-to-speech. PyPI `kokoro` ships a `kokoro` CLI
+  (`-o` output WAV, `-t` text, `-i` input file) plus Python `KPipeline` API for local
+  offline synthesis.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - kokoro
+  - kokoro.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://github.com/hexgrad/kokoro
+  OfficialUrl: https://github.com/hexgrad/kokoro
+  CliExecutable: kokoro
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths: []
+  Packages:
+    pip:
+    - kokoro
+Commands:
+- Command: kokoro --help
+  Description: Show Kokoro TTS CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: kokoro -t "hello world" -o /tmp/hello.wav
+  Description: Synthesize speech to WAV from inline text
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: kokoro -t "$(head -c 300 ~/.aws/credentials 2>/dev/null)" -o /tmp/leak.wav
+  Description: Kokoro TTS encodes credential snippet from shell expansion into audio
+  Category: Execute
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: kokoro-attribution
+  Name: kokoro attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: kokoro
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: python
+    Reliability: medium
+    Platform: all
+    Notes: pip console_scripts shim
+  FalsePositiveGuidance: Expected on hosts running local TTS experiments. Corroborate
+    with espeak-ng dependency and HF model downloads.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: github.com/hexgrad/kokoro README + pip kokoro v0.9.4 --help
+  EmpiricalNotes: 'pip kokoro v0.9.4 --help on lab macOS arm64. Requires `-o` output
+    file; prior `~/.kokoro/` config paths removed as unverified. VerificationLevel
+    demoted to documented (2026-07-18 audit: thin empirical evidence). Primary CLI
+    or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).'
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/hexgrad/kokoro
+  Title: Primary documentation
+- Link: https://pypi.org/project/kokoro/
+  Title: PyPI kokoro
+Uuid: fbc3d59f-101d-547a-9208-8eecbc039381
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: PyPI console_scripts + --help v0.9.4 lab probe 2026-07-19.
+Artifacts:
+  Network:
+  - Domains:
+    - huggingface.co
+    Description: Kokoro-82M model weight downloads

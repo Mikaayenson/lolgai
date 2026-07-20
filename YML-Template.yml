@@ -1,0 +1,117 @@
+# YML-Template.yml — copy to yaml/<vendor>/<tool-id>.yaml
+Name: Example Tool
+Id: example-tool
+Category: cli_agent
+Vendor: Example Vendor
+Description: >
+  Short description of legitimate purpose and potential abuse.
+Author: Your GitHub handle or name
+# Optional: people who later improved this entry
+# Contributors:
+#   - alice
+#   - bob
+Uuid: ""  # stable identity — generate once (uuid5 from Id); survives Id renames
+Created: "YYYY-MM-DD"
+Updated: "YYYY-MM-DD"
+LastModified: "YYYY-MM-DD"  # deprecated alias; keep in sync with Updated
+VerificationLevel: unverified  # unverified | documented | observed
+
+# Optional: homepage / org repo / docs when Details.Website is a package mirror
+# OfficialUrl: https://github.com/example/example-tool
+Details:
+  Website: https://example.com/docs
+  Binaries: [example]
+  CliExecutable: example
+  # CliAliases: [ex]   # verified alternate invocations only
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS: [macOS, Linux, Windows]
+  Capabilities: [Shell, Headless]
+  InstallationPaths:
+    - ~/.example/
+  ContextFiles:
+    - EXAMPLE.md
+
+Commands:
+  # Usage: normal = everyday legitimate use; abuse = LOL / dual-use recipe (shown in separate UI boxes)
+  - Command: example --help
+    Description: Show CLI help (normal usage)
+    Usage: normal
+    Category: Execute
+    Privileges: User
+    OperatingSystem: Windows, Linux, macOS
+  - Command: example --yes -p "…"
+    Description: Example abuse or dual-use invocation
+    Usage: abuse
+    Usecase: Execute tools without approval
+    Category: Bypass
+    Privileges: User
+    OperatingSystem: Windows, Linux, macOS
+
+DetectionOpportunities:
+  - Id: example-parent-shell
+    Name: Example-spawned shell
+    AbuseCategory: execution
+    AttributionSignals:
+      - Rank: 1
+        Field: process.parent.name
+        Value: example
+        Reliability: high
+        Platform: all
+      - Rank: 2
+        Field: process.code_signature.signing_id
+        Value: com.example.tool
+        Reliability: high
+        Platform: macos
+    FalsePositiveGuidance: >
+      Expected on developer hosts with this tool installed.
+
+Artifacts:
+  Disk:
+    - Path: ~/.example/
+      Notes: Primary install / state directory
+  ConfigFiles:
+    - Path: ~/.example/config.json
+      Notes: User settings
+  Logs:
+    - Path: ~/.example/logs/
+      Notes: Client logs if present
+  Sessions:
+    - Path: ~/.example/sessions/
+      Notes: Conversation or project session state
+  AuthTokens:
+    - Path: ~/.example/credentials.json
+      Notes: API tokens or OAuth material (treat as sensitive)
+  Network:
+    - Domains: [api.example.com]
+      Ports: [443]
+      Description: Primary API
+
+Signing:
+  macOS:
+    Depth: full
+    UsableForAttribution: true
+    SigningId: com.example.tool
+    TeamId: ABCD123456
+    BundleId: com.example.tool
+    Authority: Developer ID Application: Example Inc (ABCD123456)
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: true
+    Publisher: Example Inc
+    Subject: 'CN=Example Inc, O=Example Inc, L=City, S=State, C=US'
+    CertificateCN: Example Inc
+    Thumbprint: ABCDEF0123456789ABCDEF0123456789ABCDEF0  # SHA-1 from lab sigcheck only
+    Issuer: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=DigiCert Inc, C=US
+    Notes: Endpoint-observable signer identity only — do not invent PE hashes
+
+Coverage:
+  Verified: false
+  Confidence: low
+  ReadinessGrade: C
+  LastVerified: "YYYY-MM-DD"
+
+Resources:
+  - Link: https://example.com/docs
+    Title: Official documentation

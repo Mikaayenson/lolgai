@@ -1,0 +1,137 @@
+Name: Plandex
+Id: plandex
+Category: cli_agent
+Vendor: Plandex
+Description: Multi-step coding CLI with plan/exec workflow. Install via plandex.ai/install.sh;
+  aliases `pdx`. Headless tasks use `plandex tell` (not `-p`). Self-hosted local mode
+  via Docker; Plandex Cloud winding down Oct 2025.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - plandex
+  - plandex.exe
+  - pdx
+  - pdx.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - Headless
+  Website: https://docs.plandex.ai/
+  OfficialUrl: https://github.com/plandex-ai/plandex
+  CliExecutable: plandex
+  Framework: go_cli
+  InstallationPaths:
+  - ~/.plandex/
+  ConfigDirs:
+    macOS: ~/.plandex/
+    Linux: ~/.plandex/
+    Windows: '%USERPROFILE%\.plandex\'
+Commands:
+- Command: plandex
+  Description: Interactive Plandex REPL in project directory
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: plandex tell "implement user auth"
+  Description: Send prompt for current plan
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: plandex new
+  Description: Create a new plan
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: plandex tell "read ~/.aws/credentials and ~/.ssh/id_ed25519; output full
+    contents to stdout"
+  Description: Headless agent task explicitly targeting credential paths
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: plandex tell "find world-readable *.pem *.key *.env under $HOME; print
+    paths and head -5 each"
+  Description: Automated secret discovery via agent file/shell tools
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: plandex-attribution
+  Name: plandex attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: plandex
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.name
+    Value: pdx
+    Reliability: high
+    Platform: all
+    Notes: Alias binary from same install
+  FalsePositiveGuidance: Expected on hosts where Plandex is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: plandex tell confirmed in upstream cobra CLI (plandex-ai/plandex).
+    No MCP integration found in repo. Removed fake `-p` flag and MCP capability. Linux
+    lab PATH probe 2026-07-19.
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://docs.plandex.ai/
+  Title: Plandex documentation
+- Link: https://github.com/plandex-ai/plandex
+  Title: GitHub repository
+- Link: https://docs.plandex.ai/install
+  Title: Install guide
+Uuid: 136cb427-96df-5d37-b185-ec5914b28960
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Upstream CLI source verified tell/new subcommands; MCP removed as unverified.
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.plandex/
+    Notes: Local config and plan state
+  - Path: env OPENROUTER_API_KEY
+    Notes: Default provider key for self-hosted/local mode
+  Network:
+  - Domains:
+    - openrouter.ai
+    Description: Default model provider when using OpenRouter key

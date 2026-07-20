@@ -1,0 +1,181 @@
+Name: VSCodium
+Id: vscodium
+Category: ide_agent
+Vendor: VSCodium (OSS community)
+Description: Community rebuild of Visual Studio Code from open-source, without Microsoft
+  telemetry or branding. Uses the Open VSX extension registry instead of the VS Code
+  Marketplace.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - VSCodium
+  - codium
+  - codium.exe
+  Agentic: false
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  Website: https://vscodium.com/
+  OfficialUrl: https://github.com/VSCodium/vscodium
+  CliExecutable: codium
+  Framework: electron
+  HelperProcesses:
+  - VSCodium Helper
+  - VSCodium Helper (Plugin)
+  - VSCodium Helper (GPU)
+  - VSCodium Helper (Renderer)
+  InstallationPaths:
+  - ~/Library/Application Support/VSCodium/
+  - ~/.config/VSCodium/
+  - '%APPDATA%\VSCodium\'
+  ConfigDirs:
+    macOS: ~/Library/Application Support/VSCodium/
+    Linux: ~/.config/VSCodium/
+    Windows: '%APPDATA%\VSCodium\'
+  Packages:
+    winget:
+    - VSCodium.VSCodium
+    brew_cask:
+    - vscodium
+    deb:
+    - codium (.deb from VSCodium releases)
+Commands:
+- Command: codium .
+  Description: Open project in IDE
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: codium --help
+  Description: Show IDE CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: codium --goto $HOME/.aws/credentials:1
+  Description: Open credential path in VSCodium from script
+  Category: Execute
+  Privileges: User
+  MitreID: T1204
+  Usage: abuse
+  Platform: all
+- Command: codium mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: codium mcp add registers attacker-controlled filesystem MCP server
+    on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: vscodium-attribution
+  Name: codium attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: VSCodium Helper (Plugin)
+    Reliability: medium
+    Platform: macos
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: vscodium.com + local `codium --help` v1.112.01907 (brew, macOS arm64, 2026-07-19)
+  EmpiricalNotes: Community OSS build — NotSigned on macOS/Windows (path/hash attribution).
+    macOS/Linux/Windows x64 lab installs via brew cask /.deb / winget. Open VSX replaces
+    Microsoft Marketplace. Primary CLI or desktop binary empirically present on lab
+    PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - open-vsx.org
+    Description: Extension marketplace (Open VSX; replaces Microsoft Marketplace)
+  ConfigFiles:
+  - Path: ~/Library/Application Support/VSCodium/User/mcp.json
+    Notes: MCP server configuration (macOS)
+    Platform: macOS
+  - Path: ~/.config/VSCodium/User/mcp.json
+    Notes: MCP server configuration (Linux)
+    Platform: Linux
+  - Path: '%APPDATA%\\VSCodium\\User\\mcp.json'
+    Notes: MCP server configuration (Windows)
+    Platform: Windows
+  - Path: .vscode/mcp.json
+    Notes: Workspace-scoped MCP server configuration
+  MCP:
+  - Path: ~/Library/Application Support/VSCodium/User/mcp.json
+    Notes: MCP server configuration (macOS)
+  - Path: ~/.config/VSCodium/User/mcp.json
+    Notes: MCP server configuration (Linux)
+  - Path: .vscode/mcp.json
+    Notes: Workspace-scoped MCP server configuration
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+    BundleId: com.vscodium
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://vscodium.com/
+  Title: Official website
+- Link: https://github.com/VSCodium/vscodium
+  Title: GitHub repository
+Uuid: fc76a739-6a2c-5823-abaf-c33748462478
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    ConfigPaths:
+    - ~/Library/Application Support/VSCodium/User/mcp.json
+    - ~/.config/VSCodium/User/mcp.json
+    - .vscode/mcp.json
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  - official_source
+  Notes: Windows ARM64 empirically verified 2026-04-25, v1.112.01907 (winget VSCodium.VSCodium).
+    NotSigned (expected - community OSS build); detection on Windows must rely on
+    path/hash, not Authenticode.
+PublicEcosystems:
+- Title: Open VSX Registry
+  Url: https://open-vsx.org/
+  Category: extension_gallery
+  Operator: Eclipse Foundation (Open VSX)
+  Description: VSCodium uses Open VSX instead of the Visual Studio Marketplace; adjacent
+    extension ecosystem, not a GenAI skills registry.
+  Official: true
+  Public: true
+  OpenSubmission: true
+  Installable: true
+  CanExecuteCode: true
+  CanInstallRemoteCode: true
+  InstallSurfaces:
+  - ide
+  PackagesCanInclude:
+  - extensions

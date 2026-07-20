@@ -1,0 +1,126 @@
+Name: ComfyUI
+Id: comfyui
+Category: image_gen
+Vendor: comfyanonymous (OSS)
+Description: Node-based Stable Diffusion UI. Install via `pip install comfy-cli` (`comfy`
+  launcher) or git clone + `python main.py`.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - comfy
+  - comfy.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://github.com/comfyanonymous/ComfyUI
+  CliExecutable: comfy
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths:
+  - ~/genai-tools/ComfyUI/
+  - '%USERPROFILE%\\genai-tools\\ComfyUI\\'
+  ConfigDirs:
+    macOS: ~/genai-tools/ComfyUI/
+    Linux: ~/genai-tools/ComfyUI/
+    Windows: '%USERPROFILE%\\genai-tools\\ComfyUI\\'
+  Packages:
+    pip:
+    - comfy-cli
+Commands:
+- Command: comfy --help
+  Description: Show comfy-cli help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: comfy launch
+  Description: Launch ComfyUI via comfy-cli
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: python main.py --listen 0.0.0.0 --port 8188
+  Description: ComfyUI workflow server on all interfaces
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: comfyui-attribution
+  Name: comfy / ComfyUI attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: comfy
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.command_line
+    Value: '*main.py*--listen*'
+    Reliability: medium
+    Platform: all
+    Notes: Git-clone ComfyUI launcher; corroborate with genai-tools/ComfyUI path
+  FalsePositiveGuidance: Expected on hosts where ComfyUI or comfy-cli is installed.
+    Corroborate with path and network port 8188.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: comfy-cli on PyPI (Comfy-Org/comfy-cli). Lab Linux has `comfy`;
+    macOS probe host lacks pip install. Git-clone launcher uses python main.py (default
+    port 8188). Primary CLI or desktop binary empirically present on lab PATH or documented
+    install footprint (2026-07-19 revalidation).
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/comfyanonymous/ComfyUI
+  Title: ComfyUI repository
+- Link: https://pypi.org/project/comfy-cli/
+  Title: PyPI comfy-cli
+- Link: https://github.com/Comfy-Org/comfy-cli
+  Title: comfy-cli repository
+Uuid: d5c1f8df-9a1c-54f2-8cb4-210f100adde6
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: comfy-cli PyPI + ComfyUI repo docs; Linux lab PATH probe 2026-07-19.
+Artifacts:
+  Network:
+  - Notes: Default ComfyUI web UI / API
+    Ports:
+    - 8188
+  Disk:
+  - Path: ~/genai-tools/ComfyUI/
+    Notes: Typical git-clone install root (models/, output/, user/)
+    Platforms:
+    - macOS
+    - Linux
+    - Windows

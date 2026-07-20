@@ -1,0 +1,115 @@
+Name: Supermaven
+Id: supermaven
+Category: ide_extension
+Vendor: Supermaven
+Description: Fast code completion VS Code extension with 1M-token Pro context window. Lightweight inline suggestions and chat
+  (OpenAI/Anthropic). Primarily completion-focused; agentic shell-spawning behavior is limited compared to full coding agents.
+  No standalone CLI — marketplace ID supermaven.supermaven is not a shell executable.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - Code Helper (Plugin)
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://supermaven.com/
+  Framework: vscode_extension
+  HelperProcesses:
+  - Code Helper (Plugin)
+  - Code Helper (Renderer)
+  InstallationPaths:
+  - ~/.vscode/extensions/supermaven.supermaven-*/
+  - '%USERPROFILE%\.vscode\extensions\supermaven.supermaven-*\'
+  ConfigDirs:
+    macOS: ~/.vscode/extensions/supermaven.supermaven-*/
+    Linux: ~/.vscode/extensions/supermaven.supermaven-*/
+    Windows: '%USERPROFILE%\.vscode\extensions\supermaven.supermaven-*\'
+Commands:
+- Command: Code Helper (Plugin) --help
+  Description: Show extension CLI help when a binary ships
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: '# completion extension — no standalone CLI; abuse is prompt/context injection in editor'
+  Description: Malicious repo context or pasted secrets sent to Supermaven backend via inline completion/chat
+  Category: Headless
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: supermaven-footprint
+  Name: Supermaven extension path / network
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: file.path
+    Value: '*supermaven.supermaven-*'
+    Reliability: medium
+    Platform: all
+    Notes: Extension install dir under ~/.vscode/extensions/ — not Code Helper alone
+  FalsePositiveGuidance: Shared VS Code extension host — corroborate with supermaven.supermaven-* path or *.supermaven.com
+    network
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: C
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: VS Code marketplace extension only; no verified standalone binary. Settings live in VS Code User/settings.json
+    (supermaven.* keys), not inside the extension install dir. Attribution via extension path and network, not process.name
+    supermaven.
+Artifacts:
+  Disk:
+  - Path: ~/.vscode/extensions/supermaven.supermaven-*/
+    Notes: Extension install directory (macOS / Linux)
+    Platforms:
+    - macOS
+    - Linux
+  - Path: '%USERPROFILE%\.vscode\extensions\supermaven.supermaven-*\'
+    Notes: Extension install directory (Windows)
+    Platform: Windows
+  Network:
+  - Domains:
+    - '*.supermaven.com'
+    Description: Supermaven completion / chat backend
+Signing:
+  macOS:
+    Depth: shared_host
+    UsableForAttribution: false
+    Notes: Runs inside VS Code Code Helper — not Supermaven-specific signing
+  Windows:
+    Depth: shared_host
+    UsableForAttribution: false
+    Notes: Runs inside VS Code Code Helper — not Supermaven-specific signing
+Resources:
+- Link: https://supermaven.com/
+  Title: Supermaven product site
+- Link: https://marketplace.visualstudio.com/items?itemName=supermaven.supermaven
+  Title: VS Code Marketplace listing
+Uuid: a22f791d-b902-5de7-941a-16b30bfedd0d
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-07-19'
+ExtensionIds:
+  vscode:
+  - supermaven.supermaven
+  jetbrains:
+  - com.supermaven.intellij
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Removed invented extension-dir settings.json artifacts; VS Code stores Supermaven prefs in User profile.

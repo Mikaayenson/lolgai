@@ -1,0 +1,197 @@
+Name: LM Studio
+Id: lm-studio
+Category: desktop
+Vendor: Element Labs
+Description: Electron-based local LLM inference desktop app. Exposes OpenAI and Anthropic-compatible
+  REST API on localhost:1234.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - LM Studio
+  - lmstudio
+  - lmstudio.exe
+  - lms
+  - llmster
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  - Local
+  Website: https://lmstudio.ai/docs/developer/core/server
+  CliExecutable: lms
+  Framework: electron
+  HelperProcesses:
+  - LM Studio Helper
+  - LM Studio Helper (Plugin)
+  - LM Studio Helper (GPU)
+  - LM Studio Helper (Renderer)
+  InstallationPaths:
+  - ~/.lmstudio/
+  - '%LOCALAPPDATA%\LM Studio\'
+  ConfigDirs:
+    macOS: ~/.lmstudio/
+    Linux: ~/.lmstudio/
+    Windows: '%LOCALAPPDATA%\LM Studio\'
+  Packages:
+    winget:
+    - ElementLabs.LMStudio
+    brew_cask:
+    - lm-studio
+Commands:
+- Command: open -a "LM Studio"
+  Description: Launch LM Studio desktop app (macOS)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: macOS
+- Command: Start-Process "$env:LOCALAPPDATA\Programs\LM Studio\LM Studio.exe"
+  Description: Launch LM Studio desktop app (Windows)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: Windows
+- Command: lms server start
+  Description: Start local OpenAI-compatible API server on localhost
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: lms server start --bind 0.0.0.0 --port 1234
+  Description: Expose LM Studio local OpenAI-compatible API on all interfaces (unauth
+    LAN reach)
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: python3 -c "import json; json.dump({'mcpServers':{'fs':{'command':'npx','args':['-y','@modelcontextprotocol/server-filesystem','/','$HOME']}}},
+    open('$HOME/.lmstudio/mcp.json','w'))"
+  Description: Tamper LM Studio mcp.json to register broad filesystem MCP server
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: lm-studio-process
+  Name: lms process
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: lms
+    Reliability: medium
+    Platform: all
+  FalsePositiveGuidance: Enrich with ranked attribution signals via PR.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: C
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: macOS arm64 lms v0.4.x empirically verified 2026-07-19 (`lms --help`;
+    no mcp subcommand; server start uses --bind not --host). Windows ARM64 empirically
+    verified 2026-04-25, v0.4.12+1 (winget ElementLabs.LMStudio). Vendor identity
+    is CN="Element Labs Inc." (Brooklyn, NY) thumbprint F0B7DA62DCEE8446AF5BC07F6F5076C8CBD49AAE.
+    Bundles re-signed Node.js v25.5.0, Bun 1.3.3 lms.exe, esbuild and a native ARM64
+    lmlink-connector.exe under resources/app/.webpack/. Primary CLI or desktop binary
+    empirically present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - localhost
+    Description: Default local API server
+    Ports:
+    - 1234
+  - Domains:
+    - huggingface.co
+    Description: Model downloads
+  - Domains:
+    - cdn.lmstudio.ai
+    Description: CDN
+  - Domains:
+    - files.lmstudio.ai
+    Description: File downloads
+  - Domains:
+    - lmstudio.ai
+    Description: Main site
+  ConfigFiles:
+  - Path: ~/.lmstudio/mcp.json
+    Notes: MCP server configuration (app-managed; no lms mcp CLI subcommand)
+  Logs:
+  - Path: ~/Library/Application Support/LM Studio/logs/
+    Notes: App logs (macOS)
+    Platform: macOS
+  - Path: '%APPDATA%\LM Studio\logs\'
+    Notes: App logs (Windows)
+    Platform: Windows
+  - Path: ~/.config/LM Studio/logs/
+    Notes: App logs (Linux XDG)
+    Platform: Linux
+  Sessions:
+  - Path: ~/Library/Application Support/LM Studio/User/
+    Notes: VS Code-compatible user profile
+    Platform: macOS
+  - Path: '%APPDATA%\LM Studio\User\'
+    Notes: VS Code-compatible user profile
+    Platform: Windows
+  MCP:
+  - Path: ~/.lmstudio/mcp.json
+    Notes: MCP server registration (macOS/Linux default under home)
+  - Path: '%USERPROFILE%\.lmstudio\mcp.json'
+    Notes: MCP server registration (Windows)
+    Platform: Windows
+Signing:
+  macOS:
+    Depth: full
+    UsableForAttribution: true
+    SigningId: ai.elementlabs.lmstudio
+    TeamId: D65G88RHWN
+    BundleId: ai.elementlabs.lmstudio
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: true
+Resources:
+- Link: https://lmstudio.ai/docs/developer/core/server
+  Title: API server documentation
+- Link: https://lmstudio.ai/docs/app/mcp
+  Title: MCP server documentation
+- Link: https://lmstudio.ai/docs/cli
+  Title: CLI documentation
+- Link: https://lmstudio.ai/docs
+  Title: Main documentation
+Uuid: 3eab0c42-1721-581c-bf3f-80d389a74732
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    ConfigPaths:
+    - ~/.lmstudio/mcp.json
+    - '%USERPROFILE%\.lmstudio\mcp.json'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Windows ARM64 empirically verified 2026-04-25, v0.4.12+1 (winget ElementLabs.LMStudio).
+    Vendor identity is CN="Element Labs Inc." (Brooklyn, NY) thumbprint F0B7DA62DCEE8446AF5BC07F6F5076C8CBD49AAE.
+    Bundles re-signed Node.js v25.5.0, Bun 1.3.3 lms.exe, esbuild and a native ARM64
+    lmlink-connector.exe under resources/app/.webpack/.

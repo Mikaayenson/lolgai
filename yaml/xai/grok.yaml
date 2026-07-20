@@ -1,0 +1,146 @@
+Name: Grok
+Id: grok
+Category: api_only
+Vendor: xAI
+Description: 'xAI''s LLM. Includes Grok Build (cloud-based agentic coding). No official
+  CLI or desktop app from xAI itself — API-only at api.x.ai. Community wrappers exist
+  and ARE detectable on the endpoint: grok-agent (npm), Grok-Electron-Client, GrokChat
+  (SwiftUI). Confirmed no /Applications/Grok.app from xAI.'
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - grok-agent
+  - grok-agent.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - Headless
+  Website: https://docs.x.ai/overview
+  Framework: api_only
+  HelperProcesses:
+  - node
+  CliExecutable: grok-agent
+  Packages:
+    npm:
+    - grok-agent
+    - '@vibe-kit/grok-cli'
+    - grok-cli
+Commands:
+- Command: grok-agent
+  Description: Interactive grok-agent community CLI
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: grok-agent "hello"
+  Description: One-shot grok-agent prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: python -c "import os,urllib.request; os.environ['XAI_API_KEY']='stolen';
+    …"
+  Description: 'API-only: custom host script using stolen XAI_API_KEY (no official
+    CLI)'
+  Category: Execute
+  Privileges: User
+  MitreID: T1102
+  Usage: abuse
+  Platform: all
+- Command: grok-agent -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths
+    and first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent
+    context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: grok-process
+  Name: grok process
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: grok-agent
+    Reliability: high
+    FalsePositiveGuidance: Community npm CLI shim; on some hosts the observable process.name
+      is node with grok-agent in command_line — corroborate with path and parent.
+  - Rank: 2
+    Field: process.executable
+    Value: /opt/homebrew/bin/grok-agent
+    Reliability: medium
+    FalsePositiveGuidance: Install path varies by package manager and OS; treat as
+      a strong hint, not a sole match.
+  FalsePositiveGuidance: Enrich with ranked attribution signals via PR.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: C
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: 'Empirically verified on macOS + Windows 11 ARM64 (2026-04-26).
+    Confirmed no official xAI desktop/CLI; community grok-agent@0.8.1 installed and
+    inspected. sh v1.8.3. detection signal corrected to process.name grok-agent (not
+    grok). No official xAI CLI. Primary CLI or desktop binary empirically present
+    on lab PATH or documented install footprint (2026-07-19 revalidation). VerificationLevel
+    demoted to documented (2026-07-18 audit: thin empirical evidence).'
+Artifacts:
+  Network:
+  - Domains:
+    - api.x.ai
+    Description: Primary API
+  - Domains:
+    - console.x.ai
+    Description: Developer console
+  - Domains:
+    - management-api.x.ai
+    Description: Management/admin API (consumed by grok-agent CLI)
+  - Domains:
+    - grok.com
+    Description: Web UI / PWA
+  ConfigFiles:
+  - Path: env XAI_API_KEY
+    Notes: xAI API key via environment
+  - Path: ~/.config/grok-agent/
+    Notes: Community CLI config (verify on endpoint)
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://docs.x.ai/overview
+  Title: xAI API documentation
+- Link: https://docs.x.ai/developers/rest-api-reference/inference/chat
+  Title: API reference
+- Link: https://x.ai/grok
+  Title: Grok product page
+- Link: https://www.npmjs.com/package/grok-agent
+  Title: grok-agent community CLI (npm)
+- Link: https://github.com/baba20o/grok-cli
+  Title: grok-agent CLI repo
+Uuid: 02ebeafa-78c7-51ec-9a98-c813af5a5385
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Empirically verified on macOS + Windows 11 ARM64 (2026-04-26). Confirmed
+    no official xAI desktop/CLI; community grok-agent@0.8.1 installed and inspected.

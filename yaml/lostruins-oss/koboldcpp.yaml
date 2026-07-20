@@ -1,0 +1,115 @@
+Name: KoboldCpp
+Id: koboldcpp
+Category: local_llm
+Vendor: LostRuins (OSS)
+Description: C++ (llama.cpp-based) local LLM inference server with Python wrapper.
+  Launched directly via `koboldcpp` (no `serve` or `run` subcommands). Default port
+  5001. No authentication by default.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - koboldcpp
+  - koboldcpp.exe
+  - KoboldCpp
+  - koboldcpp-linux-x64
+  - koboldcpp-linux-x64-oldpc
+  - koboldcpp-mac-arm64
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://github.com/LostRuins/koboldcpp
+  CliExecutable: koboldcpp
+  Framework: cpp_with_python_wrapper
+  HelperProcesses:
+  - python3
+Commands:
+- Command: koboldcpp --help
+  Description: Show KoboldCpp launcher help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: koboldcpp model.gguf --port 5001
+  Description: Start local inference server with model file
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: ./koboldcpp --host 0.0.0.0 --port 5001
+  Description: KoboldCpp API on all interfaces
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: koboldcpp-attribution
+  Name: koboldcpp attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: koboldcpp
+    Reliability: high
+    FalsePositiveGuidance: Expected on hosts where KoboldCpp is installed. Corroborate
+      with path and parent.
+  - Rank: 2
+    Field: process.executable
+    Value: ~/.local/bin/koboldcpp
+    Reliability: medium
+    FalsePositiveGuidance: Install path varies by package manager and OS; treat as
+      a strong hint, not a sole match.
+  FalsePositiveGuidance: Expected on hosts where KoboldCpp is installed. Corroborate
+    with path, signing, and network port 5001.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer
+  EmpiricalNotes: macOS lab koboldcpp v1.112.2 at ~/.local/bin/koboldcpp (2026-07-19).
+    No `serve`/`run` subcommands — direct flags only (`--host`, `--port`, model path
+    positional). Primary CLI or desktop binary empirically present on lab PATH or
+    documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Notes: Default API listen port
+    Ports:
+    - 5001
+  ConfigFiles:
+  - Path: koboldcpp.ini
+    Notes: Optional local config beside binary
+  - Path: env KCPP_*
+    Notes: Runtime overrides documented in repo
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/LostRuins/koboldcpp
+  Title: GitHub repository
+- Link: https://lite.koboldai.net/koboldcpp_api
+  Title: API documentation
+Uuid: 5d25ca44-49ab-52a1-8a58-9b38767038b8
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: macOS lab --help probe 2026-07-19; removed Ollama-style fake subcommands.

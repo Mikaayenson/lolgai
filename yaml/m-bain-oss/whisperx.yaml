@@ -1,0 +1,114 @@
+Name: WhisperX
+Id: whisperx
+Category: speech
+Vendor: m-bain (OSS)
+Description: Forced-alignment ASR pipeline with word-level timestamps and optional
+  speaker diarization. PyPI `whisperx` ships a `whisperx` CLI (positional audio path;
+  `--model`, `--output_dir`, `--diarize`, etc.).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - whisperx
+  - whisperx.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://github.com/m-bain/whisperX
+  OfficialUrl: https://github.com/m-bain/whisperX
+  CliExecutable: whisperx
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths: []
+  Packages:
+    pip:
+    - whisperx
+Commands:
+- Command: whisperx --help
+  Description: Show WhisperX CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: whisperx path/to/audio.wav --model base --output_dir /tmp
+  Description: Batch transcription with alignment output to directory
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: whisperx /tmp/meeting.wav --model large-v2 --diarize --output_dir /tmp
+  Description: Batch transcription with diarization (requires HF token for pyannote
+    models)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: whisperx-attribution
+  Name: whisperx attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: whisperx
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: python
+    Reliability: medium
+    Platform: all
+    Notes: pip console_scripts shim
+  FalsePositiveGuidance: Expected on hosts running local ASR/diarization pipelines.
+    Corroborate with GPU usage and huggingface.co downloads.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: github.com/m-bain/whisperX README + PyPI console_scripts
+  EmpiricalNotes: PyPI whisperx v3.8.6 ships console_scripts entry `whisperx = whisperx.__main__:cli`.
+    Prior `~/.whisperx/` config paths removed as unverified. Not lab-installed (heavy
+    deps). Primary CLI or desktop binary empirically present on lab PATH or documented
+    install footprint (2026-07-19 revalidation).
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/m-bain/whisperX
+  Title: Primary documentation
+- Link: https://pypi.org/project/whisperx/
+  Title: PyPI whisperx
+Uuid: e8dde112-abab-561f-9107-37544a5d4754
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: README CLI usage + PyPI entry_points verified 2026-07-19; binary not lab-installed
+    due to av/pyannote deps.
+Artifacts:
+  Network:
+  - Domains:
+    - huggingface.co
+    Description: Whisper/alignment/diarization model downloads

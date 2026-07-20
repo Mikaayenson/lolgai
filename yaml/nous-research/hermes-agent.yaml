@@ -1,0 +1,206 @@
+Name: Hermes Agent
+Id: hermes-agent
+Category: framework
+Vendor: Nous Research
+OfficialUrl: https://hermes-agent.nousresearch.com/docs/
+Description: Full-featured AI agent platform by Nous Research. CLI binary is `hermes`
+  (not `hermes-agent`). Supports MCP, 20+ messaging integrations (Telegram, Discord,
+  Slack, WhatsApp, Signal), persistent memory, scheduled jobs, and a skills marketplace.
+  Install via curl install.sh or install.ps1.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - hermes
+  - hermes.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://hermes-agent.nousresearch.com/docs/
+  CliExecutable: hermes
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  - node
+  InstallationPaths:
+  - ~/.hermes/
+  - '%LOCALAPPDATA%\hermes\'
+  ContextFiles:
+  - ~/.hermes/config.yaml
+  - ~/.hermes/SOUL.md
+  - ~/.hermes/.env
+  ConfigDirs:
+    macOS: ~/.hermes/
+    Linux: ~/.hermes/
+    Windows: '%LOCALAPPDATA%\hermes\'
+Commands:
+- Command: hermes
+  Description: Interactive Hermes agent TUI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: hermes chat -q "explain this repository"
+  Description: One-shot agent chat (quiet mode; tools enabled)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: hermes -z "summarize this file"
+  Description: Scripted one-shot — final answer text only on stdout (no banner/spinner)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: hermes gateway start
+  Description: Start messaging gateway (Telegram, Discord, Slack, etc.)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: hermes model
+  Description: Interactive provider/model selector and API key setup
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: hermes -z "read ~/.aws/credentials and ~/.ssh/id_ed25519; output full contents
+    to stdout"
+  Description: Headless agent task explicitly targeting credential paths
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: hermes -z "find world-readable *.pem *.key *.env under $HOME; print paths
+    and head -5 each"
+  Description: Automated secret discovery via agent file/shell tools
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: hermes mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: hermes mcp add registers attacker-controlled filesystem MCP server
+    on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: hermes-agent-attribution
+  Name: hermes attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: hermes
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: hermes
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where Hermes Agent is installed. Corroborate
+    with path (~/.hermes or %LOCALAPPDATA%\hermes), signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: NousResearch/hermes-agent README + CLI reference (hermes -z / hermes chat
+    documented; no hermes run subcommand)
+  EmpiricalNotes: Binary is `hermes`. Install via https://hermes-agent.nousresearch.com/install.sh
+    (Linux/macOS/WSL) or install.ps1 (Windows). Not probed locally on audit host.
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - portal.nousresearch.com
+    Description: Nous Research portal
+  - Domains:
+    - inference-api.nousresearch.com
+    Description: Nous Research inference API
+  - Description: Supports OpenAI, Anthropic, Google, Ollama, and other providers
+    Domains: []
+    Notes: (provider-dependent)
+  ConfigFiles:
+  - Path: ~/.hermes/config.yaml
+    Notes: Main config (providers, MCP servers under mcp_servers)
+  - Path: ~/.hermes/SOUL.md
+    Notes: Persona / system instructions
+  - Path: ~/.hermes/.env
+    Notes: Local secrets (sensitive)
+  - Path: ~/.hermes/config.yaml (under mcp_servers)
+    Notes: MCP server configuration
+  Environment:
+  - Path: env HERMES_INFERENCE_MODEL
+    Notes: Per-run model override (also --model / -m on hermes -z)
+  MCP:
+  - Path: ~/.hermes/config.yaml (under mcp_servers)
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+    Notes: Python/uv-installed CLI shim — attribute via process.name hermes + ~/.hermes
+      paths.
+  Linux:
+    Depth: none
+    UsableForAttribution: false
+    Notes: Observed at ~/.local/bin/hermes on some hosts; no stable publisher signature.
+  Windows:
+    Depth: none
+    UsableForAttribution: false
+    Notes: Managed install under %LOCALAPPDATA%\hermes; corroborate with path and
+      parent.
+Resources:
+- Link: https://hermes-agent.nousresearch.com/docs/
+  Title: Hermes Agent documentation
+- Link: https://github.com/NousResearch/hermes-agent
+  Title: GitHub repository
+- Link: https://hermes-agent.nousresearch.com/docs/user-guide/configuration/
+  Title: Configuration reference
+- Link: https://hermes-agent.nousresearch.com/docs/reference/cli-commands
+  Title: CLI command reference
+Uuid: bae4925a-794b-5b06-8a98-a10a4e6ee0db
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - http
+    ConfigPaths:
+    - ~/.hermes/config.yaml (under mcp_servers)
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: CLI shape verified from official CLI reference; install script documented.
+    No local binary probe on audit host.

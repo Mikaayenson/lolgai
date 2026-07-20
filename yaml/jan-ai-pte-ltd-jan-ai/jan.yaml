@@ -1,0 +1,168 @@
+Name: Jan
+Id: jan
+Category: desktop
+Vendor: JAN AI PTE. LTD. (jan.ai)
+Description: Local AI desktop app (Tauri) plus `jan` CLI for local OpenAI-compatible
+  inference (serve/launch/models). MCP tool-use is desktop-app only via extensions
+  — not on `jan` CLI.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - jan
+  - jan.exe
+  - Jan
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://www.jan.ai/docs/desktop/data-folder
+  CliExecutable: jan
+  Framework: tauri_v2
+  InstallationPaths:
+  - ~/Library/Application Support/Jan/data
+  - ~/.local/share/Jan/data
+  - '%APPDATA%\Jan\data'
+  ConfigDirs:
+    macOS: ~/Library/Application Support/Jan/data
+    Linux: ~/.local/share/Jan/data
+    Windows: '%APPDATA%\Jan\data'
+  Packages:
+    winget:
+    - MenloResearch.Jan
+    brew_cask:
+    - jan
+Commands:
+- Command: open -a "Jan"
+  Description: Launch desktop app (macOS)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: macOS
+- Command: Start-Process "jan"
+  Description: Launch desktop app (Windows)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: Windows
+- Command: jan serve --detach --api-key ""
+  Description: Background local inference API on localhost with empty API key
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: jan launch claude -- "read ~/.aws/credentials and summarize every secret
+    found"
+  Description: Local model + Claude agent chain with credential-oriented prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: jan-process
+  Name: jan CLI process
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: jan
+    Reliability: high
+    FalsePositiveGuidance: Expected on hosts where Jan CLI is installed. Corroborate
+      with path and parent.
+  - Rank: 2
+    Field: process.executable
+    Value: ~/.local/bin/jan
+    Reliability: medium
+    FalsePositiveGuidance: Install path varies by package manager and OS; treat as
+      a strong hint, not a sole match.
+  FalsePositiveGuidance: Enrich with ranked attribution signals via PR.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: C
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: Lab macOS jan v0.7.9 at ~/.local/bin/jan (codesign Identifier jan-cli).
+    `jan serve` binds localhost:6767 — no --host 0.0.0.0 flag. No `jan mcp` subcommand.
+    Linux data folder defaults to ~/.local/share/Jan/data per docs. Primary CLI or
+    desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - 127.0.0.1
+    Description: Jan CLI serve OpenAI-compatible API (default port 6767)
+    Ports:
+    - 6767
+  - Domains:
+    - huggingface.co
+    Description: Model downloads
+  ConfigFiles:
+  - Path: <data_folder>/mcp_config.json
+    Notes: MCP server configuration
+  Logs:
+  - Path: ~/Library/Application Support/Jan/logs/
+    Notes: App logs (macOS)
+    Platform: macOS
+  - Path: '%APPDATA%\Jan\logs\'
+    Notes: App logs (Windows)
+    Platform: Windows
+  - Path: ~/.config/Jan/logs/
+    Notes: App logs (Linux XDG config — may differ from data folder)
+    Platform: Linux
+  Sessions:
+  - Path: ~/Library/Application Support/Jan/User/
+    Notes: VS Code-compatible user profile
+    Platform: macOS
+  - Path: '%APPDATA%\Jan\User\'
+    Notes: VS Code-compatible user profile
+    Platform: Windows
+Signing:
+  macOS:
+    Depth: full
+    UsableForAttribution: true
+    SigningId: jan.ai.app
+    TeamId: F8AH6NHVY5
+    BundleId: jan.ai.app
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: true
+Resources:
+- Link: https://www.jan.ai/docs/desktop/data-folder
+  Title: Data folder documentation
+- Link: https://github.com/janhq/jan
+  Title: GitHub repository
+Uuid: 0cc26a92-79f1-5eb7-9c16-a09993ab7bd4
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: none
+    Transports:
+    - stdio
+    - http
+    ConfigPaths:
+    - <data_folder>/mcp_config.json
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Windows ARM64 empirically verified 2026-04-25, v0.7.9 (x64 build, runs via
+    Prism emulation on ARM64 - no native ARM64 build). Signed CN="Jan AI Pte. Ltd."
+    (Singapore, GlobalSign EV) thumbprint 2C9855779F31382EF0E3FD6452910487D3944EC7.

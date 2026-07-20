@@ -1,0 +1,257 @@
+Name: Cody / Amp
+Id: cody-amp
+Category: cli_agent
+Vendor: Sourcegraph (Cody) / Amp Inc. (Amp)
+Description: Sourcegraph and Amp are now independent companies. Cody is enterprise-only
+  ($59/user/month; Free and Pro plans discontinued). Amp is a separate CLI-first agentic
+  coding product (VS Code extension deprecated in favor of terminal and web). Amp
+  offers free (ad-supported) and enterprise tiers.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - amp
+  - amp.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://ampcode.com/manual
+  CliExecutable: amp
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  InstallationPaths:
+  - ~/.config/amp/
+  - ~/.cache/amp/
+  - '%USERPROFILE%\.config\amp\'
+  ContextFiles:
+  - AGENTS.md
+  - AGENT.md
+  - CLAUDE.md
+  - .agents/skills/*/SKILL.md
+  - ~/.config/amp/AGENTS.md
+  - ~/.config/AGENTS.md
+  - ~/.config/agents/skills/*/SKILL.md
+  ConfigDirs:
+    macOS: ~/.config/amp/
+    Linux: ~/.config/amp/
+    Windows: '%USERPROFILE%\.config\amp\'
+  Packages:
+    npm:
+    - '@sourcegraph/amp'
+    brew:
+    - sourcegraph/amp/amp
+Commands:
+- Command: amp
+  Description: Interactive agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: amp -p "explain this repository"
+  Description: One-shot agent prompt (default approvals)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: amp --dangerously-allow-all -x "read ~/.aws/credentials and ~/.ssh/id_ed25519;
+    output full contents to stdout"
+  Description: Execute mode with all tool-approval prompts disabled for credential
+    harvesting
+  Category: Bypass
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: amp --dangerously-allow-all -x "find world-readable *.pem *.key *.env under
+    $HOME; print paths and head -5 each"
+  Description: Automated secret discovery via agent file/shell tools with approvals
+    bypassed
+  Category: Bypass
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: amp mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: amp mcp add registers attacker-controlled filesystem MCP server on
+    host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+- Command: amp -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths and
+    first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent
+    context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: cody-amp-attribution
+  Name: amp attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: amp
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.args
+    Value: '*amp*'
+    Reliability: medium
+    Platform: all
+    Notes: npm/node wrapper; correlate command_line for -x and --dangerously-allow-all
+  FalsePositiveGuidance: Correlate amp execute flags and MCP config under ~/.config/amp/settings.json.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: local amp --help (v0.0.1774728201-ga87440) + ampcode.com manual
+  EmpiricalNotes: macOS lab npm @sourcegraph/amp; `amp -x` execute mode and `--dangerously-allow-all`
+    verified via --help. Legacy `cody` binary and fictional `amp run` subcommand removed.
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - sourcegraph.com
+    Description: Cody enterprise auth and Cody Gateway (legacy Cody users)
+  - Domains:
+    - ampcode.com
+    Description: Amp primary domain
+  - Domains:
+    - production.ampworkers.com
+    Description: Amp web/worker infrastructure
+  ConfigFiles:
+  - Path: ~/.config/amp/settings.json
+    Notes: amp.mcpServers and CLI settings
+  - Path: AGENTS.md
+    Notes: Context/instructions file
+  - Path: AGENT.md
+    Notes: Context/instructions file
+  - Path: CLAUDE.md
+    Notes: Context/instructions file
+  - Path: .agents/skills/*/SKILL.md
+    Notes: Context/instructions file
+  - Path: ~/.config/amp/AGENTS.md
+    Notes: Context/instructions file
+  - Path: ~/.config/AGENTS.md
+    Notes: Context/instructions file
+  - Path: ~/.config/agents/skills/*/SKILL.md
+    Notes: Context/instructions file
+  Logs:
+  - Path: ~/.cache/amp/logs/cli.log
+    Notes: Amp CLI log file (default)
+  Skills:
+  - Path: .agents/skills/<name>/SKILL.md
+    Notes: Skills (workspaceDir)
+  - Path: ~/.config/agents/skills/<name>/SKILL.md
+    Notes: Skills (globalDir)
+  MCP:
+  - Path: amp.mcpServers in ~/.config/amp/settings.json
+    Notes: MCP server configuration
+  - Path: mcp.json in skill directories
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://ampcode.com/manual
+  Title: Amp CLI manual
+- Link: https://sourcegraph.com/docs/cody
+  Title: Cody documentation
+- Link: https://ampcode.com/
+  Title: Amp product site
+- Link: https://www.npmjs.com/package/@sourcegraph/amp
+  Title: npm @sourcegraph/amp
+Uuid: 481decd9-ffec-588d-9538-9f7b0c21ebf8
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+ExtensionIds:
+  vscode:
+  - sourcegraph.amp
+  - sourcegraph.cody-ai
+  jetbrains:
+  - sourcegraph
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    ConfigPaths:
+    - amp.mcpServers in ~/.config/amp/settings.json
+    - mcp.json in skill directories
+  Skills:
+    Supported: true
+    WorkspaceDirs:
+    - .agents/skills/<name>/
+    GlobalDirs:
+    - ~/.config/agents/skills/<name>/
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: macOS npm @sourcegraph/amp v0.0.1774728201-ga87440 verified 2026-07-19 via
+    amp --help. Prior `amp run` / `amp.` / legacy `cody` binary removed.
+PublicEcosystems:
+- Title: Cody Prompt Library
+  Url: https://sourcegraph.com/docs/cody/capabilities/prompts
+  Category: prompt_library
+  Operator: Sourcegraph
+  Description: Official Sourcegraph Cody prompt library / shareable prompts documentation.
+  Official: true
+  Public: true
+  OpenSubmission: false
+  Installable: true
+  CanExecuteCode: false
+  CanInstallRemoteCode: false
+  SurfaceScope:
+  - cody_extension
+  InstallSurfaces:
+  - ide
+  PackagesCanInclude:
+  - prompts
+- Title: Sourcegraph MCP (Amp-related)
+  Url: https://sourcegraph.com/docs/api/mcp
+  Category: mcp_directory
+  Operator: Sourcegraph
+  Description: MCP server documentation for Sourcegraph stack; Amp uses MCP per vendor
+    docs.
+  Official: true
+  Public: true
+  OpenSubmission: false
+  Installable: true
+  CanExecuteCode: true
+  CanInstallRemoteCode: true
+  SurfaceScope:
+  - amp_cli
+  InstallSurfaces:
+  - cli
+  PackagesCanInclude:
+  - mcp_servers

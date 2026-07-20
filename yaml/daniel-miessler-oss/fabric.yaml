@@ -1,0 +1,137 @@
+Name: Fabric
+Id: fabric
+Category: chat_cli
+Vendor: Daniel Miessler (OSS)
+Description: Go-based AI prompt-pattern CLI (fabric-ai on Homebrew). Patterns for
+  summarization, extraction, and analysis.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - fabric
+  - fabric.exe
+  - fabric-ai
+  - fabric-ai.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://github.com/danielmiessler/fabric
+  OfficialUrl: https://github.com/danielmiessler/fabric
+  CliExecutable: fabric-ai
+  Framework: go_cli
+  InstallationPaths:
+  - ~/.config/fabric/
+  - ~/.local/bin/fabric
+  - '%USERPROFILE%\\.config\\fabric\\'
+  ConfigDirs:
+    macOS: ~/.config/fabric/
+    Linux: ~/.config/fabric/
+    Windows: '%USERPROFILE%\\.config\\fabric\\'
+  Packages:
+    brew:
+    - fabric-ai
+Commands:
+- Command: fabric-ai -S setup
+  Description: Configure Fabric vendors, models, and patterns
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: fabric-ai -l
+  Description: List available Fabric patterns
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: echo "hello" | fabric-ai -p summarize
+  Description: Run a Fabric pattern on stdin (-p is pattern name, not inline prompt)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: cat ~/.aws/credentials | fabric-ai -p extract_wisdom
+  Description: Pipe credential file into Fabric pattern (-p is pattern name; stdin
+    carries secret material)
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: fabric-attribution
+  Name: fabric attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: fabric
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.name
+    Value: fabric-ai
+    Reliability: high
+    Platform: all
+    Notes: Homebrew binary name on macOS
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: github.com/danielmiessler/fabric README + local fabric-ai --help
+  EmpiricalNotes: '-p is pattern name (summarize, extract_wisdom), not inline prompt.
+    Homebrew installs fabric-ai binary; install script may shim fabric → fabric-ai.
+    Lab fabric-ai v1.4.459 (macOS arm64 brew). No interactive REPL — pattern runs
+    via stdin or -p. VerificationLevel demoted to documented (2026-07-18 audit: thin
+    empirical evidence). Primary CLI or desktop binary empirically present on lab
+    PATH or documented install footprint (2026-07-19 revalidation).'
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/danielmiessler/fabric
+  Title: Primary documentation
+Uuid: 7ae35fc8-632e-5d02-8fa0-9983f2299735
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.config/fabric/
+    Notes: Vendor keys, default model, pattern store (fabric -S setup)
+  Disk:
+  - Path: ~/.config/fabric/patterns/
+    Notes: Downloaded/updated Fabric patterns (fabric -U --updatepatterns)
+  Sessions:
+  - Path: ~/.config/fabric/sessions/
+    Notes: Named session history when --session is used
+  Environment:
+  - Path: env OPENAI_API_KEY
+    Notes: Common vendor key loaded during fabric -S setup
+  - Path: env ANTHROPIC_API_KEY
+    Notes: Optional vendor key for pattern runs
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: Added artifact paths from ~/.config/fabric/ after local fabric-ai --help;
+    removed empty Artifacts stub.

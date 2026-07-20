@@ -1,0 +1,131 @@
+Name: MCP Puppeteer Server
+Id: mcp-server-puppeteer
+Category: mcp
+Vendor: Anthropic / MCP
+OfficialUrl: https://github.com/modelcontextprotocol/servers/tree/main/src/puppeteer
+Description: MCP server for browser automation via headless Chrome/Puppeteer, exposed
+  to AI agents over MCP stdio. Published as `@modelcontextprotocol/server-puppeteer`.
+  No persistent server config directory — registration lives on the MCP host agent.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - mcp-server-puppeteer
+  - mcp-server-puppeteer.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://github.com/modelcontextprotocol/servers
+  CliExecutable: mcp-server-puppeteer
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  Packages:
+    npm:
+    - '@modelcontextprotocol/server-puppeteer'
+Commands:
+- Command: npx -y @modelcontextprotocol/server-puppeteer
+  Description: Run Puppeteer MCP server over stdio (typical host registration)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: mcp-server-puppeteer
+  Description: Same stdio MCP server when npm global bin is on PATH
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: mcp-server-puppeteer mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: mcp-server-puppeteer mcp add registers attacker-controlled filesystem
+    MCP server on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: mcp-server-puppeteer-attribution
+  Name: mcp-server-puppeteer attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: mcp-server-puppeteer
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.args
+    Value: '@modelcontextprotocol/server-puppeteer'
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected when an agent host registers this MCP server. Corroborate
+    with parent agent (claude, cursor, etc.) and host MCP config paths.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: npm @modelcontextprotocol/server-puppeteer README (stdio MCP; launchOptions
+    via env, not --browser CLI flag)
+  EmpiricalNotes: 'npm install v2025.x on audit host; binary starts stdio MCP (no
+    --help). Prior --browser chrome / --help commands were invented. VerificationLevel
+    demoted to documented (2026-07-18 audit: thin empirical evidence). Primary CLI
+    or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).'
+Artifacts:
+  MCP:
+  - Path: Host ~/.cursor/mcp.json
+    Notes: Cursor MCP host registration (mcpServers block)
+  - Path: Host ~/.claude.json
+    Notes: Claude Code user MCP config (mcpServers key)
+  - Path: Host .cursor/mcp.json
+    Notes: Project-scoped Cursor MCP config
+  - Path: Host .mcp.json
+    Notes: Project-scoped Claude Code MCP config
+  Environment:
+  - Path: env PUPPETEER_LAUNCH_OPTIONS
+    Notes: JSON Puppeteer launchOptions (documented in npm README)
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+    Notes: Node/npm entrypoint — attribute via process args and parent MCP host.
+  Windows:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/modelcontextprotocol/servers
+  Title: MCP servers monorepo
+- Link: https://github.com/modelcontextprotocol/servers/tree/main/src/puppeteer
+  Title: Puppeteer server source
+- Link: https://www.npmjs.com/package/@modelcontextprotocol/server-puppeteer
+  Title: npm @modelcontextprotocol/server-puppeteer
+Uuid: 1f41adce-44de-579c-b687-26ab73a43aa1
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: server
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: npm package installed locally; no --help/--browser CLI flags in shipped entrypoint.

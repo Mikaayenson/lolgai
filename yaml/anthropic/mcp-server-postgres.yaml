@@ -1,0 +1,120 @@
+Name: MCP Postgres Server
+Id: mcp-server-postgres
+Category: mcp
+Vendor: Anthropic / MCP
+Description: MCP server that lets AI agents run read-only SQL queries against PostgreSQL
+  databases. Published as `@modelcontextprotocol/server-postgres`. First CLI argument
+  is the Postgres DSN (no --help subcommand).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - mcp-server-postgres
+  - mcp-server-postgres.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://github.com/modelcontextprotocol/servers
+  OfficialUrl: https://github.com/modelcontextprotocol/servers/tree/main/src/postgres
+  CliExecutable: mcp-server-postgres
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  Packages:
+    npm:
+    - '@modelcontextprotocol/server-postgres'
+Commands:
+- Command: mcp-server-postgres postgresql://localhost:5432/dev
+  Description: Bridge to local dev Postgres (typical MCP host registration)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: mcp-server-postgres postgresql://admin:password@prod-db.internal:5432/customers
+  Description: Production Postgres DSN in argv — agent gains read-only SQL via MCP
+    bridge
+  Category: MCP
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: mcp-server-postgres-attribution
+  Name: mcp-server-postgres attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: mcp-server-postgres
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: node
+    Reliability: medium
+    Platform: all
+    Notes: npm MCP servers often run as node with mcp-server-postgres in argv.
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: '@modelcontextprotocol/server-postgres README; local install'
+  EmpiricalNotes: 'No package-local config dir; DSN passed as first positional arg.
+    --help is not supported (parses as invalid DSN). VerificationLevel demoted to
+    documented (2026-07-18 audit: thin empirical evidence). Primary CLI or desktop
+    binary empirically present on lab PATH or documented install footprint (2026-07-19
+    revalidation).'
+Artifacts:
+  MCP:
+  - Path: Host ~/.cursor/mcp.json
+    Notes: Cursor MCP host registration (mcpServers block)
+  - Path: Host ~/.claude.json
+    Notes: Claude Code user MCP config (mcpServers key)
+  - Path: Host .cursor/mcp.json
+    Notes: Project-scoped Cursor MCP config
+  - Path: Host .mcp.json
+    Notes: Project-scoped Claude Code MCP config
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/modelcontextprotocol/servers
+  Title: MCP servers monorepo
+- Link: https://github.com/modelcontextprotocol/servers/tree/main/src/postgres
+  Title: Postgres MCP server source
+- Link: https://www.npmjs.com/package/@modelcontextprotocol/server-postgres
+  Title: npm @modelcontextprotocol/server-postgres
+Uuid: e61933c0-f98d-56af-b58a-14165807987b
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: server
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Removed invented ~/.mcp-server-postgres/ paths. Server executes read-only
+    SQL only per upstream README.

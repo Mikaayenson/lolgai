@@ -1,0 +1,155 @@
+Name: AUTOMATIC1111 WebUI
+Id: automatic1111
+Category: image_gen
+Vendor: AUTOMATIC1111 (OSS)
+Description: Stable Diffusion WebUI — git-cloned repo launched via `webui.sh` / `webui-user.bat`
+  (not a global install). User data defaults to repo `--data-dir` (./) with config.json,
+  models/, embeddings/; override via webui-user.sh `COMMANDLINE_ARGS` / `export COMMANDLINE_ARGS`.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - webui.sh
+  - webui-user.bat
+  - webui-user.sh
+  Agentic: false
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://github.com/AUTOMATIC1111/stable-diffusion-webui
+  OfficialUrl: https://github.com/AUTOMATIC1111/stable-diffusion-webui
+  CliExecutable: webui.sh
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  - bash
+  InstallationPaths: []
+  ConfigDirs:
+    macOS: <repo>/ (default --data-dir ./; set in webui-user.sh)
+    Linux: <repo>/ (default --data-dir ./; set in webui-user.sh)
+    Windows: <repo>\ (default --data-dir ./; set in webui-user.bat)
+Commands:
+- Command: ./webui.sh --help
+  Description: Show WebUI launcher help (repo-local webui.sh)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: ./webui.sh --listen --api
+  Description: A1111 WebUI with API exposed on LAN
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platforms:
+  - Linux
+  - macOS
+- Command: export COMMANDLINE_ARGS="--listen --api" && ./webui.sh
+  Description: A1111 WebUI with API exposed on LAN (webui-user.sh pattern)
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platforms:
+  - Linux
+  - macOS
+DetectionOpportunities:
+- Id: automatic1111-attribution
+  Name: webui.sh / launch.py attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.command_line
+    Value: '*webui.sh*'
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.command_line
+    Value: '*launch.py*'
+    Reliability: medium
+    Platform: all
+    Notes: Python child of webui.sh / webui-user.bat in stable-diffusion-webui clone
+  - Rank: 3
+    Field: process.parent.command_line
+    Value: '*webui.sh*'
+    Reliability: medium
+    Platform: all
+  FalsePositiveGuidance: Expected where Stable Diffusion WebUI is cloned and run locally.
+    Corroborate with repo path (stable-diffusion-webui), --listen/--api flags, and
+    Gradio port 7860.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: github.com/AUTOMATIC1111/stable-diffusion-webui wiki + README
+  EmpiricalNotes: Not on PATH in lab probes — repo-local launcher only. No standalone
+    ~/.automatic1111 home dir; user data lives under repo --data-dir (default./).
+    webui-user.sh/bat sets COMMANDLINE_ARGS. Lab git clone with webui.sh under ~/genai-tools/stable-diffusion-webui
+    (2026-07-19 full install pass).
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/AUTOMATIC1111/stable-diffusion-webui
+  Title: Source repository
+- Link: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Command-Line-Arguments-And-Settings
+  Title: Command-line arguments and settings (wiki)
+Uuid: 9d1db8cb-1917-5bc1-b662-740d35274504
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Repo-local git clone; launcher scripts verified against upstream wiki (2026-07-19).
+Artifacts:
+  Disk:
+  - Path: <repo>/config.json
+    Notes: UI settings (default --data-dir)
+  - Path: <repo>/ui-config.json
+    Notes: Gradio UI configuration
+  - Path: <repo>/models/
+    Notes: Checkpoint and model storage
+  - Path: <repo>/embeddings/
+    Notes: Textual inversion embeddings
+  - Path: <repo>/params.txt
+    Notes: Last generation parameters (when enabled)
+  - Path: <repo>/cache.json
+    Notes: Hash cache (SD_WEBUI_CACHE_FILE default)
+  ConfigFiles:
+  - Path: webui-user.sh
+    Notes: Linux/macOS env + COMMANDLINE_ARGS (export COMMANDLINE_ARGS="--listen --api")
+    Platform: macOS
+  - Path: webui-user.sh
+    Notes: Linux env + COMMANDLINE_ARGS
+    Platform: Linux
+  - Path: webui-user.bat
+    Notes: Windows env + COMMANDLINE_ARGS (set COMMANDLINE_ARGS=...)
+    Platform: Windows
+  Environment:
+  - Path: env COMMANDLINE_ARGS
+    Notes: Launcher passes args to launch.py (e.g. --listen --api --gradio-auth)
+  Network:
+  - Domains:
+    - huggingface.co
+    Description: Model/checkpoint downloads (when configured)
+  - Description: Gradio local/LAN listener when --listen is set
+    Domains: []
+    Notes: Default port 7860; no fixed external domain

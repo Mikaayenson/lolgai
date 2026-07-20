@@ -1,0 +1,158 @@
+Name: Elastic MCP Server (Elasticsearch)
+Id: elastic-mcp-server
+Category: mcp
+Vendor: Elastic
+Description: Official Elastic Elasticsearch MCP server. Bridges Claude Code, Cursor,
+  and other MCP hosts to an Elasticsearch cluster (list indices, get mappings, search,
+  shard stats). npm `@elastic/mcp-server-elasticsearch@0.3.1` is DEPRECATED — Elastic
+  recommends migrating to v0.4.0+ per GitHub README (Elastic Agent Builder for new
+  deployments). Docker image at docker.elastic.co/mcp/elasticsearch. The package `@elastic/mcp-server-elastic-cloud`
+  referenced in older docs DOES NOT EXIST on npm.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - mcp-server-elasticsearch
+  - mcp-server-elasticsearch.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://www.npmjs.com/package/@elastic/mcp-server-elasticsearch
+  CliExecutable: mcp-server-elasticsearch
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  Packages:
+    npm:
+    - '@elastic/mcp-server-elasticsearch'
+    docker:
+    - docker.elastic.co/mcp/elasticsearch
+Commands:
+- Command: mcp-server-elasticsearch stdio
+  Description: MCP stdio bridge when registered on host (normal operation)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: ES_URL="https://prod.es.example:9243" ES_API_KEY="$STOLEN_KEY" mcp-server-elasticsearch
+    stdio
+  Description: Host-launched MCP bridge using stolen cluster credentials (configured
+    on Claude/Cursor host)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Usecase: Agent reads/search exfil via MCP host config, not the npm package alone
+  Platform: all
+DetectionOpportunities:
+- Id: elastic-mcp-server-attribution
+  Name: mcp-server-elasticsearch attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: mcp-server-elasticsearch
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: mcp-server-elasticsearch
+    Reliability: high
+    Platform: all
+  - Rank: 3
+    Field: process.command_line
+    Value: node ... mcp-server-elasticsearch/dist/index.js
+    Reliability: medium
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: 'macOS lab npm @elastic/mcp-server-elasticsearch v0.3.1 (deprecated).
+    `mcp-server-elasticsearch stdio` starts MCP bridge; bare invocation without ES_URL
+    env fails URL validation. Windows ARM64 npm shim NotSigned (2026-04-26). `@elastic/mcp-server-elastic-cloud`
+    is NOT a published npm package. VerificationLevel demoted to documented (2026-07-18
+    audit: thin empirical evidence). Primary CLI or desktop binary empirically present
+    on lab PATH or documented install footprint (2026-07-19 revalidation).'
+Artifacts:
+  Network:
+  - Domains:
+    - <customer-cluster>.es.<region>.aws.found.io
+    Description: Elasticsearch _search / _mapping / indices APIs
+  - Domains:
+    - '*.es.<region>.aws.found.io'
+    Description: Elastic Cloud Hosted ES endpoints
+  - Domains:
+    - '*.found.io'
+    Description: Elastic Cloud cluster endpoints
+  ConfigFiles:
+  - Path: Host ~/.cursor/mcp.json or ~/.claude.json mcpServers block
+    Notes: Configured on MCP host, not in server package
+  - Path: env ES_URL / ELASTICSEARCH_URL
+    Notes: Cluster endpoint passed via host env
+  - Path: env ES_API_KEY / ELASTIC_API_KEY
+    Notes: Cluster credentials (sensitive)
+  MCP:
+  - Path: Host ~/.cursor/mcp.json or ~/.claude.json mcpServers block
+    Notes: MCP host registration (server is stdio child)
+  - Path: Host ~/.cursor/mcp.json
+    Notes: Cursor MCP host registration (mcpServers block)
+  - Path: Host ~/.claude.json
+    Notes: Claude Code user MCP config (mcpServers key)
+  - Path: Host .cursor/mcp.json
+    Notes: Project-scoped Cursor MCP config
+  - Path: Host .mcp.json
+    Notes: Project-scoped Claude Code MCP config
+  Environment:
+  - Path: env ES_URL / ELASTICSEARCH_URL
+    Notes: Cluster endpoint (passed by MCP host)
+  - Path: env ES_API_KEY / ELASTIC_API_KEY
+    Notes: Cluster credentials (sensitive)
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: npm shim is unsigned; rely on process name + parent host attribution.
+Resources:
+- Link: https://www.npmjs.com/package/@elastic/mcp-server-elasticsearch
+  Title: npm package (deprecated at v0.3.1; migrate to v0.4.0+)
+- Link: https://github.com/elastic/mcp-server-elasticsearch
+  Title: Source repository (v0.4.0+ migration guide)
+- Link: https://www.elastic.co/docs/solutions/search/mcp
+  Title: Elastic MCP solution docs
+Uuid: 9a8555f5-b20b-5a75-a63c-5caf9c85a49b
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: server
+    Transports:
+    - stdio
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Empirically verified on macOS + Windows 11 ARM64 (2026-04-26). Confirmed
+    `@elastic/mcp-server-elastic-cloud` is NOT a published package — npm name is `@elastic/mcp-server-elasticsearch`
+    (deprecated).

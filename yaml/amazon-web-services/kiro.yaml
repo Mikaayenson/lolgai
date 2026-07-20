@@ -1,0 +1,307 @@
+Name: Kiro (AWS)
+Id: kiro
+Category: ide_agent
+Vendor: Amazon Web Services
+Description: AWS Kiro product family — spec-driven agent IDE (VS Code fork) and Kiro
+  CLI (rebranded from Amazon Q Developer CLI, November 2025). CLI supports agent mode,
+  MCP, hooks, and custom agents; backwards compatible with legacy `q` / `q chat` entrypoints.
+  IDE uses AWS Builder ID auth and.kiro/ steering files for spec-driven development.
+SearchAliases:
+- amazon-q-developer-cli
+- amazon q developer cli
+- q chat
+- codewhisperer cli
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Surfaces:
+- Id: kiro_ide
+  Label: Kiro IDE (desktop)
+  Binaries:
+  - Kiro
+  - Kiro.exe
+  - kiro
+- Id: kiro_cli
+  Label: Kiro CLI (formerly Amazon Q Developer CLI)
+  Binaries:
+  - kiro-cli
+  - kiro-cli.exe
+  - q
+  - q.exe
+  - qchat
+Details:
+  Binaries:
+  - Kiro
+  - Kiro.exe
+  - kiro
+  - kiro-cli
+  - kiro-cli.exe
+  - q
+  - q.exe
+  - qchat
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://kiro.dev/
+  OfficialUrl: https://kiro.dev/
+  CliExecutable: kiro-cli
+  Framework: electron
+  HelperProcesses:
+  - Kiro Helper
+  - Kiro Helper (Plugin)
+  - Kiro Helper (GPU)
+  - Kiro Helper (Renderer)
+  InstallationPaths:
+  - ~/.kiro/
+  - '%USERPROFILE%\.kiro\'
+  - ~/.config/Kiro/
+  - '%APPDATA%\Kiro\'
+  - '%LOCALAPPDATA%\Kiro-Cli\'
+  ContextFiles:
+  - .kiro/settings/
+  - .kiro/agents/
+  - .kiro/steering.md
+  - .kiro/specs/
+  - ~/.kiro/settings/mcp.json
+Commands:
+- Command: kiro-cli chat
+  Description: Interactive Kiro CLI chat
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: kiro-cli doctor
+  Description: Check Kiro CLI auth and configuration
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: kiro-cli mcp list
+  Description: List configured MCP servers
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: kiro-cli chat "enumerate IAM roles in this account" --trust-all-tools
+  Description: kiro-cli --trust-all-tools auto-trusts all agent tools for one-shot
+    prompt
+  Category: Bypass
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+- Command: kiro-cli --agent security-reviewer chat "review terraform for secrets"
+    --trust-all-tools
+  Description: kiro-cli --agent profile with --trust-all-tools for named agent abuse
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+- Command: q chat "print contents of ~/.aws/credentials" --trust-all-tools
+  Description: Legacy q chat alias with --trust-all-tools reads credential files
+  Category: Bypass
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: kiro-cli chat --resume
+  Description: kiro-cli --resume resumes prior agent session (may inherit prior tool
+    grants)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+- Command: kiro-cli mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: kiro-cli mcp add registers attacker-controlled filesystem MCP server
+    on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+- Command: kiro-cli -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths
+    and first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent
+    context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: kiro-cli-attribution
+  Name: Kiro CLI attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: kiro-cli
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: q
+    Reliability: high
+    Platform: all
+    Notes: Legacy Amazon Q Developer CLI binary name
+  - Rank: 3
+    Field: process.executable
+    Value: '*\Kiro-Cli\kiro-cli.exe'
+    Reliability: high
+    Platform: windows
+  FalsePositiveGuidance: Expected on AWS developer hosts. Corroborate with path, signing,
+    and kiro.dev network.
+- Id: kiro-ide-attribution
+  Name: Kiro IDE attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: Kiro Helper (Plugin)
+    Reliability: medium
+    Platform: all
+    Notes: VS Code-style extension host — corroborate with path
+  - Rank: 2
+    Field: process.name
+    Value: Kiro
+    Reliability: medium
+    Platform: all
+  FalsePositiveGuidance: VS Code fork — corroborate with install path and AWS signing
+    where available.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: A
+  LastVerified: '2026-07-19'
+  Source: kiro.dev docs + local kiro-cli --help v2.2.2
+  EmpiricalNotes: 'CLI: Windows ARM64 kiro-cli v2.1.1 winget Amazon.KiroCLI; Authenticode
+    CN="Amazon Web Services, Inc." OU=AWS Kiro at %LOCALAPPDATA%\Kiro-Cli\kiro-cli.exe.
+    Linux/mac ~/.local/bin/kiro-cli via curl cli.kiro.dev/install. Lab 2026-07-19:
+    kiro-cli v2.2.2 at ~/.local/bin (macOS); codesign Identifier=kiro-cli TeamId=94KV3E626L.
+    chat uses positional INPUT and -a/--trust-all-tools (no -p flag). Legacy q/qchat
+    not on lab PATH. IDE not lab-installed. Primary CLI or desktop binary empirically
+    present on lab PATH or documented install footprint (2026-07-19 revalidation).'
+Artifacts:
+  Disk:
+  - Path: '%USERPROFILE%\.kiro\'
+    Notes: Shared Kiro CLI/IDE config (Windows)
+    Platform: Windows
+  - Path: ~/.config/Kiro/
+    Notes: Kiro IDE config (Linux)
+    Platform: Linux
+  - Path: '%APPDATA%\Kiro\'
+    Notes: Kiro IDE config (Windows)
+    Platform: Windows
+  - Path: '%LOCALAPPDATA%\Kiro-Cli\'
+    Notes: Kiro CLI install directory (Windows)
+    Platform: Windows
+  - Path: ~/.kiro/
+    Notes: Shared Kiro CLI/IDE config
+  Network:
+  - Domains:
+    - kiro.dev
+    Description: Product site, IDE and CLI downloads
+  - Domains:
+    - cli.kiro.dev
+    Description: CLI installation script
+  - Domains:
+    - desktop-release.q.us-east-1.amazonaws.com
+    Description: IDE/CLI release CDN (AWS)
+  - Domains:
+    - '*.amazonaws.com'
+    Description: AWS backend (Bedrock, Builder ID auth)
+  ConfigFiles:
+  - Path: .kiro/settings/
+    Notes: Project settings directory
+  - Path: .kiro/agents/
+    Notes: Custom agent definitions
+  - Path: .kiro/steering.md
+    Notes: Spec-driven steering instructions (IDE)
+  - Path: .kiro/specs/
+    Notes: Generated requirements/spec artifacts (IDE)
+  - Path: ~/.kiro/settings/mcp.json
+    Notes: MCP server configuration
+  - Path: .kiro/settings/mcp.json
+    Notes: Project MCP configuration
+  - Path: ~/.kiro/settings.json
+    Notes: User settings
+  - Path: ~/.aws/amazonq/
+    Notes: Legacy Q CLI config (migrates to ~/.kiro/)
+  AuthTokens:
+  - Path: ~/.kiro/
+    Notes: AWS Builder ID OAuth material (sensitive)
+  - Path: ~/.aws/amazonq/
+    Notes: Legacy Q CLI config (auto-migrates to ~/.kiro/ on first Kiro CLI run)
+  Logs:
+  - Path: ~/Library/Application Support/Kiro/logs/
+    Notes: App logs (macOS)
+    Platform: macOS
+  - Path: '%APPDATA%\Kiro\logs\'
+    Notes: App logs (Windows)
+    Platform: Windows
+  - Path: ~/.config/Kiro/logs/
+    Notes: App logs (Linux XDG)
+    Platform: Linux
+  Sessions:
+  - Path: ~/Library/Application Support/Kiro/User/
+    Notes: VS Code-compatible user profile
+    Platform: macOS
+  - Path: '%APPDATA%\Kiro\User\'
+    Notes: VS Code-compatible user profile
+    Platform: Windows
+  MCP:
+  - Path: ~/.kiro/settings/mcp.json
+    Notes: MCP server configuration
+  - Path: .kiro/settings/mcp.json
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: full
+    UsableForAttribution: true
+    SigningId: kiro-cli
+    TeamId: 94KV3E626L
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: true
+    Publisher: Amazon Web Services, Inc.
+    CertificateCN: Amazon Web Services, Inc.
+    Subject: CN=Amazon Web Services, Inc., OU=AWS Kiro
+    Notes: kiro-cli.exe signed OU=AWS Kiro (Empirically verified ARM64 winget)
+Resources:
+- Link: https://kiro.dev/docs/cli/
+  Title: Kiro CLI documentation
+- Link: https://kiro.dev/docs/
+  Title: Kiro IDE documentation
+- Link: https://kiro.dev/downloads/
+  Title: Kiro IDE downloads
+- Link: https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/command-line.html
+  Title: Amazon Q Developer CLI (redirects to Kiro)
+- Link: https://kiro.dev/docs/cli/mcp/configuration/
+  Title: Kiro MCP configuration
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Notes: kiro-cli mcp add|list|remove|import|status; config at ~/.kiro/settings/mcp.json
+Uuid: b503f667-c768-5be4-aa3c-1a44cc685f62
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-07-19'

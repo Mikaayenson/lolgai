@@ -1,0 +1,184 @@
+Name: Void Editor
+Id: void-editor
+Category: ide_agent
+Vendor: Void Editor
+Description: 'Open-source AI-native code editor (VS Code fork). Status: paused. Team
+  announced they paused work on the IDE to explore new directions; existing builds
+  continue to run but may bit-rot. MCP support added in beta. Keep entry only for
+  fielded installations.'
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - void
+  - Void
+  - Void.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  Website: https://www.voideditor.com/
+  CliExecutable: void
+  Framework: electron
+  HelperProcesses:
+  - Electron
+  - Void Helper
+  - Void Helper (Plugin)
+  - Void Helper (GPU)
+  - Void Helper (Renderer)
+  InstallationPaths:
+  - ~/Library/Application Support/Void/
+  - ~/.config/Void/
+  - '%APPDATA%\Void\'
+  ContextFiles:
+  - .void/
+  ConfigDirs:
+    macOS: ~/Library/Application Support/Void/
+    Linux: ~/.config/Void/
+    Windows: '%APPDATA%\Void\'
+  Packages:
+    brew_cask:
+    - void
+    deb:
+    - void_*.deb
+Commands:
+- Command: void .
+  Description: Open project in IDE
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: void --help
+  Description: Show IDE CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: void --goto $HOME/.aws/credentials:1
+  Description: Open credential path in Void from shell (--goto)
+  Category: Execute
+  Privileges: User
+  MitreID: T1204
+  Usage: abuse
+  Platform: all
+- Command: open -a Void --args "$HOME/.aws/credentials"
+  Description: Script-launched Void onto credential path (macOS open helper)
+  Category: Execute
+  Privileges: User
+  MitreID: T1204
+  Usage: abuse
+  Platform: macOS
+- Command: void mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: void mcp add registers attacker-controlled filesystem MCP server on
+    host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: void-editor-attribution
+  Name: Void attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: Void
+    Reliability: high
+    Platform: macos
+  - Rank: 2
+    Field: process.parent.name
+    Value: Void Helper (Plugin)
+    Reliability: medium
+    Platform: macos
+  FalsePositiveGuidance: Expected on hosts where Void Editor is installed. Correlate
+    with com.void signing (TeamId ZUZ6WG9BCN) and ~/Library/Application Support/Void/.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: A
+  LastVerified: '2026-07-19'
+  Source: local void --help (v1.99.30044) + voideditor.com
+  EmpiricalNotes: macOS lab brew void v1.99.30044; CLI binary is `void` (Void.app
+    also present). Prior Headless capability removed (IDE-only surface). Primary CLI
+    or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - voideditor.com
+    Description: Product site, downloads
+  - Description: BYOK to multiple LLM providers
+    Domains: []
+    Notes: (provider-dependent)
+  ConfigFiles:
+  - Path: .void/
+    Notes: Context/instructions file
+  - Path: Void settings.json
+    Notes: MCP server configuration
+  Logs:
+  - Path: ~/Library/Application Support/Void/logs/
+    Notes: App logs (macOS)
+    Platform: macOS
+  - Path: '%APPDATA%\Void\logs\'
+    Notes: App logs (Windows)
+    Platform: Windows
+  - Path: ~/.config/Void/logs/
+    Notes: App logs (Linux XDG)
+    Platform: Linux
+  Sessions:
+  - Path: ~/Library/Application Support/Void/User/
+    Notes: VS Code-compatible user profile
+    Platform: macOS
+  - Path: '%APPDATA%\Void\User\'
+    Notes: VS Code-compatible user profile
+    Platform: Windows
+  MCP:
+  - Path: Void settings.json
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: full
+    UsableForAttribution: true
+    SigningId: com.void
+    TeamId: ZUZ6WG9BCN
+    BundleId: com.void
+Resources:
+- Link: https://www.voideditor.com/
+  Title: Void Editor site
+- Link: https://voideditor.com/download-beta
+  Title: Void Editor download (beta)
+- Link: https://github.com/voideditor/void/
+  Title: Void Editor GitHub
+Uuid: 02848c27-19c6-5dc3-ac46-28e8e260ecc5
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    ConfigPaths:
+    - Void settings.json
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: macOS void --help v1.99.30044 verified 2026-07-19. Bundle ID com.void, TeamId
+    ZUZ6WG9BCN.

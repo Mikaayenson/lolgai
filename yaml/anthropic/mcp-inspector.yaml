@@ -1,0 +1,126 @@
+Name: MCP Inspector
+Id: mcp-inspector
+Category: mcp
+Vendor: Anthropic / MCP
+Description: Official Model Context Protocol Inspector — developer tool with a React
+  web UI and Node proxy for testing, debugging, and validating MCP server implementations.
+  Not an MCP server itself; bridges browser UI to stdio/SSE/HTTP MCP servers.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - mcp-inspector
+  - mcp-inspector.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://github.com/modelcontextprotocol/inspector
+  CliExecutable: mcp-inspector
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  InstallationPaths: []
+  Packages:
+    npm:
+    - '@modelcontextprotocol/inspector'
+Commands:
+- Command: npx @modelcontextprotocol/inspector
+  Description: Launch MCP Inspector web UI (default localhost:6274) and proxy (6277)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: npx @modelcontextprotocol/inspector node build/index.js
+  Description: Inspect a local MCP server via stdio transport through the proxy
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: mcp-inspector --help
+  Description: Show MCP Inspector CLI/proxy options
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: mcp-inspector mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: mcp-inspector mcp add registers attacker-controlled filesystem MCP
+    server on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: mcp-inspector-attribution
+  Name: mcp-inspector attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.command_line
+    Value: '*@modelcontextprotocol/inspector*'
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: network.destination.port
+    Value: '6274'
+    Reliability: medium
+    Platform: all
+    Notes: Default MCPI web UI port (6277 for proxy); customizable via CLIENT_PORT/SERVER_PORT
+  FalsePositiveGuidance: Expected during MCP server development. Correlate with localhost:6274/6277
+    listeners and npx inspector invocation.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: local mcp-inspector --help + MCP Inspector README
+  EmpiricalNotes: 'macOS lab npm @modelcontextprotocol/inspector; binary help shows
+    inspector-bin proxy flags (--transport, --server-url). Prior ~/.mcp-inspector/
+    config and Integrations Role server removed. VerificationLevel demoted to documented
+    (2026-07-18 audit: thin empirical evidence). Primary CLI or desktop binary empirically
+    present on lab PATH or documented install footprint (2026-07-19 revalidation).'
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/modelcontextprotocol/inspector
+  Title: Primary documentation
+- Link: https://modelcontextprotocol.io/docs/tools/inspector
+  Title: MCP docs — Inspector
+- Link: https://www.npmjs.com/package/@modelcontextprotocol/inspector
+  Title: npm @modelcontextprotocol/inspector
+Uuid: 1b14c860-38f2-59fa-91f8-3f7f31d974f3
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: macOS lab mcp-inspector --help verified 2026-07-19. Default ports 6274/6277
+    per upstream README.
+Artifacts:
+  Network:
+  - Domains:
+    - localhost
+    Description: MCPI web UI (default port 6274) and MCPP proxy (default port 6277)

@@ -1,0 +1,134 @@
+Name: Xinference
+Id: xinference
+Category: local_llm
+Vendor: Xorbits
+Description: Distributed model inference platform. Local supervisor entrypoint is
+  `xinference-local` (not `xinference serve`). Client CLI is `xinference` with launch/list/chat
+  subcommands. Default home ~/.xinference (override XINFERENCE_HOME).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - xinference
+  - xinference-local
+  - xinference.exe
+  - xinference-local.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://inference.readthedocs.io/
+  OfficialUrl: https://inference.readthedocs.io/
+  CliExecutable: xinference-local
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  ConfigDirs:
+    macOS: ~/.xinference/
+    Linux: ~/.xinference/
+    Windows: '%USERPROFILE%\\.xinference\\'
+  Packages:
+    pip:
+    - xinference
+Commands:
+- Command: xinference-local --host 127.0.0.1 --port 9997
+  Description: Start local Xinference supervisor on localhost
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: xinference launch --model-engine transformers -n qwen2.5-instruct -s 0_5
+    -f pytorch
+  Description: Launch model on running Xinference endpoint
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: xinference-local --host 0.0.0.0 --port 9997
+  Description: XInference local model server public bind
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: xinference-attribution
+  Name: xinference attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: xinference-local
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.name
+    Value: xinference
+    Reliability: medium
+    Platform: all
+    Notes: Client CLI subcommands (launch, chat, list) after supervisor is running.
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: inference.readthedocs.io using_xinference; xinference --help (documented)
+  EmpiricalNotes: Not on local PATH. Removed generic xinference serve/run templates.
+    Default data dir ~/.xinference per official docs. Primary CLI or desktop binary
+    empirically present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Disk:
+  - Path: ~/.xinference/
+    Notes: Default home for logs/models (override XINFERENCE_HOME)
+    Platform: macOS
+  - Path: ~/.xinference/
+    Notes: Default home for logs/models (override XINFERENCE_HOME)
+    Platform: Linux
+  - Path: '%USERPROFILE%\\.xinference\\'
+    Notes: Default home for logs/models (override XINFERENCE_HOME)
+    Platform: Windows
+  Network:
+  - Domains:
+    - 127.0.0.1
+    Description: Default local API when started with --host 127.0.0.1
+    Ports:
+    - 9997
+  Environment:
+  - Path: env XINFERENCE_HOME
+    Notes: Override default ~/.xinference data root
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://inference.readthedocs.io/
+  Title: Primary documentation
+- Link: https://pypi.org/project/xinference/
+  Title: PyPI xinference
+Uuid: 3c41426a-2958-5432-84a7-246a590defcb
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Server entrypoint is xinference-local; client uses xinference launch|list|chat|generate.
+    No xinference serve subcommand.

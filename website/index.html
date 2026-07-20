@@ -1,0 +1,3139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LOL-GAI: Living Off Legitimate GenAI</title>
+  <meta name="description" content="LOL-GAI (Living Off Legitimate GenAI): a living-off-the-land catalog — deliberate play on LOLBins — of GenAI tools on developer workstations and endpoints. Binaries, attribution, artifacts, abuse recipes, and observable datapoints." />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="assets/favicon-16.png" type="image/png" sizes="16x16" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <meta name="theme-color" content="#b45309" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+
+    /*
+      Visual system — light catalog, not GTFOBins crimson and not AI teal chrome.
+      Accent: fox copper #b45309 · Attribution ink #1f4b7a · Abuse rust #9a3412
+      Type: Syne (brand) · Source Sans 3 (UI) · Inconsolata (binaries).
+    */
+    :root,
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #ffffff;
+      --bg-soft: #f4f2ec;
+      --bg-code: #f5efe6;
+      --border: #d6d0c6;
+      --border-strong: #1a1a1a;
+      --text: #141414;
+      --muted: #5c5852;
+      --faint: #8a857c;
+      --accent: #b45309;
+      --accent-hover: #92400e;
+      --abuse: #9a3412;
+      --abuse-bg: #f7ebe8;
+      --detect: #1f4b7a;
+      --ok: #1f6b3a;
+      --warn: #8a5a10;
+      --bad: #991b1b;
+      --danger: #b91c1c;
+      --on-accent: #ffffff;
+      --shadow-menu: 0 6px 18px rgba(0, 0, 0, 0.08);
+      --offline-bg: #fef3c7;
+      --offline-border: #d97706;
+      --offline-text: #78350f;
+      --sans: "Source Sans 3", "Segoe UI", sans-serif;
+      --display: "Syne", "Source Sans 3", sans-serif;
+      --mono: "Inconsolata", ui-monospace, monospace;
+      --detail-label-size: 0.72rem;
+      --detail-label-spacing: 0.05em;
+      --detail-prose-size: 0.88rem;
+      --detail-prose-lh: 1.45;
+      --detail-intro-size: 0.85rem;
+      --detail-note-size: 0.78rem;
+      --detail-code-size: 0.78rem;
+      --detail-table-size: 0.85rem;
+    }
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #141312;
+      --bg-soft: #1c1b19;
+      --bg-code: #222019;
+      --border: #4a453e;
+      --border-strong: #e8e4dc;
+      --text: #ece8e1;
+      --muted: #a8a299;
+      --faint: #9a9288;
+      --accent: #e08a24;
+      --accent-hover: #f59e0b;
+      --abuse: #e07a52;
+      --abuse-bg: #2a1812;
+      --detect: #6ba8d9;
+      --ok: #5cb87a;
+      --warn: #d4a843;
+      --bad: #f07171;
+      --danger: #ef4444;
+      --on-accent: #ffffff;
+      --shadow-menu: 0 6px 18px rgba(0, 0, 0, 0.45);
+      --offline-bg: #422006;
+      --offline-border: #d97706;
+      --offline-text: #fde68a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    section[id], #scope, #catalog, #contribute, #about {
+      scroll-margin-top: 64px;
+    }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.4;
+      font-size: 16px;
+    }
+    ::selection { background: var(--text); color: var(--bg); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+    button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    code, .mono { font-family: var(--mono); }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 1.25rem; }
+
+    nav {
+      position: sticky; top: 0; z-index: 40;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 52px; gap: 1rem;
+    }
+    .logo {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: var(--display); font-weight: 800; font-size: 1.15rem;
+      letter-spacing: -0.03em; color: var(--text); text-decoration: none;
+    }
+    .logo:hover { text-decoration: none; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .logo-mark {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: block; flex-shrink: 0;
+    }
+    .hero-brand {
+      display: flex; align-items: center; gap: 0.85rem;
+      margin-bottom: 0.85rem;
+    }
+    .hero-brand img {
+      width: 56px; height: 56px; border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .hero-brand h1 { margin: 0; }
+    .nav-links { display: flex; gap: 1.15rem; font-size: 0.9rem; color: var(--muted); flex-wrap: wrap; }
+    .nav-links a { color: var(--muted); text-decoration: none; }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); text-decoration: none; }
+    .nav-cta {
+      font-size: 0.8rem; font-family: var(--mono);
+      padding: 0.3rem 0.6rem; border: 1px solid var(--accent);
+      color: var(--accent); white-space: nowrap; text-decoration: none;
+    }
+    .nav-end {
+      display: flex; align-items: center; gap: 0.65rem; flex-shrink: 0;
+    }
+    .theme-toggle {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 2rem; height: 2rem;
+      border: 1px solid var(--border); border-radius: 4px;
+      color: var(--muted); flex-shrink: 0;
+    }
+    .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    .theme-toggle:focus-visible {
+      outline: 2px solid color-mix(in srgb, var(--accent) 35%, transparent);
+      outline-offset: 2px;
+    }
+    .theme-toggle svg { width: 1.05rem; height: 1.05rem; display: block; }
+    [data-theme="light"] .theme-toggle .icon-sun { display: none; }
+    [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+    .nav-cta:hover { background: var(--accent); color: var(--on-accent); text-decoration: none; }
+    .nav-repo {
+      font-size: 0.85rem; color: var(--muted); text-decoration: none; white-space: nowrap;
+    }
+    .nav-repo:hover { color: var(--accent); text-decoration: none; }
+
+    .hero { padding: 2.75rem 0 1.5rem; }
+    .hero h1 {
+      font-family: var(--display); font-size: clamp(2.4rem, 6vw, 3.4rem);
+      font-weight: 800; letter-spacing: -0.045em; line-height: 0.95;
+      color: var(--text);
+    }
+    .hero h1 .gai { color: var(--accent); }
+    .hero-sub {
+      margin-top: 1rem; max-width: 38rem;
+      color: var(--muted); font-size: 1.05rem; line-height: 1.45;
+    }
+    .hero-sub a { border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+    .hero-sub a:hover { border-bottom-color: var(--accent-hover); }
+
+    .metrics {
+      margin-top: 1.75rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+    }
+    @media (max-width: 720px) { .metrics { grid-template-columns: 1fr 1fr; } }
+    .metric {
+      background: var(--bg); padding: 0.85rem 1rem;
+      border-right: 1px solid var(--border);
+    }
+    .metric:last-child { border-right: none; }
+    @media (max-width: 720px) {
+      .metric:nth-child(2n) { border-right: none; }
+      .metric:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+    }
+    .metric .n {
+      font-family: var(--mono); font-size: 1.5rem; font-weight: 700; line-height: 1;
+      color: var(--text);
+    }
+    .metric .n.teal, .metric .n.amber, .metric .n.green, .metric .n.blue { color: var(--text); }
+    .metric .l {
+      margin-top: 0.35rem; font-size: 0.72rem; color: var(--faint);
+      text-transform: uppercase; letter-spacing: 0.04em; font-family: var(--mono);
+    }
+    .metric .hint {
+      margin-top: 0.2rem; font-size: 0.62rem; color: var(--faint);
+      text-transform: none; letter-spacing: 0; line-height: 1.25;
+      font-family: var(--sans, system-ui, sans-serif);
+    }
+
+    .disclaimer {
+      margin-top: 1rem; font-size: 0.85rem; color: var(--faint);
+      border-left: 3px solid var(--accent); padding-left: 0.85rem;
+    }
+    .disclaimer a { color: var(--accent); }
+
+    .search-bar { margin-top: 1.75rem; }
+    .search-input {
+      width: 100%;
+      font-family: var(--mono); font-size: 0.95rem;
+      background: var(--bg); border: 1px solid var(--accent);
+      padding: 0.75rem 0.9rem; color: var(--text); outline: none;
+    }
+    .search-input:focus { outline: 2px solid color-mix(in srgb, var(--accent) 25%, transparent); outline-offset: 1px; }
+    .search-input::placeholder { color: var(--faint); }
+
+    .filter-block { margin-top: 1rem; }
+    .filter-label {
+      font-family: var(--mono); font-size: 0.72rem; color: var(--faint);
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .chip {
+      font-family: var(--mono); font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border: 1px solid var(--border); color: var(--muted); background: var(--bg);
+    }
+    .chip:hover, .chip.active {
+      border-color: var(--accent); color: var(--accent); background: var(--bg-code);
+    }
+    .chip.fn.active {
+      border-color: var(--abuse); color: var(--abuse); background: var(--abuse-bg);
+    }
+
+    .filter-bar {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; align-items: flex-start;
+    }
+    .filter-dropdown { position: relative; }
+    .filter-btn {
+      font-family: var(--mono); font-size: 0.75rem;
+      padding: 0.35rem 0.65rem;
+      border: 1px solid var(--border); color: var(--muted); background: var(--bg);
+      cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;
+    }
+    .filter-btn:hover, .filter-btn.open, .filter-btn.active {
+      border-color: var(--accent); color: var(--accent); background: var(--bg-code);
+    }
+    .filter-btn .caret { opacity: 0.55; font-size: 0.65rem; }
+    .filter-menu {
+      display: none; position: absolute; z-index: 20; top: calc(100% + 0.25rem); left: 0;
+      min-width: 15rem; max-width: min(22rem, 92vw); max-height: 16rem; overflow: auto;
+      border: 1px solid var(--border); background: var(--bg); box-shadow: var(--shadow-menu);
+    }
+    .filter-menu.open { display: block; }
+    .filter-menu-head {
+      padding: 0.45rem 0.65rem; font-family: var(--mono); font-size: 0.65rem;
+      color: var(--faint); text-transform: uppercase; letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border); background: var(--bg-soft);
+      position: sticky; top: 0;
+    }
+    .filter-option {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 0.65rem; font-size: 0.82rem; color: var(--text);
+      cursor: pointer; border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+    }
+    .filter-option:last-child { border-bottom: none; }
+    .filter-option:hover { background: var(--bg-code); }
+    .filter-option input { accent-color: var(--accent); flex-shrink: 0; }
+    .filter-option .label { flex: 1; display: inline-flex; align-items: center; gap: 0.35rem; }
+    .filter-option .os-icon { width: 0.95rem; height: 0.95rem; flex-shrink: 0; }
+    .filter-option .count {
+      font-family: var(--mono); font-size: 0.68rem; color: var(--faint);
+      min-width: 1.5rem; text-align: right;
+    }
+    .filter-summary {
+      margin-top: 0.65rem; display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;
+      font-size: 0.78rem; color: var(--muted);
+    }
+    .filter-summary:empty { display: none; }
+    .filter-pill {
+      font-family: var(--mono); font-size: 0.68rem;
+      padding: 0.15rem 0.45rem; border: 1px solid var(--border); color: var(--muted); background: var(--bg-soft);
+    }
+    .filter-clear {
+      font-family: var(--mono); font-size: 0.68rem; color: var(--accent);
+      background: none; border: none; cursor: pointer; padding: 0.15rem 0.25rem;
+    }
+    .filter-clear:hover { text-decoration: underline; }
+
+    .sort-toggle {
+      display: inline-flex; border: 1px solid var(--border); font-family: var(--mono); font-size: 0.68rem;
+    }
+    .sort-toggle button {
+      padding: 0.25rem 0.5rem; border: none; background: var(--bg); color: var(--faint); cursor: pointer;
+    }
+    .sort-toggle button + button { border-left: 1px solid var(--border); }
+    .sort-toggle button.active { color: var(--accent); background: var(--bg-code); }
+
+    .catalog-controls {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem;
+    }
+
+    .catalog { margin: 2rem 0 2rem; }
+    .catalog-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 0.5rem; gap: 1rem; flex-wrap: wrap;
+    }
+    .catalog-head h2 {
+      font-family: var(--display); font-size: 1rem; font-weight: 700;
+      color: var(--text); letter-spacing: -0.02em; text-transform: none;
+    }
+    .catalog-head span { font-family: var(--mono); font-size: 0.75rem; color: var(--faint); }
+
+    .table-wrap { border: 1px solid var(--border); overflow: auto; background: var(--bg); }
+    table { width: 100%; border-collapse: collapse; min-width: 700px; }
+    th {
+      text-align: left; font-size: 0.7rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--faint); padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid var(--border); background: var(--bg-soft);
+    }
+    td {
+      padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--border);
+      font-size: 0.9rem; vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: var(--bg-code); }
+    tbody tr.selected { background: var(--bg-code); box-shadow: inset 3px 0 0 var(--accent); }
+
+    .bin { font-family: var(--mono); font-weight: 600; color: var(--accent); }
+    .vendor { color: var(--faint); font-size: 0.78rem; }
+    .row-desc {
+      margin-top: 0.28rem;
+      font-size: 0.78rem;
+      line-height: 1.4;
+      color: var(--faint);
+      max-width: 42ch;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .tags { display: flex; flex-wrap: wrap; gap: 0.22rem; }
+    .tag {
+      font-family: var(--mono); font-size: 0.68rem;
+      padding: 0.1rem 0.35rem;
+      border: 1px solid var(--border); color: var(--muted); background: var(--bg);
+    }
+    .tag.fn { border-color: var(--abuse); color: var(--abuse); }
+    .tag.ok { border-color: var(--ok); color: var(--ok); }
+    .tag.warn { border-color: var(--warn); color: var(--warn); }
+    .os-icons {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      flex-wrap: nowrap; white-space: nowrap;
+    }
+    .os-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      width: 1.15rem; height: 1.15rem;
+      color: var(--muted);
+    }
+    .os-icon.os-linux {
+      width: 1.2rem;
+      height: 1.35rem;
+    }
+    .os-icon svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .os-icon[title] { cursor: default; }
+    tr.selected .os-icon, .detail-head .os-icon { color: var(--text); }
+    .os-extra {
+      font-family: var(--mono); font-size: 0.65rem;
+      padding: 0.05rem 0.3rem; border: 1px solid var(--border); color: var(--faint);
+    }
+    .chip .os-icon { width: 0.95rem; height: 0.95rem; margin-right: 0.15rem; vertical-align: -0.1rem; }
+    .grade {
+      font-family: var(--mono); font-weight: 700; font-size: 0.8rem;
+      width: 1.5rem; height: 1.5rem; display: inline-flex;
+      align-items: center; justify-content: center;
+      border: 1px solid var(--border);
+    }
+    .grade.a { border-color: var(--ok); color: var(--ok); }
+    .grade.b { border-color: var(--detect); color: var(--detect); }
+    .grade.c { border-color: var(--warn); color: var(--warn); }
+    .grade.d { border-color: var(--bad); color: var(--bad); }
+    .grade.a-plus, .grade.aplus { border-color: var(--ok); color: var(--ok); min-width: 2rem; font-size: 0.72rem; }
+
+    .score-panel { display: flex; flex-direction: column; gap: 1rem; }
+    .score-summary {
+      display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start;
+      border: 1px solid var(--border); background: var(--bg); padding: 0.85rem 1rem;
+    }
+    .score-badge {
+      font-family: var(--mono); font-weight: 700; font-size: 1.15rem;
+      min-width: 2.75rem; height: 2.75rem; display: inline-flex;
+      align-items: center; justify-content: center;
+      border: 1px solid var(--border); flex-shrink: 0;
+    }
+    .score-badge.ok { border-color: var(--ok); color: var(--ok); }
+    .score-badge.partial { border-color: var(--warn); color: var(--warn); }
+    .score-badge.gap { border-color: var(--bad); color: var(--bad); }
+    .score-meta { flex: 1; min-width: 12rem; }
+    .score-meta .score-fraction {
+      font-family: var(--mono); font-size: 0.95rem; font-weight: 700; color: var(--text);
+    }
+    .score-meta .score-pct { font-family: var(--mono); font-size: 0.78rem; color: var(--faint); margin-left: 0.35rem; }
+    .score-bar {
+      margin-top: 0.55rem; height: 0.45rem; width: 100%; max-width: 22rem;
+      background: var(--bg-soft); border: 1px solid var(--border);
+    }
+    .score-bar > span {
+      display: block; height: 100%; background: var(--detect); transition: width 0.2s ease;
+    }
+    .score-bar > span.ok { background: var(--ok); }
+    .score-bar > span.partial { background: var(--warn); }
+    .score-bar > span.gap { background: var(--bad); }
+    .score-intro, .score-note { margin: 0; }
+    .score-meta .score-note { margin-top: 0.55rem; }
+    .score-diverge {
+      font-size: 0.82rem; color: var(--warn); margin: 0;
+      border-left: 3px solid var(--warn); padding-left: 0.65rem;
+    }
+    .score-table {
+      border: 1px solid var(--border); background: var(--bg);
+    }
+    .score-table th.score-col { text-align: center; width: 4.5rem; }
+    .score-table td {
+      padding: 0.5rem 0.65rem; border-bottom: 1px solid var(--border); vertical-align: top;
+    }
+    .score-table tr:last-child td { border-bottom: none; }
+    .score-table .score-cell {
+      text-align: center; font-family: var(--mono); font-size: var(--detail-code-size); font-weight: 600;
+    }
+    .score-table .finding-ok { color: var(--ok); }
+    .score-table .finding-partial { color: var(--warn); }
+    .score-table .finding-gap { color: var(--bad); }
+    .score-table .finding-na { color: var(--faint); font-style: italic; }
+    .score-resources { margin-top: 0.25rem; }
+    .score-resources h4 { margin: 0 0 0.35rem; }
+    .score-resources ul { margin: 0.35rem 0 0; }
+    .score-resources a { color: var(--accent); }
+    .score-readiness-divider {
+      margin: 0.35rem 0 0.15rem; border: none; border-top: 1px solid var(--border);
+    }
+    #tool-view .score-panel { width: 100%; max-width: none; }
+
+    .detail {
+      display: none; margin: 0 0 2.5rem;
+      border: 1px solid var(--border); background: var(--bg);
+      --detail-pad-x: 1.25rem;
+    }
+    .detail.open { display: block; }
+
+    .detail-head {
+      padding: 1.1rem var(--detail-pad-x) 0.85rem;
+      display: flex; flex-direction: column; gap: 0.35rem;
+      min-width: 0; width: 100%;
+    }
+    .detail-head h3 { font-family: var(--mono); font-size: 1.35rem; font-weight: 700; color: var(--accent); }
+    .detail-tool-name {
+      font-family: var(--sans); font-size: 1rem; font-weight: 600;
+      color: var(--text); margin: 0.15rem 0 0; line-height: 1.3;
+    }
+    .detail-tool-name:empty { display: none; }
+    .detail-head .meta { color: var(--muted); font-size: 0.9rem; margin-top: 0.2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
+    .detail-head .meta .os-icons { margin-left: 0.1rem; flex-shrink: 0; }
+    .catalog table td:nth-child(4),
+    .catalog table th:nth-child(4) { white-space: nowrap; }
+    .detail-head .tool-links { margin-top: 0.45rem; }
+    .detail-head .official-link {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      font-size: 0.92rem; font-weight: 600; color: var(--accent);
+      text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    }
+    .detail-head .official-link:hover { color: var(--text); border-bottom-color: var(--text); }
+    .detail-head .tool-links.missing { color: var(--faint); font-size: 0.85rem; font-style: italic; }
+    .detail-head .cli-invoke {
+      margin-top: 0.35rem; font-size: 0.88rem; color: var(--muted);
+    }
+    .detail-head .cli-invoke code {
+      font-family: var(--mono); font-size: 0.86rem; color: var(--text);
+      background: color-mix(in srgb, var(--border) 35%, transparent);
+      padding: 0.08rem 0.35rem; border-radius: 4px;
+    }
+    .detail-head .byline {
+      margin-top: 0.45rem; font-size: 0.82rem; color: var(--faint);
+    }
+    .detail-head .byline a { color: var(--accent); }
+    .detail-head .byline .sep { margin: 0 0.35rem; color: var(--border); }
+    .tool-summary {
+      padding: 0.55rem var(--detail-pad-x) 0.65rem;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--muted);
+      max-width: none;
+    }
+    .tool-summary:empty { display: none; padding: 0; }
+    .detail-head-badges,
+    .detail-head > .badges {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;
+      margin-top: 0.35rem; padding-top: 0.55rem;
+      border-top: 1px solid var(--border);
+    }
+    .detail-head-badges:empty,
+    .detail-head > .badges:empty { display: none; border-top: none; padding-top: 0; margin-top: 0; }
+    .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+    .detail-head-badges .grade,
+    .detail-head > .badges .grade { flex-shrink: 0; }
+    .badge {
+      font-family: var(--mono); font-size: 0.72rem;
+      padding: 0.3rem 0.5rem; border: 1px solid var(--border); color: var(--muted);
+    }
+    .badge.teal { border-color: var(--detect); color: var(--detect); }
+    .badge.green { border-color: var(--ok); color: var(--ok); }
+    .badge.warn { border-color: var(--warn); color: var(--warn); }
+    .badge.muted { border-color: var(--border); color: var(--faint); }
+    .badge.check-observed { border-color: var(--ok); color: var(--ok); background: color-mix(in srgb, var(--ok) 8%, transparent); }
+    .badge.check-documented { border-color: var(--detect); color: var(--detect); background: color-mix(in srgb, var(--detect) 8%, transparent); }
+    .badge.check-unverified { border-color: var(--border); color: var(--faint); }
+    .badge.prov-doc { border-color: var(--detect); color: var(--detect); }
+    .badge.prov-lab { border-color: var(--ok); color: var(--ok); }
+    .badge.prov-emp { border-color: var(--warn); color: var(--warn); }
+    .surface-chips {
+      display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.45rem;
+    }
+    .surface-chip {
+      font-family: var(--mono); font-size: 0.68rem;
+      padding: 0.12rem 0.4rem; border: 1px solid var(--border);
+      color: var(--muted); background: var(--bg-soft);
+    }
+    .surface-chip .fw { color: var(--faint); margin-left: 0.25rem; }
+    .integrations-block { margin-bottom: 0.85rem; }
+    .integrations-block h4 { margin: 0 0 0.35rem; }
+    .integrations-kv { line-height: var(--detail-prose-lh); }
+    .ecosystems-panel { display: flex; flex-direction: column; gap: 0.85rem; }
+    .ecosystem-card {
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      padding: 0.85rem 0.95rem;
+      display: flex; flex-direction: column; gap: 0.45rem;
+    }
+    .ecosystem-card-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; }
+    .ecosystem-card-head a {
+      font-weight: 600; font-size: 0.92rem; color: var(--accent); text-decoration: none;
+    }
+    .ecosystem-card-head a:hover { text-decoration: underline; }
+    .ecosystem-kind {
+      font-family: var(--mono); font-size: 0.62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 0.12rem 0.4rem; border: 1px solid var(--border);
+      color: var(--detect); background: var(--bg);
+    }
+    .ecosystem-operator { margin: 0; }
+    .ecosystem-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .ecosystem-tag {
+      font-family: var(--mono); font-size: 0.68rem; font-weight: 600; padding: 0.1rem 0.35rem;
+      border: 1px solid var(--border); color: var(--muted); background: var(--bg);
+    }
+    .ecosystem-tag.official { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 35%, var(--border)); }
+    .ecosystem-tag.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 35%, var(--border)); }
+    .ecosystem-tag.risk { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, var(--border)); }
+    .ecosystem-surfaces { margin: 0; color: var(--faint); font-size: var(--detail-note-size); }
+    .ecosystem-desc { margin: 0; }
+    .tool-meta-foot {
+      padding: 0.55rem var(--detail-pad-x) 0.85rem;
+      font-size: 0.75rem; color: var(--faint); font-family: var(--mono);
+      display: flex; flex-wrap: wrap; gap: 0.35rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .tool-meta-foot:empty { display: none; }
+    .sign-os-block {
+      margin-bottom: 0.55rem; min-width: 0;
+    }
+    .sign-os-block:last-child { margin-bottom: 0; }
+    .sign-os-head {
+      display: flex; align-items: center; gap: 0.45rem;
+      color: var(--detect); margin-bottom: 0.35rem;
+    }
+    .sign-os-head .os-icons { color: var(--muted); }
+    .sign-os-head .os-label {
+      color: var(--text); text-transform: none; letter-spacing: 0; font-weight: 600;
+    }
+    .sign-fields { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+    .sign-field-row {
+      min-width: 0;
+      overflow-wrap: anywhere; word-break: break-word;
+    }
+
+    .tool-tabs-wrap {
+      border-top: 1px solid var(--border);
+      min-width: 0;
+    }
+    .tool-tabs {
+      display: flex;
+      gap: 0.15rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      border-bottom: 1px solid var(--border);
+      padding: 0.35rem var(--detail-pad-x) 0;
+      background: var(--bg-soft);
+    }
+    .tool-tab {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.65rem 0.9rem 0.7rem;
+      color: var(--muted);
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      background: transparent;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+    }
+    .tool-tab:hover {
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+    }
+    .tool-tab:focus-visible {
+      outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+      outline-offset: -2px;
+    }
+    .tool-tab[aria-selected="true"] {
+      color: var(--accent);
+      background: var(--bg);
+      border-bottom-color: var(--accent);
+      box-shadow: inset 0 -2px 0 var(--accent);
+    }
+    .tool-tab-panel {
+      display: none;
+      padding: 1.1rem var(--detail-pad-x);
+      min-width: 0;
+      overflow: hidden;
+    }
+    .tool-tab-panel.active { display: block; }
+    .tool-tab-panel[data-tab="attribution"] .attrib-disclaimer { margin-top: 0; }
+    [data-theme="dark"] .about-photo {
+      box-shadow: 0 0 0 1px var(--border), 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+    [data-theme="dark"] .badge.muted,
+    [data-theme="dark"] .badge.check-unverified {
+      color: var(--muted);
+      border-color: color-mix(in srgb, var(--muted) 35%, var(--border));
+    }
+    [data-theme="dark"] .detail-code,
+    [data-theme="dark"] .detail-head .cli-invoke code {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+    }
+    @media (max-width: 720px) {
+      .nav-inner {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 0.45rem 0;
+        row-gap: 0.35rem;
+      }
+      .nav-links {
+        order: 3;
+        width: 100%;
+        gap: 0.65rem 0.85rem;
+        font-size: 0.82rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.1rem;
+      }
+      .nav-cta { display: none; }
+    }
+    @media (max-width: 640px) {
+      .filter-bar { gap: 0.35rem; }
+      .filter-btn { font-size: 0.68rem; padding: 0.3rem 0.5rem; }
+      .catalog-head { flex-direction: column; align-items: flex-start; gap: 0.45rem; }
+    }
+    /* Detail tab typography — shared across tool panels */
+    .detail-section-label,
+    .pane-label,
+    .usage-label,
+    .integrations-block h4,
+    .install-block h4,
+    .install-block .install-block-title,
+    .readiness-card h4,
+    .score-table th,
+    .network-table th,
+    .commands-fn-tags .fn-tags-label,
+    .score-resources h4,
+    .attrib-group-head,
+    .sign-os-head {
+      font-family: var(--mono);
+      font-size: var(--detail-label-size);
+      font-weight: 700;
+      letter-spacing: var(--detail-label-spacing);
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+    .detail-prose,
+    .readiness-card p,
+    .install-kv,
+    .integrations-kv,
+    .ecosystem-desc,
+    .ecosystem-operator,
+    .sign-field-row,
+    .signal,
+    .cmd .desc,
+    .score-note,
+    .network-table td:not(:first-child),
+    .install-channel-row,
+    .score-table td:first-child,
+    .score-table td:last-child,
+    .score-resources ul,
+    .detail-list,
+    .artifacts {
+      font-family: var(--sans);
+      font-size: var(--detail-prose-size);
+      color: var(--muted);
+      line-height: var(--detail-prose-lh);
+    }
+    .detail-intro,
+    .recipe-note,
+    .score-intro,
+    .attrib-disclaimer {
+      font-family: var(--sans);
+      font-size: var(--detail-intro-size);
+      color: var(--muted);
+      line-height: var(--detail-prose-lh);
+      margin: 0 0 0.75rem;
+    }
+    .detail-note,
+    .signal .fp,
+    .install-lab-note {
+      font-family: var(--sans);
+      font-size: var(--detail-note-size);
+      color: var(--faint);
+      line-height: var(--detail-prose-lh);
+    }
+    .detail-code,
+    .tool-summary .detail-code,
+    .row-desc .detail-code,
+    .signal code,
+    .sign-field-row code,
+    .artifacts .signal code,
+    .network-table code,
+    .install-channel-vals code,
+    .integrations-kv code,
+    .install-kv code,
+    .readiness-card code,
+    .ecosystem-surfaces code,
+    .detail-list code {
+      font-family: var(--mono);
+      font-size: var(--detail-code-size);
+      background: var(--bg-soft);
+      padding: 0.1rem 0.3rem;
+      color: var(--text);
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .detail-table,
+    .score-table,
+    .network-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--detail-table-size);
+    }
+    .detail-table th,
+    .score-table th,
+    .network-table th {
+      text-align: left;
+      padding: 0.45rem 0.65rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-soft);
+      vertical-align: bottom;
+    }
+    .network-table th { padding-right: 0; padding-left: 0; }
+    .network-table td { padding: 0.45rem 0.65rem 0.45rem 0; }
+    .detail-empty,
+    .attrib-empty,
+    .artifacts-empty {
+      font-family: var(--sans);
+      font-size: var(--detail-prose-size);
+      color: var(--faint);
+    }
+    .detail-foot,
+    .readiness-foot,
+    .score-foot {
+      font-family: var(--mono);
+      font-size: var(--detail-note-size);
+      color: var(--faint);
+      margin: 0;
+    }
+    .detail-list,
+    .readiness-card ul,
+    .score-resources ul {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+    .detail-foot a,
+    .readiness-foot a { color: var(--accent); }
+
+    .pane-label {
+      letter-spacing: 0.06em;
+      margin-bottom: 0.85rem;
+    }
+    .pane-label.detect { color: var(--detect); }
+
+    .usage-block { margin-bottom: 1.15rem; }
+    .usage-block:last-child { margin-bottom: 0; }
+    .usage-label {
+      letter-spacing: 0.06em;
+      margin-bottom: 0.55rem;
+    }
+    .usage-block.normal .usage-label { color: var(--ok); }
+    .usage-block.abuse .usage-label { color: var(--abuse); }
+    .recipe-note {
+      border-left: 2px solid var(--border);
+      padding-left: 0.65rem;
+    }
+    .recipe-note strong { color: var(--muted); font-weight: 600; }
+    .cmd.generic .desc::before {
+      content: "Template · ";
+      color: var(--warn);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+    }
+    .cmd.config .desc::before {
+      content: "Config · not a shell one-liner · ";
+      color: var(--warn);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+    }
+
+    .cmd {
+      margin-bottom: 0.75rem; border: 1px solid var(--border);
+      background: var(--bg-code); overflow: hidden;
+    }
+    .cmd-top {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.3rem 0.55rem; border-bottom: 1px solid var(--border);
+      background: var(--bg-soft); font-size: 0.68rem; color: var(--faint);
+      font-family: var(--mono);
+    }
+    .copy-btn {
+      font-family: var(--mono); font-size: 0.68rem;
+      color: var(--accent); padding: 0.1rem 0.35rem;
+      border: 1px solid var(--accent);
+    }
+    .copy-btn:hover { background: var(--accent); color: var(--on-accent); }
+    .copy-btn:focus-visible,
+    .filter-btn:focus-visible {
+      outline: 2px solid color-mix(in srgb, var(--accent) 35%, transparent);
+      outline-offset: 2px;
+    }
+    .cmd pre {
+      font-family: var(--mono); font-size: 0.82rem;
+      padding: 0.65rem 0.75rem;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      margin: 0;
+      max-width: 100%;
+    }
+    .usage-block.normal .cmd pre { color: var(--detect); }
+    .usage-block.abuse .cmd pre { color: var(--abuse); }
+    .cmd .desc {
+      padding: 0 0.75rem 0.45rem;
+      overflow-wrap: anywhere; word-break: break-word;
+    }
+
+    .signal {
+      display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: 0.25rem 0.5rem;
+      margin-bottom: 0.85rem; min-width: 0;
+    }
+    .signal:last-child { margin-bottom: 0; }
+    .rank { font-family: var(--mono); color: var(--detect); font-weight: 700; font-size: 0.75rem; }
+    .signal > div:last-child { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+    .artifacts .signal code { display: block; max-width: 100%; }
+    .signal .fp {
+      overflow-wrap: anywhere; word-break: break-word;
+      margin-top: 0.15rem; grid-column: 2;
+    }
+    .signal code,
+    .artifacts .signal code { white-space: pre-wrap; }
+    .signal .collision-warn {
+      display: block; margin-top: 0.2rem;
+      font-family: var(--mono); font-size: 0.68rem; color: var(--warn);
+    }
+    .signal .op-label,
+    .artifacts .op-label {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 400;
+      color: var(--faint);
+      letter-spacing: 0.05em;
+      text-transform: none;
+    }
+    .signal .op-label {
+      grid-column: 2;
+      margin-bottom: 0.1rem;
+    }
+    .artifacts .art-section > .op-label {
+      margin-bottom: 0.35rem;
+    }
+    .artifacts .signal.art-row .rank.art-spacer {
+      visibility: hidden;
+    }
+
+    .attrib-groups { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+    .attrib-group {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      padding: 0.65rem 0.75rem 0.55rem;
+      min-width: 0; overflow: hidden;
+    }
+    .attrib-disclaimer {
+      margin-bottom: 0.75rem;
+      border: 1px solid var(--border); background: var(--bg-soft);
+      padding: 0.55rem 0.65rem;
+    }
+    .attrib-disclaimer strong { color: var(--text); font-weight: 600; }
+    .attrib-group-head {
+      display: flex; align-items: center; gap: 0.45rem;
+      color: var(--detect); margin-bottom: 0.55rem;
+      padding-bottom: 0.35rem; border-bottom: 1px solid var(--border);
+    }
+    .attrib-group-head .os-icons { color: var(--muted); }
+    .attrib-group-head .os-label { color: var(--text); text-transform: none; letter-spacing: 0; font-weight: 600; }
+    .attrib-group.signing-group .attrib-group-head { color: var(--muted); }
+    .signing-group > .recipe-note { margin-top: 0; margin-bottom: 0.55rem; }
+
+    .network-table td {
+      border-bottom: 1px solid var(--border); vertical-align: top;
+    }
+    .network-table tr:last-child td { border-bottom: none; }
+    .readiness-panel {
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .install-panel {
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .install-block h4,
+    .install-block .install-block-title { margin: 0 0 0.45rem; }
+    .install-channel-row {
+      display: flex; flex-wrap: wrap; gap: 0.35rem 0.85rem; align-items: baseline;
+      margin-bottom: 0.4rem;
+    }
+    .install-channel-row:last-child { margin-bottom: 0; }
+    .install-channel-label {
+      font-family: var(--mono); font-size: var(--detail-label-size); font-weight: 600;
+      color: var(--text); min-width: 6.5rem; flex-shrink: 0;
+      text-transform: none; letter-spacing: 0;
+    }
+    .install-kv { line-height: var(--detail-prose-lh); }
+    .install-block .surface-chips { margin-top: 0; }
+    .install-cap-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .install-lab-note { margin-top: 0.45rem; }
+    .install-lab-note a { color: var(--accent); }
+    .commands-fn-tags {
+      margin-bottom: 0.85rem; padding-bottom: 0.65rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .commands-fn-tags .fn-tags-label {
+      display: block; margin-bottom: 0.35rem;
+    }
+    .commands-fn-tags .tag.fn { opacity: 0.88; }
+    #tool-view .detail,
+    #tool-view .tool-tabs-wrap,
+    #tool-view .tool-tab-panel,
+    #tool-view .readiness-panel,
+    #tool-view .install-panel,
+    #tool-view .network-table { width: 100%; max-width: none; }
+    .readiness-card {
+      border: 1px solid var(--border); background: var(--bg); padding: 0.85rem 1rem;
+    }
+    .readiness-card h4 { margin-bottom: 0.45rem; }
+    .readiness-card p { margin: 0; }
+    .readiness-card p + p { margin-top: 0.45rem; }
+    .readiness-card .readiness-value {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      margin-bottom: 0.35rem; font-size: 0.95rem;
+    }
+    .readiness-card .readiness-value .badge { font-size: var(--detail-note-size); }
+    .artifacts-by-os { display: flex; flex-direction: column; gap: 0.85rem; }
+    .artifacts-os {
+      border: 1px solid var(--border); background: var(--bg);
+      padding: 0.65rem 0.75rem 0.55rem;
+      min-width: 0; overflow: hidden;
+    }
+    .artifacts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+      gap: 0.9rem 1.1rem;
+      min-width: 0;
+    }
+    .art-section { min-width: 0; overflow: hidden; }
+    .artifacts .signal.art-row { margin-bottom: 0.55rem; }
+    .artifacts .signal.art-row:last-child { margin-bottom: 0; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+      padding-bottom: calc(3.25rem + env(safe-area-inset-bottom, 0px));
+      font-size: 0.82rem; color: var(--faint);
+      display: grid; gap: 0.65rem;
+    }
+    footer .row { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; justify-content: space-between; }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--accent); }
+
+    .page-section {
+      margin: 0 0 2rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      padding: 1.15rem 1.25rem 1.35rem;
+    }
+    .page-section h2 {
+      font-family: var(--display); font-size: 1.2rem; font-weight: 700;
+      margin-bottom: 0.65rem; letter-spacing: -0.02em; color: var(--text);
+    }
+    .page-section p, .page-section li {
+      font-size: 0.95rem; color: var(--muted); max-width: 42rem;
+    }
+    .page-section p + p { margin-top: 0.6rem; }
+    .page-section ul { margin: 0.6rem 0 0 1.15rem; }
+    .page-section li { margin-bottom: 0.3rem; }
+    .page-section .mono-block {
+      margin-top: 0.85rem;
+      font-family: var(--mono); font-size: 0.8rem;
+      background: var(--bg-code); border: 1px solid var(--border);
+      padding: 0.75rem 0.85rem; color: var(--text); white-space: pre-wrap;
+    }
+    .page-section h3 {
+      font-family: var(--display); font-size: 1rem; font-weight: 700;
+      margin: 1.1rem 0 0.45rem; letter-spacing: -0.01em; color: var(--text);
+    }
+    .scope-grade-table {
+      width: 100%; max-width: 42rem; margin-top: 0.55rem;
+      border-collapse: collapse; font-size: 0.9rem;
+    }
+    .scope-grade-table th, .scope-grade-table td {
+      border: 1px solid var(--border); padding: 0.45rem 0.6rem;
+      text-align: left; vertical-align: top;
+    }
+    .scope-grade-table th {
+      font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--faint); font-weight: 600; background: var(--bg-code);
+    }
+    .scope-grade-table td { color: var(--muted); }
+    .scope-grade-table td:first-child { width: 3.5rem; white-space: nowrap; }
+    #about.page-section { overflow: visible; }
+    .about-layout {
+      display: flex; gap: 1.35rem; align-items: flex-start;
+      overflow: visible;
+    }
+    .about-photo-wrap {
+      flex: 0 0 auto;
+      align-self: flex-start;
+      min-height: 140px;
+      padding-bottom: 0.4rem;
+      overflow: visible;
+    }
+    .about-photo {
+      display: block;
+      width: 140px; height: 140px;
+      min-width: 140px; min-height: 140px;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center 15%;
+      border: 1px solid var(--border);
+    }
+    .about-body { min-width: 0; flex: 1; }
+    .about-body p { max-width: none; }
+    .about-links { margin-top: 0.85rem; }
+    .about-links-label {
+      color: var(--faint);
+      font-weight: 600;
+      margin-right: 0.35rem;
+    }
+    @media (max-width: 640px) {
+      .about-layout { flex-direction: column; align-items: center; }
+      .about-photo-wrap { padding-bottom: 0.55rem; }
+      .about-body { width: 100%; }
+    }
+
+    body.view-tool #home-view,
+    body.view-lab #home-view,
+    body.view-api #home-view { display: none; }
+    body.view-home #tool-view,
+    body.view-home #lab-view,
+    body.view-home #api-view { display: none; }
+    body.view-tool #lab-view,
+    body.view-tool #api-view,
+    body.view-lab #tool-view,
+    body.view-lab #api-view,
+    body.view-api #tool-view,
+    body.view-api #lab-view { display: none; }
+    #tool-view,
+    #lab-view,
+    #api-view { padding: 1.25rem 0 2.5rem; }
+    .api-file-list {
+      list-style: none;
+      margin: 0.85rem 0 0;
+      padding: 0;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+    }
+    .api-file-list li {
+      margin-bottom: 0.55rem;
+      color: var(--muted);
+    }
+    .api-file-list a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .api-file-list a:hover { text-decoration: underline; }
+    .api-file-list .desc { color: var(--faint); }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-family: var(--mono); font-size: 0.85rem; color: var(--muted);
+      margin-bottom: 1.15rem; text-decoration: none;
+    }
+    .back-link:hover { color: var(--accent); text-decoration: none; }
+    .site-foot-spacer { padding-bottom: 1.5rem; }
+    .offline-banner {
+      background: var(--offline-bg);
+      border-bottom: 1px solid var(--offline-border);
+      color: var(--offline-text);
+      font-size: 0.88rem;
+      padding: 0.45rem 0;
+      text-align: center;
+    }
+    .offline-banner.hidden { display: none; }
+  
+</style>
+  <!-- LOLGAI_EMBED_START -->
+<!-- LOLGAI_EMBED_END -->
+</head>
+<body class="view-home">
+  <div id="offline-banner" class="offline-banner hidden" role="status"></div>
+  <nav>
+    <div class="wrap nav-inner">
+      <a class="logo" href="#catalog" id="logo-link">
+        <img class="logo-mark" src="assets/mark.svg" width="32" height="32" alt="" />
+        LOL<span>-GAI</span>
+      </a>
+      <div class="nav-links">
+        <a href="#catalog">Catalog</a>
+        <a href="#scope">Scope</a>
+        <a href="#/lab">Install</a>
+        <a href="#/api">API</a>
+        <a href="#contribute">Contribute</a>
+        <a href="#about">About</a>
+      </div>
+      <div class="nav-end">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme" title="Toggle color theme">
+          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+        <a class="nav-repo" href="https://github.com/Mikaayenson/lolgai" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="nav-cta" href="#/lab">Install script</a>
+      </div>
+    </div>
+  </nav>
+
+  <div id="home-view">
+  <header class="wrap hero" id="top">
+    <div class="hero-brand">
+      <img src="assets/mark.svg" width="56" height="56" alt="LOL-GAI mark" />
+      <h1>LOL<span class="gai">-GAI</span></h1>
+    </div>
+    <p class="hero-sub">
+      <strong style="color:var(--text);font-weight:600">Living Off Legitimate GenAI</strong>
+      — a living-off-the-land catalog of GenAI tools on developer workstations and endpoints
+      (named as a deliberate play on LOLBins: legitimate GenAI binaries, same detection problem).
+      Detection-engineering oriented: binaries, attribution signals, artifacts,
+      abuse recipes, and observable datapoints.
+      Read the <a href="#scope">scope</a>,
+      <a href="#/lab">install lab tools</a>, or <a href="#contribute">contribute</a> a tool.
+    </p>
+
+    <!-- Hero metrics -->
+    <div class="metrics">
+      <div class="metric"><div class="n teal" id="stat-tools">—</div><div class="l">Tools tracked</div></div>
+      <div class="metric"><div class="n amber" id="stat-cats">—</div><div class="l">Categories</div></div>
+    </div>
+
+    <p class="disclaimer">
+      Readiness grades measure how complete an entry is for detection work, not severity. Abuse recipes are for
+      <strong style="color:var(--muted);font-weight:600">authorized defensive research</strong> on systems you own or may test,
+      not operational attack guidance.       Filter the catalog with the dropdowns below
+      (<strong style="color:var(--muted);font-weight:600">Category</strong>,
+      <strong style="color:var(--muted);font-weight:600">Capabilities</strong>,
+      <strong style="color:var(--muted);font-weight:600">Functions</strong>,
+      <strong style="color:var(--muted);font-weight:600">Ecosystem</strong>,
+      <strong style="color:var(--muted);font-weight:600">Verified</strong>), or jump to
+      <a href="#scope" style="color:var(--accent)">full scope criteria</a>.
+    </p>
+
+    <div class="search-bar">
+      <input class="search-input" type="search" id="q" placeholder="Filter binary, vendor, function…" />
+    </div>
+
+    <div class="filter-bar" id="filter-bar">
+      <div class="filter-dropdown" id="cat-dropdown">
+        <button class="filter-btn" type="button" id="cat-btn" aria-haspopup="true" aria-expanded="false">Category <span class="caret">▾</span></button>
+        <div class="filter-menu" id="cat-menu" role="group" aria-label="Category filters"></div>
+      </div>
+      <div class="filter-dropdown" id="cap-dropdown">
+        <button class="filter-btn" type="button" id="cap-btn" aria-haspopup="true" aria-expanded="false">Capabilities <span class="caret">▾</span></button>
+        <div class="filter-menu" id="cap-menu" role="group" aria-label="Capability filters"></div>
+      </div>
+      <div class="filter-dropdown" id="fn-dropdown">
+        <button class="filter-btn" type="button" id="fn-btn" aria-haspopup="true" aria-expanded="false">Functions <span class="caret">▾</span></button>
+        <div class="filter-menu" id="fn-menu" role="group" aria-label="Function filters"></div>
+      </div>
+      <div class="filter-dropdown" id="eco-dropdown">
+        <button class="filter-btn" type="button" id="eco-btn" aria-haspopup="true" aria-expanded="false">Ecosystem <span class="caret">▾</span></button>
+        <div class="filter-menu" id="eco-menu" role="group" aria-label="Ecosystem filters"></div>
+      </div>
+      <div class="filter-dropdown" id="ver-dropdown">
+        <button class="filter-btn" type="button" id="ver-btn" aria-haspopup="true" aria-expanded="false">Verified <span class="caret">▾</span></button>
+        <div class="filter-menu" id="ver-menu" role="group" aria-label="Verified filters"></div>
+      </div>
+    </div>
+    <div class="filter-summary" id="filter-summary" aria-live="polite"></div>
+  </header>
+
+  <main class="wrap">
+    <section class="catalog" id="catalog">
+      <div class="catalog-head">
+        <h2>Catalog</h2>
+        <div class="catalog-controls">
+          <span id="count">—</span>
+          <div class="sort-toggle" role="group" aria-label="Sort catalog">
+            <button type="button" id="sort-alpha" class="active" aria-pressed="true">A–Z</button>
+            <button type="button" id="sort-readiness" aria-pressed="false">Readiness</button>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Binary</th>
+              <th>Functions</th>
+              <th>Type</th>
+              <th>OS</th>
+              <th title="Evidence level: Unverified, Documented, or Observed">Verified</th>
+              <th><a href="#scope-readiness" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--faint)" title="A/B/C = catalog readiness for detection (see Scope)">Readiness</a></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page-section" id="scope">
+      <h2>Scope</h2>
+      <p>
+        LOL-GAI (<strong style="color:var(--text);font-weight:600">Living Off Legitimate GenAI</strong>)
+        is a living-off-the-land catalog of GenAI-related binaries and tooling
+        that may appear on developer workstations and endpoints as adoption grows —
+        named as a deliberate play on LOLBins (legitimate GenAI tools, same class of problem).
+        Oriented toward detection engineering: what runs, where it lives, how to attribute it, and
+        how those surfaces can be abused.
+      </p>
+      <p><strong style="color:var(--text);font-weight:600">In scope</strong></p>
+      <ul>
+        <li>Terminal / CLI binaries with an observable process name</li>
+        <li>Companion helpers (tunnels, updaters) when abuse or attribution differs</li>
+        <li>Install paths, config dirs, network destinations, and signing/origin signals</li>
+        <li>Documented abuse recipes and ranked attribution signals</li>
+      </ul>
+      <p style="margin-top:0.85rem"><strong style="color:var(--text);font-weight:600">Out of scope</strong></p>
+      <ul>
+        <li>IDE-only chat UIs with no distinct process (unless a binary ships)</li>
+        <li>Cloud SaaS with no host footprint</li>
+        <li>Generic language runtimes (<span class="mono">python</span>, <span class="mono">node</span>) without a GenAI-specific entrypoint</li>
+      </ul>
+      <h3 id="scope-readiness">Catalog readiness (A/B/C)</h3>
+      <p>
+        The <strong style="color:var(--text);font-weight:600">Readiness</strong> column is an editorial grade:
+        how useful this YAML entry is for detection engineering, not how dangerous the tool is.
+        It reflects binaries, host artifacts, abuse recipes, ranked attribution signals, and
+        (for Grade&nbsp;A) whether you can reliably attribute the process on an endpoint.
+      </p>
+      <table class="scope-grade-table" aria-label="Readiness grade definitions">
+        <thead>
+          <tr><th scope="col">Grade</th><th scope="col">Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="grade a">A</span></td>
+            <td>Detection-ready: full binaries, artifacts, recipes, and signals, plus
+              <strong style="color:var(--muted);font-weight:600">strong attribution</strong>,
+              usable signing (<span class="mono">full</span> / <span class="mono">authenticode</span> depth) or a
+              high-reliability, product-specific signal (not shared VS Code Code Helper or generic
+              <span class="mono">process.name</span> alone).</td>
+          </tr>
+          <tr>
+            <td><span class="grade b">B</span></td>
+            <td>Solid entry: binaries, paths, recipes, and attribution signals are present; attribution is
+              usable but does not meet Grade&nbsp;A bar (weak signing, shared host, or corroboration-heavy signals).</td>
+          </tr>
+          <tr>
+            <td><span class="grade c">C</span></td>
+            <td>Partial or sparse: a useful catalog pointer; may lack lab depth, strong signals, or full artifact coverage.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top:0.85rem">
+        <strong style="color:var(--text);font-weight:600">Readiness ≠ Verified.</strong>
+        The <strong style="color:var(--muted);font-weight:600">Verified</strong> column is
+        <span class="mono">VerificationLevel</span> in YAML: how the entry was checked:
+        <strong style="color:var(--muted);font-weight:600">Unverified</strong> (stub),
+        <strong style="color:var(--muted);font-weight:600">Documented</strong> (official docs / <span class="mono">--help</span>),
+        or <strong style="color:var(--muted);font-weight:600">Observed</strong> (lab host: paths, signing, or binary behavior).
+        An Observed tool can still be Grade&nbsp;C if metadata is thin; a Documented stub can be Grade&nbsp;B if fields are complete.
+      </p>
+    </section>
+
+    <section class="page-section" id="contribute">
+      <h2>Contribute</h2>
+      <p>
+        Source and pull requests:
+        <a href="https://github.com/Mikaayenson/lolgai" target="_blank" rel="noopener noreferrer">https://github.com/Mikaayenson/lolgai</a>
+        · Site: <a href="https://lolgai.io">lolgai.io</a>
+      </p>
+      <p>
+        See <a href="https://github.com/Mikaayenson/lolgai/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">CONTRIBUTING.md</a> for the full checklist.
+      </p>
+      <p>
+        One YAML file per tool (or per surface when abuse differs). Do not edit
+        <span class="mono">tools.json</span> by hand; it is generated at build time.
+      </p>
+      <ul>
+        <li>Fork the repository and create a branch</li>
+        <li>Add <span class="mono">yaml/&lt;vendor&gt;/&lt;tool&gt;.yaml</span> from the template</li>
+        <li>Set <span class="mono">Author</span> to your GitHub handle; when editing an existing entry, keep the original Author and add yourself under <span class="mono">Contributors</span></li>
+        <li>Include binaries, functions, abuse recipes, attribution signals, and artifacts</li>
+        <li>Do not submit vendor query languages or sample SIEM rules</li>
+        <li>Open a pull request. CI validates the schema</li>
+      </ul>
+      <div class="mono-block">Name: Example Tool
+Id: example-tool
+Category: cli_agent
+Author: your-handle
+Details:
+  Binaries: [example]
+Commands:
+  - Command: example --yes …
+    Description: …
+DetectionOpportunities:
+  - Name: Example parented shell
+    AttributionSignals:
+      - Field: process.parent.name
+        Value: example</div>
+    </section>
+
+    <section class="page-section" id="about">
+      <h2>About</h2>
+      <div class="about-layout">
+        <div class="about-photo-wrap">
+          <img class="about-photo" src="public/img/mika-ayenson.jpg" width="140" height="140" alt="Mika Ayenson" />
+        </div>
+        <div class="about-body">
+          <p>
+            <strong style="color:var(--text);font-weight:600">LOL-GAI</strong> (Living Off Legitimate GenAI) is a
+            living-off-the-land catalog of GenAI binaries on developer workstations and endpoints —
+            a deliberate play on LOLBins, not a mistype of “land.” Attribution signals, artifacts,
+            abuse recipes, and observable datapoints for detection engineering.
+          </p>
+          <p>
+            Maintained by <a href="https://www.linkedin.com/in/mika-ayenson/" target="_blank" rel="noopener noreferrer">Mika Ayenson</a>, who leads the
+            Threat Research and Detection Engineering (TRaDE) team at Elastic with a focus on AI Security. With a
+            background in Cyber Missions Operations at JHUAPL, Ayenson keeps LOL-GAI as a personal catalog as GenAI
+            adoption maps to new endpoint and SIEM detection surfaces.
+          </p>
+          <p class="about-links">
+            <span class="about-links-label">Connect:</span>
+            <a href="https://x.com/stryker0x" target="_blank" rel="noopener noreferrer">X</a> ·
+            <a href="https://www.linkedin.com/in/mika-ayenson/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="row">
+      <div><a href="https://github.com/Mikaayenson/lolgai" target="_blank" rel="noopener noreferrer">GitHub</a> · LOL-GAI · Apache-2.0</div>
+      <div>
+        <a href="#scope">Scope</a> ·
+        <a href="#/lab">Install</a> ·
+        <a href="#contribute">Contribute</a> ·
+        <a href="#about">About</a>
+      </div>
+    </div>
+  </footer>
+  </div>
+
+  <div id="tool-view">
+    <div class="wrap">
+      <a class="back-link" href="#catalog" id="back-catalog">← Catalog</a>
+      <section class="detail open" id="detail">
+        <div class="detail-head">
+          <div>
+            <h3 id="d-bin">—</h3>
+            <div class="meta" id="d-meta"></div>
+            <div class="tool-links" id="d-official"></div>
+            <div class="cli-invoke" id="d-cli"></div>
+            <div class="byline" id="d-byline"></div>
+            <div class="tags" style="margin-top:0.55rem" id="d-tags"></div>
+          </div>
+          <div class="badges">
+            <span class="grade ?" id="d-grade" title="Readiness grade unknown. See Scope" aria-label="Readiness ?">?</span>
+            <span class="badge" id="d-ver">—</span>
+            <span class="badge teal">Readiness ≠ severity</span>
+          </div>
+        </div>
+        <div class="tool-summary" id="d-desc"></div>
+        <div class="tool-meta-foot" id="d-catalog-meta"></div>
+        <div class="tool-tabs-wrap" id="d-tabs-wrap">
+          <div class="tool-tabs" id="d-tabs" role="tablist" aria-label="Tool detail sections"></div>
+          <div class="tool-tab-panels" id="d-tab-panels"></div>
+        </div>
+      </section>
+      <div class="tool-view-foot">LOL-GAI · Apache-2.0</div>
+    </div>
+  </div>
+
+  <div id="lab-view">
+    <div class="wrap">
+      <a class="back-link" href="#catalog" id="back-catalog-lab">← Catalog</a>
+      <section class="page-section" id="lab">
+      <h2>Lab install script</h2>
+      <p>
+        Cross-platform installer for GenAI CLIs and related tooling, useful for populating a
+        lab host with the binaries in this catalog. Review the script before running it.
+        Use <span class="mono">--tool &lt;id&gt;</span> for one tool or <span class="mono">--all</span> for the full catalog
+        (<span class="mono">--list</span> shows IDs; group filters include <span class="mono">--cli</span>, <span class="mono">--desktop</span>, <span class="mono">--mcp</span>).
+      </p>
+      <ul>
+        <li>
+          <a href="https://gist.github.com/Mikaayenson/3f05db683761ba604bec1575607dce0c" target="_blank" rel="noopener">install-genai-tools.sh</a>
+          (GitHub Gist v1.9.2; canonical installer; examples below pin revision ce115bc9e0ca)
+        </li>
+        <li>Supports macOS, Linux, and Windows (including WSL)</li>
+        <li>Tool IDs align with catalog <span class="mono">Id</span> fields (legacy installer aliases still work)</li>
+      </ul>
+      <p style="margin-top:0.85rem;color:var(--abuse);border-left:3px solid var(--abuse);padding-left:0.75rem;font-size:0.9rem">
+        <strong>Supply-chain caution:</strong> Do not pipe remote shell scripts to <span class="mono">bash</span> without review.
+        Open the Gist, read every line, verify the author, and pin a specific revision hash.
+      </p>
+      <p style="margin-top:0.85rem;font-size:0.85rem;color:var(--faint)">Download and inspect (recommended):</p>
+      <div class="mono-block" style="position:relative;padding-right:4.5rem">
+        <button class="copy-btn" type="button" data-copy="lab-curl-safe" style="position:absolute;top:0.55rem;right:0.55rem">Copy</button>
+        <pre id="lab-curl-safe" style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;background:none;border:none;padding:0;color:inherit">curl -fsSL -o install-genai-tools.sh \
+  "https://gist.githubusercontent.com/Mikaayenson/3f05db683761ba604bec1575607dce0c/raw/ce115bc9e0ca59619269a7f670ce2a1a3e9c6bcc/install-genai-tools.sh"
+less install-genai-tools.sh
+bash install-genai-tools.sh --list</pre>
+      </div>
+      <p style="margin-top:0.85rem;font-size:0.85rem;color:var(--faint)">Install one tool (replace <span class="mono">claude</span> with any ID from <span class="mono">--list</span>):</p>
+      <div class="mono-block" style="position:relative;padding-right:4.5rem">
+        <button class="copy-btn" type="button" data-copy="lab-tool-one" style="position:absolute;top:0.55rem;right:0.55rem">Copy</button>
+        <pre id="lab-tool-one" style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;background:none;border:none;padding:0;color:inherit">bash install-genai-tools.sh --tool claude --yes</pre>
+      </div>
+      <p style="margin-top:0.85rem;font-size:0.85rem;color:var(--faint)">Install everything (skips unsupported platforms; use <span class="mono">--check</span> first):</p>
+      <div class="mono-block" style="position:relative;padding-right:4.5rem">
+        <button class="copy-btn" type="button" data-copy="lab-tool-all" style="position:absolute;top:0.55rem;right:0.55rem">Copy</button>
+        <pre id="lab-tool-all" style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;background:none;border:none;padding:0;color:inherit">bash install-genai-tools.sh --all --yes</pre>
+      </div>
+      <p style="margin-top:0.65rem;font-size:0.85rem;color:var(--faint)">Pipe from URL (pass flags after <span class="mono">bash -s --</span>; inspect first):</p>
+      <div class="mono-block" style="position:relative;padding-right:4.5rem">
+        <button class="copy-btn" type="button" data-copy="lab-curl" style="position:absolute;top:0.55rem;right:0.55rem">Copy</button>
+        <pre id="lab-curl" style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;background:none;border:none;padding:0;color:inherit">curl -fsSL https://gist.githubusercontent.com/Mikaayenson/3f05db683761ba604bec1575607dce0c/raw/ce115bc9e0ca59619269a7f670ce2a1a3e9c6bcc/install-genai-tools.sh | bash -s -- --all --yes</pre>
+      </div>
+      <p style="margin-top:0.85rem;font-size:0.85rem;color:var(--muted)">
+        Pin a revision:
+        <span class="mono">…/raw/&lt;commit-sha&gt;/install-genai-tools.sh</span>: get the SHA from the Gist history.
+        The installer syncs tool metadata from a third-party registry; treat updates like any external dependency.
+      </p>
+    </section>
+      <div class="tool-view-foot">LOL-GAI · Apache-2.0</div>
+    </div>
+  </div>
+
+
+  <div id="api-view">
+    <div class="wrap">
+      <a class="back-link" href="#catalog" id="back-catalog-api">← Catalog</a>
+      <section class="page-section" id="api">
+      <h2>API</h2>
+      <p>
+        Static JSON and CSV under <span class="mono">public/api/</span>, generated at build time from
+        <span class="mono">yaml/</span>. Replace <span class="mono">ORIGIN</span> with
+        <span class="mono">https://lolgai.io</span> or <span class="mono">http://127.0.0.1:8765</span> for local preview.
+      </p>
+
+      <h3 style="margin-top:1.25rem">Files</h3>
+      <ul class="api-file-list">
+        <li><a href="public/api/tools.json">tools.json</a> <span class="desc">— full catalog (site UI shape)</span></li>
+        <li><a href="public/api/tools/claude.json">tools/&lt;id&gt;.json</a> <span class="desc">— one tool per file</span></li>
+        <li><a href="public/api/lookup.json">lookup.json</a> <span class="desc">— id / name / binary / CLI alias → tool id</span></li>
+        <li><a href="public/api/tools.raw.json">tools.raw.json</a> <span class="desc">— full YAML documents</span></li>
+        <li><a href="public/api/tools.csv">tools.csv</a> <span class="desc">— flat table</span></li>
+        <li><a href="public/api/binaries.csv">binaries.csv</a> <span class="desc">— process names → tool ids</span></li>
+        <li><a href="public/api/domains.csv">domains.csv</a> <span class="desc">— network destinations → tool ids</span></li>
+        <li><a href="public/api/stats.json">stats.json</a> <span class="desc">— summary counters</span></li>
+      </ul>
+
+      <h3 style="margin-top:1.35rem">Fetch one tool</h3>
+      <div class="mono-block" style="position:relative;padding-right:4.5rem">
+        <button class="copy-btn" type="button" data-copy="api-ex-one" style="position:absolute;top:0.55rem;right:0.55rem">Copy</button>
+        <pre id="api-ex-one" style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;background:none;border:none;padding:0;color:inherit">curl -sS "ORIGIN/public/api/tools/claude.json" | python3 -m json.tool</pre>
+      </div>
+
+      <h3 style="margin-top:1.15rem">Resolve an alias, then fetch</h3>
+      <div class="mono-block" style="position:relative;padding-right:4.5rem">
+        <button class="copy-btn" type="button" data-copy="api-ex-lookup" style="position:absolute;top:0.55rem;right:0.55rem">Copy</button>
+        <pre id="api-ex-lookup" style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;background:none;border:none;padding:0;color:inherit">ID=$(curl -sS "ORIGIN/public/api/lookup.json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("claude",""))')
+curl -sS "ORIGIN/public/api/tools/${ID}.json" | python3 -m json.tool</pre>
+      </div>
+
+      <h3 style="margin-top:1.15rem">Search the catalog</h3>
+      <div class="mono-block" style="position:relative;padding-right:4.5rem">
+        <button class="copy-btn" type="button" data-copy="api-ex-search" style="position:absolute;top:0.55rem;right:0.55rem">Copy</button>
+        <pre id="api-ex-search" style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;background:none;border:none;padding:0;color:inherit">curl -sS "ORIGIN/public/api/tools.json" | python3 -c '
+import json,sys,re
+q=re.compile("copilot", re.I)
+tools=json.load(sys.stdin)
+print(json.dumps([{"id":t["id"],"name":t["name"],"bin":t["bin"]} for t in tools if q.search(" ".join([t.get("id",""),t.get("name",""),t.get("bin","")]))], indent=2))
+'</pre>
+      </div>
+
+      <h3 style="margin-top:1.15rem">Filter (observed + MCP support)</h3>
+      <div class="mono-block" style="position:relative;padding-right:4.5rem">
+        <button class="copy-btn" type="button" data-copy="api-ex-filter" style="position:absolute;top:0.55rem;right:0.55rem">Copy</button>
+        <pre id="api-ex-filter" style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;background:none;border:none;padding:0;color:inherit">curl -sS "ORIGIN/public/api/tools.json" | python3 -c '
+import json,sys
+tools=json.load(sys.stdin)
+out=[{"id":t["id"],"bin":t["bin"],"grade":(t.get("score") or {}).get("grade")} for t in tools
+     if str(t.get("verificationLevel","")).lower()=="observed"
+     and "mcp_support" in (t.get("filterCapabilities") or [])]
+print(json.dumps(out, indent=2))
+'</pre>
+      </div>
+      <p style="margin-top:0.85rem;font-size:0.85rem;color:var(--muted)">
+        Optional: pipe JSON through <span class="mono">jq</span> instead of <span class="mono">python3 -m json.tool</span>.
+        Filter field names match the catalog UI (<span class="mono">filterCapabilities</span>,
+        <span class="mono">filterEcosystem</span>, <span class="mono">verificationLevel</span>, <span class="mono">category</span>).
+      </p>
+    </section>
+      <div class="tool-view-foot">LOL-GAI · Apache-2.0</div>
+    </div>
+  </div>
+
+  <script>
+    let TOOLS = [];
+    let categoryFilters = new Set();
+    let capabilityFilters = new Set();
+    let fnFilters = new Set();
+    let ecosystemFilters = new Set();
+    let verFilters = new Set();
+    let sortMode = "alpha";
+    let openFilterMenu = null;
+    let selected = null;
+    let viewMode = "home";
+    const PAGE_TITLE = "LOL-GAI: Living Off Legitimate GenAI";
+
+    function parseRoute() {
+      const raw = location.hash.replace(/^#/, "").trim();
+      const toolMatch = raw.match(/^\/?tool\/(.+)$/);
+      if (toolMatch) {
+        return { view: "tool", id: decodeURIComponent(toolMatch[1]) };
+      }
+      const anchor = raw.replace(/^\//, "");
+      if (anchor === "lab") {
+        return { view: "lab" };
+      }
+      if (anchor === "api") {
+        return { view: "api" };
+      }
+      return { view: "home", anchor: anchor || "" };
+    }
+
+    function setViewMode(mode) {
+      viewMode = mode;
+      document.body.classList.toggle("view-tool", mode === "tool");
+      document.body.classList.toggle("view-home", mode === "home");
+      document.body.classList.toggle("view-lab", mode === "lab");
+      document.body.classList.toggle("view-api", mode === "api");
+    }
+
+    function openTool(id) {
+      location.hash = `#/tool/${encodeURIComponent(id)}`;
+    }
+
+    function openLab() {
+      location.hash = "#/lab";
+    }
+
+    function openApi() {
+      location.hash = "#/api";
+    }
+
+    function openCatalog(anchor) {
+      location.hash = anchor ? `#${anchor}` : "#catalog";
+    }
+
+    function applyRoute() {
+      const route = parseRoute();
+      if (route.view === "tool" && TOOLS.length) {
+        const t = TOOLS.find(x => x.id === route.id);
+        if (t) {
+          selected = t.id;
+          setViewMode("tool");
+          renderRows();
+          renderDetail();
+          document.title = `${t.bin} · LOL-GAI`;
+          window.scrollTo(0, 0);
+          return;
+        }
+        openCatalog("catalog");
+        return;
+      }
+      if (route.view === "lab") {
+        selected = null;
+        setViewMode("lab");
+        renderRows();
+        document.title = "Lab install · LOL-GAI";
+        window.scrollTo(0, 0);
+        return;
+      }
+      if (route.view === "api") {
+        selected = null;
+        setViewMode("api");
+        renderRows();
+        document.title = "API · LOL-GAI";
+        window.scrollTo(0, 0);
+        return;
+      }
+      selected = null;
+      setViewMode("home");
+      renderRows();
+      document.title = PAGE_TITLE;
+      if (route.anchor && route.anchor !== "top") {
+        const anchorId = route.anchor.replace(/^\//, "");
+        const el = document.getElementById(anchorId);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    const FN_ORDER = ["Shell", "Headless", "MCP", "Tunnel", "Bypass", "Local", "Creds"];
+    const TYPE_ORDER = [
+      "CLI Agent", "IDE Agent", "IDE Extension", "Tunnel", "Local", "Chat CLI",
+      "MCP", "Desktop", "Speech", "Image Gen", "Cloud / MLOps", "Cloud Agent",
+      "Framework", "API", "Other",
+    ];
+    const CATEGORY_SLUG_ORDER = [
+      "cli_agent", "ide_agent", "ide_extension", "tunnel", "local_llm", "chat_cli",
+      "mcp", "desktop", "speech", "image_gen", "cloud_mlops", "cloud_agent",
+      "framework", "api_only", "other",
+    ];
+    const CAP_FILTER_DEFS = [
+      { key: "agentic", label: "Agentic" },
+      { key: "non_agentic", label: "Non-agentic" },
+      { key: "mcp_support", label: "MCP support" },
+      { key: "spawns_shells", label: "Spawns shells" },
+      { key: "hooks_support", label: "Hooks support" },
+      { key: "on_disk_skills", label: "On-disk skills" },
+      { key: "attribution_signals", label: "Attribution signals" },
+      { key: "empirically_verified", label: "Empirically verified" },
+    ];
+    const ECO_FILTER_DEFS = [
+      { key: "installable_surface", label: "Installable surface" },
+      { key: "plugin_marketplace", label: "Plugin marketplace" },
+      { key: "extension_gallery", label: "Extension gallery" },
+      { key: "mcp_directory", label: "MCP directory link" },
+      { key: "skill_catalog", label: "Skill catalog link" },
+    ];
+    const OS_ORDER = ["macOS", "Linux", "Windows"];
+    const VER_FILTER_DEFS = [
+      { key: "observed", label: "Observed" },
+      { key: "documented", label: "Documented" },
+      { key: "unverified", label: "Unverified" },
+    ];
+    const OS_GROUP_ORDER = ["macOS", "Linux", "Windows", "All platforms"];
+    const ALL_PLATFORMS = "All platforms";
+
+    const OS_SVG = {
+      macOS: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>',
+      Linux: '<svg viewBox="0 0 448 512" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path fill="currentColor" d="M220.8 123.3c1 .5 1.8 1.7 3 1.7 1.1 0 2.8-.4 2.9-1.5.2-1.4-1.9-2.3-3.2-2.9-1.7-.7-3.9-1-5.5-.1-.4.2-.8.7-.6 1.1.3 1.3 2.3 1.1 3.4 1.7zm-21.9 1.7c1.2 0 2-1.2 3-1.7 1.1-.6 3.1-.4 3.5-1.6.2-.4-.2-.9-.6-1.1-1.6-.9-3.8-.6-5.5.1-1.3.6-3.4 1.5-3.2 2.9.1 1 1.8 1.5 2.8 1.4zM420 403.8c-3.6-4-5.3-11.6-7.2-19.7-1.8-8.1-3.9-16.8-10.5-22.4-1.3-1.1-2.6-2.1-4-2.9-1.3-.8-2.7-1.5-4.1-2 9.2-27.3 5.6-54.5-3.7-79.1-11.4-30.1-31.3-56.4-46.5-74.4-17.1-21.5-33.7-41.9-33.4-72C311.1 85.4 315.7.1 234.8 0 132.4-.2 158 103.4 156.9 135.2c-1.7 23.4-6.4 41.8-22.5 64.7-18.9 22.5-45.5 58.8-58.1 96.7-6 17.9-8.8 36.1-6.2 53.3-6.5 5.8-11.4 14.7-16.6 20.2-4.2 4.3-10.3 5.9-17 8.3s-14 6-18.5 14.5c-2.1 3.9-2.8 8.1-2.8 12.4 0 3.9.6 7.9 1.2 11.8 1.2 8.1 2.5 15.7.8 20.8-5.2 14.4-5.9 24.4-2.2 31.7 3.8 7.3 11.4 10.5 20.1 12.3 17.3 3.6 40.8 2.7 59.3 12.5 19.8 10.4 39.9 14.1 55.9 10.4 11.6-2.6 21.1-9.6 25.9-20.2 12.5-.1 26.3-5.4 48.3-6.6 14.9-1.2 33.6 5.3 55.1 4.1.6 2.3 1.4 4.6 2.5 6.7v.1c8.3 16.7 23.8 24.3 40.3 23 16.6-1.3 34.1-11 48.3-27.9 13.6-16.4 36-23.2 50.9-32.2 7.4-4.5 13.4-10.1 13.9-18.3.4-8.2-4.4-17.3-15.5-29.7zM223.7 87.3c9.8-22.2 34.2-21.8 44-.4 6.5 14.2 3.6 30.9-4.3 40.4-1.6-.8-5.9-2.6-12.6-4.9 1.1-1.2 3.1-2.7 3.9-4.6 4.8-11.8-.2-27-9.1-27.3-7.3-.5-13.9 10.8-11.8 23-4.1-2-9.4-3.5-13-4.4-1-6.9-.3-14.6 2.9-21.8zM183 75.8c10.1 0 20.8 14.2 19.1 33.5-3.5 1-7.1 2.5-10.2 4.6 1.2-8.9-3.3-20.1-9.6-19.6-8.4.7-9.8 21.2-1.8 28.1 1 .8 1.9-.2-5.9 5.5-15.6-14.6-10.5-52.1 8.4-52.1zm-13.6 60.7c6.2-4.6 13.6-10 14.1-10.5 4.7-4.4 13.5-14.2 27.9-14.2 7.1 0 15.6 2.3 25.9 8.9 6.3 4.1 11.3 4.4 22.6 9.3 8.4 3.5 13.7 9.7 10.5 18.2-2.6 7.1-11 14.4-22.7 18.1-11.1 3.6-19.8 16-38.2 14.9-3.9-.2-7-1-9.6-2.1-8-3.5-12.2-10.4-20-15-8.6-4.8-13.2-10.4-14.7-15.3-1.4-4.9 0-9 4.2-12.3zm3.3 334c-2.7 35.1-43.9 34.4-75.3 18-29.9-15.8-68.6-6.5-76.5-21.9-2.4-4.7-2.4-12.7 2.6-26.4v-.2c2.4-7.6.6-16-.6-23.9-1.2-7.8-1.8-15 .9-20 3.5-6.7 8.5-9.1 14.8-11.3 10.3-3.7 11.8-3.4 19.6-9.9 5.5-5.7 9.5-12.9 14.3-18 5.1-5.5 10-8.1 17.7-6.9 8.1 1.2 15.1 6.8 21.9 16l19.6 35.6c9.5 19.9 43.1 48.4 41 68.9zm-1.4-25.9c-4.1-6.6-9.6-13.6-14.4-19.6 7.1 0 14.2-2.2 16.7-8.9 2.3-6.2 0-14.9-7.4-24.9-13.5-18.2-38.3-32.5-38.3-32.5-13.5-8.4-21.1-18.7-24.6-29.9s-3-23.3-.3-35.2c5.2-22.9 18.6-45.2 27.2-59.2 2.3-1.7.8 3.2-8.7 20.8-8.5 16.1-24.4 53.3-2.6 82.4.6-20.7 5.5-41.8 13.8-61.5 12-27.4 37.3-74.9 39.3-112.7 1.1.8 4.6 3.2 6.2 4.1 4.6 2.7 8.1 6.7 12.6 10.3 12.4 10 28.5 9.2 42.4 1.2 6.2-3.5 11.2-7.5 15.9-9 9.9-3.1 17.8-8.6 22.3-15 7.7 30.4 25.7 74.3 37.2 95.7 6.1 11.4 18.3 35.5 23.6 64.6 3.3-.1 7 .4 10.9 1.4 13.8-35.7-11.7-74.2-23.3-84.9-4.7-4.6-4.9-6.6-2.6-6.5 12.6 11.2 29.2 33.7 35.2 59 2.8 11.6 3.3 23.7.4 35.7 16.4 6.8 35.9 17.9 30.7 34.8-2.2-.1-3.2 0-4.2 0 3.2-10.1-3.9-17.6-22.8-26.1-19.6-8.6-36-8.6-38.3 12.5-12.1 4.2-18.3 14.7-21.4 27.3-2.8 11.2-3.6 24.7-4.4 39.9-.5 7.7-3.6 18-6.8 29-32.1 22.9-76.7 32.9-114.3 7.2zm257.4-11.5c-.9 16.8-41.2 19.9-63.2 46.5-13.2 15.7-29.4 24.4-43.6 25.5s-26.5-4.8-33.7-19.3c-4.7-11.1-2.4-23.1 1.1-36.3 3.7-14.2 9.2-28.8 9.9-40.6.8-15.2 1.7-28.5 4.2-38.7 2.6-10.3 6.6-17.2 13.7-21.1.3-.2.7-.3 1-.5.8 13.2 7.3 26.6 18.8 29.5 12.6 3.3 30.7-7.5 38.4-16.3 9-.3 15.7-.9 22.6 5.1 9.9 8.5 7.1 30.3 17.1 41.6 10.6 11.6 14 19.5 13.7 24.6zM173.3 148.7c2 1.9 4.7 4.5 8 7.1 6.6 5.2 15.8 10.6 27.3 10.6 11.6 0 22.5-5.9 31.8-10.8 4.9-2.6 10.9-7 14.8-10.4s5.9-6.3 3.1-6.6-2.6 2.6-6 5.1c-4.4 3.2-9.7 7.4-13.9 9.8-7.4 4.2-19.5 10.2-29.9 10.2s-18.7-4.8-24.9-9.7c-3.1-2.5-5.7-5-7.7-6.9-1.5-1.4-1.9-4.6-4.3-4.9-1.4-.1-1.8 3.7 1.7 6.5z"/></svg>',
+      Windows: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5l7.5-1.05v7.05H3V5.5zm8.5-1.2L21 3v8.5h-9.5V4.3zM3 12.5h7.5v7.05L3 18.5v-6zm8.5 0H21V21l-9.5-1.35V12.5z"/></svg>',
+    };
+
+    function normalizeOs(name) {
+      const s = String(name || "").toLowerCase();
+      if (s.includes("win")) return "Windows";
+      if (s.includes("mac") || s.includes("darwin") || s.includes("osx")) return "macOS";
+      if (s.includes("linux") || s.includes("ubuntu") || s.includes("debian")) return "Linux";
+      return String(name || "");
+    }
+
+    function isAllPlatformsToken(name) {
+      const s = String(name || "").trim().toLowerCase();
+      return !s || s === "all" || s === "any" || s === "cross-platform" || s === "crossplatform";
+    }
+
+    function signalPlatformGroups(sig) {
+      const rawList = Array.isArray(sig?.platforms) ? sig.platforms
+        : (sig?.platform ? [sig.platform] : []);
+      if (!rawList.length) return [ALL_PLATFORMS];
+      const groups = [];
+      const seen = new Set();
+      for (const raw of rawList) {
+        if (isAllPlatformsToken(raw)) {
+          if (!seen.has(ALL_PLATFORMS)) {
+            seen.add(ALL_PLATFORMS);
+            groups.push(ALL_PLATFORMS);
+          }
+          continue;
+        }
+        const n = normalizeOs(raw);
+        if (OS_SVG[n] && !seen.has(n)) {
+          seen.add(n);
+          groups.push(n);
+        }
+      }
+      return groups.length ? groups : [ALL_PLATFORMS];
+    }
+
+    function escapeHtml(text) {
+      return String(text || "").replace(/[<>&]/g, c => ({ "<":"&lt;", ">":"&gt;", "&":"&amp;" }[c]));
+    }
+
+    function formatInlineCode(text) {
+      return escapeHtml(text).replace(/`([^`\n]+)`/g, '<code class="detail-code">$1</code>');
+    }
+
+    function truncateDescription(text, maxLen = 140) {
+      const s = String(text || "").replace(/\s+/g, " ").trim();
+      if (!s) return "";
+      if (s.length <= maxLen) return s;
+      const cut = s.slice(0, maxLen);
+      const lastSpace = cut.lastIndexOf(" ");
+      return `${(lastSpace > 80 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+    }
+
+    function catalogDescHtml(t) {
+      const full = String(t.description || "").replace(/\s+/g, " ").trim();
+      if (!full) return "";
+      const short = truncateDescription(full);
+      return `<div class="row-desc" title="${escapeHtml(full)}">${escapeHtml(short)}</div>`;
+    }
+
+    function verificationBadgeClass(level) {
+      const lv = String(level || "unverified").toLowerCase();
+      if (lv === "observed") return "check-observed";
+      if (lv === "documented") return "check-documented";
+      return "check-unverified";
+    }
+
+    function verificationLabel(level) {
+      const lv = String(level || "unverified").toLowerCase();
+      if (lv === "observed") return "Observed";
+      if (lv === "documented") return "Documented";
+      return "Unverified";
+    }
+
+    function verificationTitle(level) {
+      const lv = String(level || "unverified").toLowerCase();
+      if (lv === "observed") return "Empirically validated on a lab host (paths, signing, or binary behavior)";
+      if (lv === "documented") return "Checked against official docs or local --help; not lab-confirmed";
+      return "Stub or not yet checked against primary sources";
+    }
+
+    function readinessTitle(grade) {
+      const g = String(grade || "?").toLowerCase();
+      if (g === "a") return "Grade A: detection-ready with strong attribution (see Scope)";
+      if (g === "b") return "Grade B: solid entry; attribution usable but not Grade A (see Scope)";
+      if (g === "c") return "Grade C: partial or sparse catalog entry (see Scope)";
+      return "Readiness grade unknown. See Scope";
+    }
+
+    function applyReadinessGradeBadge(el, grade) {
+      const g = String(grade || "?").toLowerCase();
+      const label = g.toUpperCase();
+      el.textContent = label;
+      el.className = `grade ${g}`;
+      el.title = readinessTitle(grade);
+      el.setAttribute("aria-label", `Readiness ${label}`);
+    }
+
+    function formatSigningBlock(block) {
+      if (!block || typeof block !== "object") return "";
+      const parts = [];
+      if (block.SigningId) parts.push(`id=${block.SigningId}`);
+      if (block.TeamId) parts.push(`team=${block.TeamId}`);
+      if (block.Authority) parts.push(String(block.Authority));
+      else if (block.Publisher) parts.push(`publisher=${block.Publisher}`);
+      if (block.Thumbprint) parts.push(`thumbprint=${block.Thumbprint}`);
+      if (block.Depth) parts.push(`depth=${block.Depth}`);
+      return parts.join("; ");
+    }
+
+    function signingDetailHtml(details) {
+      if (!details || !details.length) return "";
+      return details.map(group => {
+        const rows = (group.fields || []).map(f => `
+          <div class="sign-field-row">
+            <code>${escapeHtml(f.label)}</code> = <code>${escapeHtml(f.value)}</code>
+          </div>
+        `).join("");
+        return `
+          <div class="sign-os-block">
+            <div class="sign-os-head">${osIconsHtml([group.os])}<span class="os-label">${escapeHtml(group.label)}</span></div>
+            <div class="sign-fields">${rows}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function signingGroupsFromRaw(signing, signingDetails) {
+      if (signingDetails && signingDetails.length) {
+        return signingDetails.map(g => ({ os: g.os, text: formatSigningBlock((signing || {})[g.os] || {}) }));
+      }
+      const out = [];
+      for (const os of OS_ORDER) {
+        const block = signing?.[os];
+        const text = formatSigningBlock(block);
+        if (text) out.push({ os, text });
+      }
+      return out;
+    }
+
+    function groupDetectSignals(signals) {
+      const grouped = Object.fromEntries(OS_GROUP_ORDER.map(os => [os, []]));
+      for (const sig of signals) {
+        for (const os of signalPlatformGroups(sig)) {
+          grouped[os].push(sig);
+        }
+      }
+      for (const os of OS_GROUP_ORDER) {
+        grouped[os].sort((a, b) => (a.rank || 999) - (b.rank || 999));
+      }
+      return grouped;
+    }
+
+    function commandPlatformGroups(cmd) {
+      const rawList = Array.isArray(cmd?.platforms) ? cmd.platforms
+        : (cmd?.platform ? [cmd.platform] : []);
+      if (!rawList.length && cmd?.operatingSystem) {
+        const parts = String(cmd.operatingSystem).split(/[,;/|]+/).map(p => normalizeOs(p.trim())).filter(Boolean);
+        const uniq = [...new Set(parts)];
+        if (uniq.includes("macOS") && uniq.includes("Linux") && uniq.includes("Windows")) {
+          return [ALL_PLATFORMS];
+        }
+        for (const part of String(cmd.operatingSystem).split(/[,;/|]+/)) {
+          rawList.push(part.trim());
+        }
+      }
+      if (!rawList.length) return [ALL_PLATFORMS];
+      const groups = [];
+      const seen = new Set();
+      for (const raw of rawList) {
+        if (isAllPlatformsToken(raw)) {
+          if (!seen.has(ALL_PLATFORMS)) {
+            seen.add(ALL_PLATFORMS);
+            groups.push(ALL_PLATFORMS);
+          }
+          continue;
+        }
+        const n = normalizeOs(raw);
+        if (OS_SVG[n] && !seen.has(n)) {
+          seen.add(n);
+          groups.push(n);
+        }
+      }
+      return groups.length ? groups : [ALL_PLATFORMS];
+    }
+
+    function groupAbuseCommands(commands) {
+      const grouped = Object.fromEntries(OS_GROUP_ORDER.map(os => [os, []]));
+      for (const cmd of commands) {
+        for (const os of commandPlatformGroups(cmd)) {
+          grouped[os].push(cmd);
+        }
+      }
+      return grouped;
+    }
+
+    function isGenericRecipe(cmd, desc) {
+      const text = `${cmd} ${desc}`.toLowerCase();
+      return /find world-readable secrets|read ~\/\.aws\/credentials|vs code extension — abuse via extension host|completion extension — no standalone cli|pattern: malicious \.clinerules|verify subcommand per product/.test(text)
+        || cmd.trim().startsWith("#");
+    }
+
+    function abuseCmdHtml(a, copyId) {
+      const genericCls = a.generic ? " generic" : "";
+      return `
+        <div class="cmd${genericCls}">
+          <div class="cmd-top">
+            <span>context: ${escapeHtml(a.ctx)}</span>
+            <button class="copy-btn" type="button" data-copy="${copyId}">Copy</button>
+          </div>
+          <pre id="${copyId}">${escapeHtml(a.cmd)}</pre>
+          <div class="desc">${escapeHtml(a.desc)}</div>
+        </div>
+      `;
+    }
+
+    function renderCommandGroupHtml(commands, copyPrefix) {
+      if (!commands.length) {
+        return `<div class="attrib-empty">None documented yet.</div>`;
+      }
+      const grouped = groupAbuseCommands(commands);
+      const hasOsSplit = OS_GROUP_ORDER.some(os => grouped[os].length)
+        && !(grouped[ALL_PLATFORMS].length && OS_GROUP_ORDER.every(os => !grouped[os].length || os === ALL_PLATFORMS));
+      if (!hasOsSplit) {
+        return commands.map((a, i) => abuseCmdHtml(a, `${copyPrefix}-${i}`)).join("");
+      }
+      let html = `<div class="attrib-groups">`;
+      let copyIdx = 0;
+      for (const os of OS_GROUP_ORDER) {
+        const items = grouped[os];
+        if (!items.length) continue;
+        html += `<div class="attrib-group">${attribGroupHeadHtml(os)}`;
+        html += items.map(a => abuseCmdHtml(a, `${copyPrefix}-${copyIdx++}`)).join("");
+        html += `</div>`;
+      }
+      html += `</div>`;
+      return html;
+    }
+
+    function renderAbuseHtml(t) {
+      const commands = t.abuse || [];
+      const normal = commands.filter(c => c.usage === "normal");
+      const abuse = commands.filter(c => c.usage !== "normal");
+      if (!normal.length && !abuse.length) {
+        return `<div class="attrib-empty">No commands documented yet.</div>`;
+      }
+      let html = "";
+      if (normal.length) {
+        html += `<div class="usage-block normal"><div class="usage-label">Normal · usage</div>`;
+        html += renderCommandGroupHtml(normal, "norm");
+        html += `</div>`;
+      }
+      if (abuse.length) {
+        html += `<div class="usage-block abuse"><div class="usage-label">Abuse · recipes</div>`;
+        html += `<p class="recipe-note"><strong>Authorized use only.</strong> Dual-use patterns for detection engineering on owned/lab systems. Generic templates are starting points; verify CLI flags against vendor docs before hunting.</p>`;
+        html += renderCommandGroupHtml(abuse, "abuse");
+        html += `</div>`;
+      }
+      return html;
+    }
+
+    function attribGroupHeadHtml(osName) {
+      if (osName === ALL_PLATFORMS) {
+        return `<div class="attrib-group-head"><span class="os-label">${ALL_PLATFORMS}</span></div>`;
+      }
+      return `<div class="attrib-group-head">${osIconsHtml([osName])}<span class="os-label">${osName}</span></div>`;
+    }
+
+    function signalHtml(sig, showOp) {
+      const opLine = (showOp && sig.op)
+        ? `<div class="op-label">${escapeHtml(sig.op)}</div>`
+        : "";
+      const fp = sig.fp ? `<div class="fp">Note: ${escapeHtml(sig.fp)}</div>` : "";
+      const field = String(sig.field || "").toLowerCase();
+      const val = String(sig.val || "").toLowerCase();
+      const collision = (field === "process.name" && val === "agent")
+        || (field === "process.name" && val === "cline")
+        || (field === "process.parent.name" && val.includes("code helper"));
+      const collisionLine = collision
+        ? `<span class="collision-warn">⚠ Generic/shared signal: corroborate with path, signing, or network before auto-rules</span>`
+        : "";
+      return `
+        <div class="signal">
+          <div class="rank">#${sig.rank}</div>
+          <div>
+            ${opLine}
+            <code>${escapeHtml(sig.field)}</code> = <code>${escapeHtml(sig.val)}</code>
+            ${collisionLine}
+            ${fp}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAttributionHtml(t) {
+      const signals = t.detect || [];
+      const signingGroups = signingGroupsFromRaw(t.signing || {}, t.signingDetails || []);
+      const signingDetailBlock = signingDetailHtml(t.signingDetails || []);
+      if (!signals.length && !signingGroups.length && !signingDetailBlock) {
+        return `<div class="attrib-empty">No attribution signals yet.</div>`;
+      }
+
+      let html = `<div class="attrib-disclaimer"><strong>Field paths are illustrative.</strong> Map to your stack (ECS, EDR vendor schemas) before deploying detections. Parent/signing fields vary by integration and OS.</div>`;
+      html += `<div class="attrib-groups">`;
+      if (signals.length) {
+        const grouped = groupDetectSignals(signals);
+        for (const os of OS_GROUP_ORDER) {
+          const items = grouped[os];
+          if (!items.length) continue;
+          const opNames = new Set(items.map(s => s.op).filter(Boolean));
+          const showOp = opNames.size > 1;
+          html += `<div class="attrib-group">${attribGroupHeadHtml(os)}`;
+          html += items.map(sig => signalHtml(sig, showOp)).join("");
+          html += `</div>`;
+        }
+      }
+
+      if (signingGroups.length || signingDetailBlock) {
+        html += `<div class="attrib-group signing-group">`;
+        html += `<div class="attrib-group-head"><span class="os-label">Signing / origin</span></div>`;
+        const signingRaw = t.signing || {};
+        const sharedHost = Object.values(signingRaw).some(b =>
+          b && typeof b === "object" && String(b.Depth || b.depth || "").toLowerCase() === "shared_host"
+        );
+        if (sharedHost) {
+          html += `<p class="recipe-note"><strong>Shared host.</strong> IDE extensions run inside the editor host (e.g. VS Code Code Helper). Signing and parent process are not product-specific; corroborate with extension paths, config, and network.</p>`;
+        }
+        if (signingDetailBlock) {
+          html += signingDetailBlock;
+        } else {
+          html += signingGroups.map(({ os, text }) => `
+            <div class="sign-os-block">
+              <div class="sign-os-head">${osIconsHtml([os])}<span class="os-label">${escapeHtml(os)}</span></div>
+              <div class="sign-fields">
+                <div class="sign-field-row"><code>${escapeHtml(text)}</code></div>
+              </div>
+            </div>
+          `).join("");
+        }
+        html += `</div>`;
+      }
+      html += `</div>`;
+      return html;
+    }
+
+    function osIconsHtml(osList) {
+      const raw = Array.isArray(osList) ? osList : [];
+      const primary = [];
+      const seen = new Set();
+      const extra = [];
+      for (const o of raw) {
+        const n = normalizeOs(o);
+        if (OS_SVG[n]) {
+          if (!seen.has(n)) { seen.add(n); primary.push(n); }
+        } else if (o && !extra.includes(o)) {
+          extra.push(o);
+        }
+      }
+      // Stable order: macOS, Linux, Windows
+      primary.sort((a, b) => OS_ORDER.indexOf(a) - OS_ORDER.indexOf(b));
+      const icons = primary.map(n => {
+        const extraClass = n === "Linux" ? " os-linux" : "";
+        return `<span class="os-icon${extraClass}" title="${n}" aria-label="${n}">${OS_SVG[n]}</span>`;
+      }).join("");
+      const extras = extra.map(e => `<span class="os-extra">${e}</span>`).join("");
+      if (!icons && !extras) return `<span class="os-extra">?</span>`;
+      return `<span class="os-icons">${icons}${extras}</span>`;
+    }
+
+    function creditLink(name) {
+      const n = String(name || "").trim();
+      if (!n) return "";
+      // Bare GitHub-style handles become profile links; leave names/emails as plain text.
+      if (/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/.test(n)) {
+        return `<a href="https://github.com/${encodeURIComponent(n)}" target="_blank" rel="noopener">${n}</a>`;
+      }
+      return n.replace(/[<>&]/g, c => ({ "<":"&lt;", ">":"&gt;", "&":"&amp;" }[c]));
+    }
+
+    function officialLinkHtml(t) {
+      const url = (t.officialUrl || t.website || "").trim();
+      if (!url) {
+        return `<div class="tool-links missing">No official URL documented</div>`;
+      }
+      const label = (t.officialUrlLabel || "Official project ↗").replace(/\s*↗\s*$/, "");
+      return `<div class="tool-links"><a class="official-link" href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(label)} ↗</a></div>`;
+    }
+
+    function cliInvokeHtml(t) {
+      const primary = (t.cliPrimary || t.bin || "").trim();
+      const aliases = (t.cliAliases || []).filter(a => a && a !== primary);
+      if (!primary) return "";
+      const names = aliases.length ? [primary, ...aliases] : [];
+      if (!names.length) return "";
+      return `CLI: ${names.map(n => `<code>${escapeHtml(n)}</code>`).join(", ")}`;
+    }
+
+    function bylineHtml(t) {
+      const author = (t.author || "").trim();
+      const contribs = (t.contributors || []).map(c => String(c).trim()).filter(Boolean);
+      const seen = new Set();
+      const people = [];
+      for (const name of [author, ...contribs]) {
+        if (!name) continue;
+        const key = name.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        people.push(name);
+      }
+      if (!people.length) return "";
+      const links = people.map(creditLink).join(", ");
+      return `Contributors: ${links}`;
+    }
+
+    function readinessSortKey(grade) {
+      const g = String(grade || "?").toLowerCase();
+      if (g === "a") return 0;
+      if (g === "b") return 1;
+      if (g === "c") return 2;
+      return 3;
+    }
+
+    function compareTools(a, b) {
+      if (sortMode === "readiness") {
+        const rg = readinessSortKey(a.grade) - readinessSortKey(b.grade);
+        if (rg !== 0) return rg;
+      }
+      const ab = (a.bin || a.id || "").toLowerCase();
+      const bb = (b.bin || b.id || "").toLowerCase();
+      if (ab !== bb) return ab.localeCompare(bb);
+      const an = (a.name || a.id || "").toLowerCase();
+      const bn = (b.name || b.id || "").toLowerCase();
+      if (an !== bn) return an.localeCompare(bn);
+      return (a.id || "").localeCompare(b.id || "");
+    }
+
+    function sortTools(list) {
+      return [...list].sort(compareTools);
+    }
+
+    function mapTool(raw) {
+      const abuse = (raw.commands || []).map(c => {
+        const usageRaw = String(c.Usage || "").toLowerCase();
+        const usage = (usageRaw === "normal" || usageRaw === "legitimate" || usageRaw === "legit")
+          ? "normal" : "abuse";
+        return {
+          cmd: c.Command || "",
+          desc: c.Description || "",
+          mitre: c.MitreID || "",
+          ctx: (c.Privileges || "User").toLowerCase() === "user" ? "unprivileged" : (c.Privileges || "unprivileged"),
+          usage,
+          generic: isGenericRecipe(c.Command || "", c.Description || ""),
+          platform: c.Platform,
+          platforms: c.Platforms,
+          operatingSystem: c.OperatingSystem || "",
+        };
+      });
+      const detect = [];
+      for (const op of (raw.detection_opportunities || [])) {
+        for (const sig of (op.AttributionSignals || [])) {
+          detect.push({
+            rank: sig.Rank || detect.length + 1,
+            field: sig.Field || "",
+            val: sig.Value || "",
+            fp: sig.FalsePositiveGuidance || op.FalsePositiveGuidance || "",
+            op: op.Name || "",
+            platform: sig.Platform,
+            platforms: sig.Platforms,
+          });
+        }
+      }
+      const arts = raw.artifacts || {};
+      const diskEntries = artifactEntriesFromRaw(raw.disk_entries, arts.Disk, raw.disk, raw.installation_paths || []);
+      const configEntries = artifactEntriesFromRaw(raw.config_entries, arts.ConfigFiles, raw.config_files, []);
+      const logEntries = artifactEntriesFromRaw(raw.log_entries, arts.Logs, raw.logs, []);
+      const sessionEntries = artifactEntriesFromRaw(raw.session_entries, arts.Sessions, raw.sessions, []);
+      const authEntries = artifactEntriesFromRaw(raw.auth_entries, arts.AuthTokens, raw.auth_tokens, []);
+      const hookEntries = artifactEntriesFromRaw(raw.hook_entries, arts.Hooks, raw.hooks, []);
+      const skillsEntries = artifactEntriesFromRaw(raw.skills_entries, arts.Skills, raw.skills, []);
+      const mcpEntries = artifactEntriesFromRaw(raw.mcp_entries, arts.MCP, raw.mcp, []);
+      const envEntries = artifactEntriesFromRaw(raw.env_entries, arts.Environment, raw.environment, []);
+      const networkEntries = [];
+      for (const n of (arts.Network || [])) {
+        const desc = String(n.Description || n.Notes || "").trim();
+        for (const d of (n.Domains || [])) {
+          const ports = (n.Ports || []).join(",");
+          networkEntries.push({
+            domain: ports ? `${d}:${ports}` : String(d),
+            notes: desc,
+            platforms: [],
+          });
+        }
+        if (!(n.Domains || []).length && n.Notes) {
+          networkEntries.push({ domain: String(n.Notes), notes: "", platforms: [] });
+        }
+      }
+      const net = [];
+      if (raw.network_domains?.length) {
+        for (const d of raw.network_domains) net.push(d);
+      } else {
+        for (const e of networkEntries) net.push(e.domain);
+      }
+      if (!networkEntries.length && net.length) {
+        for (const d of net) networkEntries.push({ domain: d, notes: "", platforms: [] });
+      }
+      const signLines = (raw.signing_summary && raw.signing_summary.length)
+        ? raw.signing_summary
+        : (() => {
+            const signing = raw.signing || {};
+            const mac = signing.macOS || {};
+            if (mac.SigningId || mac.TeamId || mac.Authority) {
+              return [[
+                mac.Authority || "",
+                mac.SigningId ? `id=${mac.SigningId}` : "",
+                mac.TeamId ? `team=${mac.TeamId}` : "",
+              ].filter(Boolean).join("; ") || "macOS signing present"];
+            }
+            return Object.keys(signing).length ? ["See Signing in YAML"] : [];
+          })();
+      return {
+        id: raw.id,
+        name: raw.name || raw.bin || raw.id,
+        bin: raw.bin,
+        vendor: raw.vendor || "",
+        author: raw.author || "",
+        contributors: raw.contributors || [],
+        website: raw.website || "",
+        officialUrl: raw.officialUrl || raw.website || "",
+        officialUrlLabel: raw.officialUrlLabel || "",
+        cliPrimary: raw.cliPrimary || raw.bin || "",
+        cliAliases: raw.cliAliases || [],
+        type: raw.type || "",
+        category: raw.category || "",
+        description: raw.description || "",
+        search: raw.search || [],
+        surfaces: raw.surfaces || [],
+        grade: (raw.grade || "?").toLowerCase(),
+        fns: raw.fns || [],
+        mitre: raw.mitre || [],
+        os: raw.os || [],
+        verified: !!raw.verified,
+        ops: raw.ops || 0,
+        abuse,
+        detect,
+        diskEntries,
+        configEntries,
+        logEntries,
+        sessionEntries,
+        authEntries,
+        hookEntries,
+        skillsEntries,
+        mcpEntries,
+        envEntries,
+        net: net.length ? net : [],
+        networkEntries,
+        sign: signLines,
+        signing: raw.signing || {},
+        signingDetails: raw.signing_details || [],
+        uuid: raw.uuid || "",
+        created: raw.created || "",
+        updated: raw.updated || "",
+        verificationLevel: raw.verificationLevel || raw.verification_level || (raw.verified ? "documented" : "unverified"),
+        filterCapabilities: raw.filterCapabilities || deriveFilterCapabilitiesClient(raw, detect),
+        filterEcosystem: raw.filterEcosystem || deriveFilterEcosystemClient(raw),
+      };
+    }
+
+    function deriveFilterCapabilitiesClient(raw, detect) {
+      const caps = new Set(raw.filterCapabilities || []);
+      if (raw.agentic === true) caps.add("agentic");
+      if (raw.agentic === false) caps.add("non_agentic");
+      if ((raw.fns || []).includes("MCP") || (raw.mcp || []).length || (raw.mcp_entries || []).length) {
+        caps.add("mcp_support");
+      }
+      if (raw.spawnsShells || (raw.fns || []).includes("Shell")) caps.add("spawns_shells");
+      if ((raw.hooks || []).length || (raw.hook_entries || []).length) caps.add("hooks_support");
+      if ((raw.skills || []).length || (raw.skills_entries || []).length) caps.add("on_disk_skills");
+      if ((detect || []).length) caps.add("attribution_signals");
+      if ((raw.verificationLevel || raw.verification_level) === "observed") caps.add("empirically_verified");
+      return [...caps];
+    }
+
+    function deriveFilterEcosystemClient(raw) {
+      const eco = new Set(raw.filterEcosystem || []);
+      for (const resource of raw.resources || []) {
+        const text = `${resource.title || ""} ${resource.link || ""}`.toLowerCase();
+        if (text.includes("marketplace")) eco.add("plugin_marketplace");
+        if (text.includes("extension") && /gallery|marketplace|vscode|jetbrains|open-vsx/.test(text)) {
+          eco.add("extension_gallery");
+        }
+        if (text.includes("mcp") && /registry|directory|servers|hub|catalog/.test(text)) eco.add("mcp_directory");
+        if (text.includes("skill") && /catalog|registry|marketplace/.test(text)) eco.add("skill_catalog");
+      }
+      const cat = raw.category || "";
+      if (["ide_extension", "desktop", "ide_agent"].includes(cat)) eco.add("installable_surface");
+      return [...eco];
+    }
+
+    function platformsFromYamlEntry(entry) {
+      if (!entry || typeof entry !== "object") return [];
+      const raw = entry.Platforms || entry.platforms || entry.Platform || entry.platform
+        || entry.OperatingSystem || entry.operatingSystem;
+      if (Array.isArray(raw)) return raw.map(String);
+      if (raw) return String(raw).split(/[,;/|]+/).map(s => s.trim()).filter(Boolean);
+      return [];
+    }
+
+    function artifactEntriesFromRaw(apiEntries, yamlList, legacyStrings, installPaths) {
+      const out = [];
+      const seen = new Set();
+      const push = (path, notes, platforms) => {
+        const p = String(path || "").trim();
+        if (!p) return;
+        const key = `${p.toLowerCase()}|${(platforms || []).map(x => String(x).toLowerCase()).sort().join(",")}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        out.push({ path: p, notes: String(notes || "").trim(), platforms: platforms || [] });
+      };
+      for (const e of (apiEntries || [])) {
+        if (!e) continue;
+        push(e.path || e.Path, e.notes || e.Notes, Array.isArray(e.platforms) ? e.platforms
+          : (e.platform ? [e.platform] : platformsFromYamlEntry(e)));
+      }
+      if (!out.length) {
+        for (const e of (yamlList || [])) {
+          if (typeof e === "string") push(e, "", []);
+          else if (e && e.Path) push(e.Path, e.Notes || e.Description || "", platformsFromYamlEntry(e));
+        }
+      }
+      if (!out.length) {
+        for (const s of (legacyStrings || [])) {
+          if (typeof s !== "string") continue;
+          // Prefer trailing " (note)" but keep nested parens in the note.
+          const m = s.match(/^(.*)\s+\((.+)\)\s*$/);
+          push(m ? m[1] : s, m ? m[2] : "", []);
+        }
+      }
+      if (!out.length) {
+        for (const p of (installPaths || [])) push(p, "", []);
+      }
+      return out;
+    }
+
+    function artEntryPlatformGroups(entry) {
+      const rawList = Array.isArray(entry?.platforms) ? entry.platforms.slice() : [];
+      if (!rawList.length && entry?.platform) rawList.push(entry.platform);
+      if (!rawList.length) {
+        // Infer from path when YAML omitted Platform (same heuristics as site.py).
+        const pl = String(entry?.path || "").toLowerCase();
+        if (/%localappdata%|%appdata%|%userprofile%|%programfiles%|\.exe\b/.test(pl)) {
+          return ["Windows"];
+        }
+        if (pl.includes("library/application support") || pl.includes("library/logs") || pl.includes("/applications/")) {
+          return ["macOS"];
+        }
+        if (pl.startsWith("/usr/") || pl.startsWith("/opt/") || pl.includes("journalctl") || pl.includes("/var/log")) {
+          return ["Linux"];
+        }
+        if (pl.startsWith("~/") || pl.startsWith("$home/") || pl.startsWith("${home}/")) {
+          return ["macOS", "Linux"];
+        }
+        return [ALL_PLATFORMS];
+      }
+      const groups = [];
+      const seen = new Set();
+      for (const raw of rawList) {
+        if (isAllPlatformsToken(raw)) {
+          if (!seen.has(ALL_PLATFORMS)) {
+            seen.add(ALL_PLATFORMS);
+            groups.push(ALL_PLATFORMS);
+          }
+          continue;
+        }
+        const n = normalizeOs(raw);
+        if (OS_SVG[n] && !seen.has(n)) {
+          seen.add(n);
+          groups.push(n);
+        }
+      }
+      return groups.length ? groups : [ALL_PLATFORMS];
+    }
+
+    function artifactRowHtml(entry) {
+      const note = entry.notes
+        ? `<div class="op-label">${escapeHtml(entry.notes)}</div>`
+        : "";
+      return `
+        <div class="signal art-row">
+          <div class="rank art-spacer" aria-hidden="true">·</div>
+          <div>
+            ${note}
+            <code>${escapeHtml(entry.path)}</code>
+          </div>
+        </div>
+      `;
+    }
+
+    function artifactBuckets(t, { includeNetwork = false } = {}) {
+      const buckets = {
+        disk: t.diskEntries || [],
+        config: t.configEntries || [],
+        logs: t.logEntries || [],
+        sessions: t.sessionEntries || [],
+        auth: t.authEntries || [],
+        hooks: t.hookEntries || [],
+        skills: t.skillsEntries || [],
+        mcp: t.mcpEntries || [],
+        env: t.envEntries || [],
+      };
+      if (includeNetwork) {
+        buckets.net = (t.networkEntries || []).length
+          ? t.networkEntries
+          : (t.net || []).map(n => ({ domain: n, notes: "", platforms: [] }));
+      }
+      return buckets;
+    }
+
+    function hasHostArtifacts(t) {
+      const buckets = artifactBuckets(t, { includeNetwork: false });
+      return Object.values(buckets).some(arr => arr.length > 0);
+    }
+
+    function hasAttributionContent(t) {
+      const signals = t.detect || [];
+      const signingGroups = signingGroupsFromRaw(t.signing || {}, t.signingDetails || []);
+      const signingDetailBlock = signingDetailHtml(t.signingDetails || []);
+      return !!(signals.length || signingGroups.length || signingDetailBlock);
+    }
+
+    function hasCommandsContent(t) {
+      return (t.abuse || []).length > 0;
+    }
+
+    function hasNetworkContent(t) {
+      return (t.networkEntries || []).length > 0 || (t.net || []).length > 0;
+    }
+
+    const TOOL_TAB_DEFS = [
+      { id: "commands", label: "Commands", hasContent: hasCommandsContent },
+      { id: "attribution", label: "Attribution", hasContent: hasAttributionContent },
+      { id: "artifacts", label: "Host artifacts", hasContent: hasHostArtifacts },
+      { id: "network", label: "Network", hasContent: hasNetworkContent },
+      { id: "readiness", label: "Readiness", hasContent: () => true },
+    ];
+
+    function visibleToolTabs(t) {
+      return TOOL_TAB_DEFS.filter(tab => tab.hasContent(t));
+    }
+
+    function toolTabStorageKey(toolId) {
+      return `lolgai-tool-tab:${toolId}`;
+    }
+
+    function getSavedToolTab(toolId) {
+      try { return sessionStorage.getItem(toolTabStorageKey(toolId)); } catch (_) { return null; }
+    }
+
+    function saveToolTab(toolId, tabId) {
+      try { sessionStorage.setItem(toolTabStorageKey(toolId), tabId); } catch (_) {}
+    }
+
+    function renderArtifactsHtml(t, { includeNetwork = false, showCaption = true } = {}) {
+      const buckets = artifactBuckets(t, { includeNetwork });
+      const labels = {
+        disk: "Install / disk",
+        config: "Config files",
+        logs: "Logs",
+        sessions: "Sessions",
+        auth: "Auth / tokens",
+        hooks: "Hooks",
+        skills: "Skills / rules",
+        mcp: "MCP configs",
+        env: "Environment variables",
+        net: "Network",
+      };
+      const kinds = includeNetwork
+        ? ["disk", "config", "logs", "sessions", "auth", "hooks", "skills", "mcp", "env", "net"]
+        : ["disk", "config", "logs", "sessions", "auth", "hooks", "skills", "mcp", "env"];
+      const byOs = Object.fromEntries(OS_GROUP_ORDER.map(os => [os, Object.fromEntries(kinds.map(k => [k, []]))]));
+      for (const kind of kinds) {
+        for (const entry of (buckets[kind] || [])) {
+          const item = kind === "net"
+            ? { path: entry.domain || entry.path || entry, notes: entry.notes || "", platforms: entry.platforms || [] }
+            : entry;
+          const groups = artEntryPlatformGroups(item);
+          for (const os of groups) {
+            if (byOs[os]) byOs[os][kind].push(item);
+          }
+        }
+      }
+      let html = `<div class="artifacts-by-os">`;
+      let any = false;
+      for (const os of OS_GROUP_ORDER) {
+        const sections = kinds
+          .map(kind => {
+            const items = byOs[os][kind];
+            if (!items.length) return "";
+            const body = items.map(e => artifactRowHtml(e)).join("");
+            return `<div class="art-section"><div class="op-label">${labels[kind]}</div>${body}</div>`;
+          })
+          .filter(Boolean);
+        if (!sections.length) continue;
+        any = true;
+        html += `<section class="artifacts-os" aria-label="${escapeHtml(os)} artifacts">`;
+        html += attribGroupHeadHtml(os);
+        html += `<div class="artifacts-grid">${sections.join("")}</div></section>`;
+      }
+      html += `</div>`;
+      if (!any) {
+        return `<div class="artifacts-empty">No host artifacts documented yet.</div>`;
+      }
+      const caption = showCaption
+        ? `<div class="pane-label detect">Host artifacts · by OS</div>`
+        : "";
+      return `${caption}<div class="artifacts">${html}</div>`;
+    }
+
+    function renderNetworkHtml(t) {
+      const entries = (t.networkEntries || []).length
+        ? t.networkEntries
+        : (t.net || []).map(d => ({ domain: d, notes: "", platforms: [] }));
+      if (!entries.length) {
+        return `<div class="attrib-empty">No network destinations documented yet.</div>`;
+      }
+      const hasNotes = entries.some(e => e.notes);
+      let html = `<div class="pane-label detect">API domains · egress</div>`;
+      html += `<p class="recipe-note">Documented outbound destinations for this tool. Use for network hunts and allowlist reviews; not every integration emits DNS from the local process.</p>`;
+      html += `<table class="network-table"><thead><tr>`;
+      html += `<th scope="col">Domain</th>`;
+      if (hasNotes) html += `<th scope="col">Purpose</th>`;
+      html += `</tr></thead><tbody>`;
+      for (const e of entries) {
+        html += `<tr><td><code>${escapeHtml(e.domain)}</code></td>`;
+        if (hasNotes) {
+          html += `<td>${e.notes ? escapeHtml(e.notes) : `<span style="color:var(--faint)">—</span>`}</td>`;
+        }
+        html += `</tr>`;
+      }
+      html += `</tbody></table>`;
+      return html;
+    }
+
+    function renderReadinessHtml(t) {
+      const grade = (t.grade || "?").toUpperCase();
+      const verLabel = verificationLabel(t.verificationLevel);
+      const verClass = verificationBadgeClass(t.verificationLevel);
+      return `
+        <div class="readiness-panel">
+          <div class="readiness-card">
+            <h4>Readiness grade</h4>
+            <div class="readiness-value">
+              <span class="grade ${escapeHtml(t.grade || "?")}" title="${escapeHtml(readinessTitle(t.grade))}">${escapeHtml(grade)}</span>
+            </div>
+            <p>${escapeHtml(readinessTitle(t.grade))}. Editorial A/B/C for detection-engineering handoff, not a severity score.</p>
+          </div>
+          <div class="readiness-card">
+            <h4>Verification level</h4>
+            <div class="readiness-value">
+              <span class="badge ${verClass}" title="${escapeHtml(verificationTitle(t.verificationLevel))}">${escapeHtml(verLabel)}</span>
+            </div>
+            <p>${escapeHtml(verificationTitle(t.verificationLevel))}.</p>
+          </div>
+          <div class="readiness-foot">Full grade definitions: <a href="#scope">Scope</a></div>
+        </div>
+      `;
+    }
+
+    function renderToolTabPanelHtml(t, tabId) {
+      if (tabId === "commands") return renderAbuseHtml(t);
+      if (tabId === "attribution") return renderAttributionHtml(t);
+      if (tabId === "artifacts") return renderArtifactsHtml(t, { includeNetwork: false, showCaption: false });
+      if (tabId === "network") return renderNetworkHtml(t);
+      if (tabId === "readiness") return renderReadinessHtml(t);
+      return "";
+    }
+
+    let activeToolTabId = null;
+
+    function activateToolTab(tabId, { focus = false, toolId = null } = {}) {
+      const tabs = document.querySelectorAll("#d-tabs .tool-tab");
+      const panels = document.querySelectorAll("#d-tab-panels .tool-tab-panel");
+      let found = false;
+      tabs.forEach(btn => {
+        const selected = btn.dataset.tab === tabId;
+        btn.setAttribute("aria-selected", selected ? "true" : "false");
+        btn.tabIndex = selected ? 0 : -1;
+        if (selected) found = true;
+      });
+      panels.forEach(panel => {
+        const active = panel.dataset.tab === tabId;
+        panel.classList.toggle("active", active);
+        panel.hidden = !active;
+      });
+      if (found) {
+        activeToolTabId = tabId;
+        if (toolId) saveToolTab(toolId, tabId);
+        if (focus) {
+          const btn = document.querySelector(`#d-tabs .tool-tab[data-tab="${tabId}"]`);
+          if (btn) btn.focus();
+        }
+      }
+    }
+
+    function wireToolTabs(t) {
+      const tabsEl = document.getElementById("d-tabs");
+      const panelsEl = document.getElementById("d-tab-panels");
+      const tabs = visibleToolTabs(t);
+      if (!tabs.length) {
+        tabsEl.innerHTML = "";
+        panelsEl.innerHTML = `<div class="tool-tab-panel active" data-tab="empty"><div class="attrib-empty">No detail sections for this tool yet.</div></div>`;
+        return;
+      }
+      tabsEl.innerHTML = tabs.map((tab, i) => {
+        const panelId = `tool-tabpanel-${tab.id}`;
+        return `<button type="button" class="tool-tab" role="tab" id="tool-tab-${tab.id}" data-tab="${tab.id}" aria-controls="${panelId}" aria-selected="false" tabindex="${i === 0 ? 0 : -1}">${escapeHtml(tab.label)}</button>`;
+      }).join("");
+      panelsEl.innerHTML = tabs.map(tab => {
+        const panelId = `tool-tabpanel-${tab.id}`;
+        return `<div class="tool-tab-panel" role="tabpanel" id="${panelId}" data-tab="${tab.id}" aria-labelledby="tool-tab-${tab.id}" hidden>${renderToolTabPanelHtml(t, tab.id)}</div>`;
+      }).join("");
+      const saved = getSavedToolTab(t.id);
+      const defaultTab = tabs.find(tab => tab.id === saved)?.id || tabs[0].id;
+      activateToolTab(defaultTab, { toolId: t.id });
+      wireCopy();
+      tabsEl.onkeydown = e => {
+        const btns = [...tabsEl.querySelectorAll(".tool-tab")];
+        const idx = btns.findIndex(b => b.getAttribute("aria-selected") === "true");
+        if (idx < 0) return;
+        let next = idx;
+        if (e.key === "ArrowRight") next = (idx + 1) % btns.length;
+        else if (e.key === "ArrowLeft") next = (idx - 1 + btns.length) % btns.length;
+        else if (e.key === "Home") next = 0;
+        else if (e.key === "End") next = btns.length - 1;
+        else return;
+        e.preventDefault();
+        const tabId = btns[next].dataset.tab;
+        activateToolTab(tabId, { focus: true, toolId: t.id });
+      };
+      tabsEl.onclick = e => {
+        const btn = e.target.closest(".tool-tab");
+        if (!btn) return;
+        activateToolTab(btn.dataset.tab, { focus: true, toolId: t.id });
+      };
+    }
+
+    function catalogMetaHtml(t) {
+      const parts = [];
+      if (t.created) parts.push(`Created ${escapeHtml(t.created)}`);
+      if (t.updated) parts.push(`Updated ${escapeHtml(t.updated)}`);
+      if (t.uuid) parts.push(`Uuid ${escapeHtml(t.uuid)}`);
+      return parts.length ? parts.join(" · ") : "";
+    }
+
+    function toolHasFilterKey(tool, keyField, key) {
+      return (tool[keyField] || []).includes(key);
+    }
+
+    function matchesSetOr(t, selected, keyField) {
+      if (!selected.size) return true;
+      for (const key of selected) {
+        if (toolHasFilterKey(t, keyField, key)) return true;
+      }
+      return false;
+    }
+
+    function matchesFnFilters(t) {
+      if (!fnFilters.size) return true;
+      for (const fn of fnFilters) {
+        if (t.fns.includes(fn)) return true;
+      }
+      return false;
+    }
+
+    function matchesVerFilters(t) {
+      if (!verFilters.size) return true;
+      return verFilters.has(t.verificationLevel || "unverified");
+    }
+
+    function matchesCategoryFilters(t) {
+      if (!categoryFilters.size) return true;
+      return categoryFilters.has(t.category || "");
+    }
+
+    function countFilterOptions(items, defs, keyField) {
+      const counts = Object.fromEntries(defs.map(d => [d.key, 0]));
+      for (const t of items) {
+        for (const key of (t[keyField] || [])) {
+          if (key in counts) counts[key] += 1;
+        }
+      }
+      return counts;
+    }
+
+    function countVerOptions(items) {
+      const counts = Object.fromEntries(VER_FILTER_DEFS.map(d => [d.key, 0]));
+      for (const t of items) {
+        const lv = t.verificationLevel || "unverified";
+        if (lv in counts) counts[lv] += 1;
+      }
+      return counts;
+    }
+
+    function countCategoryOptions(items) {
+      const counts = {};
+      for (const t of items) {
+        const slug = t.category || "";
+        if (!slug) continue;
+        counts[slug] = (counts[slug] || 0) + 1;
+      }
+      return counts;
+    }
+
+    function categoryLabelForSlug(slug, fallbackType) {
+      if (fallbackType) return fallbackType;
+      return slug.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function renderDropdownMenu(menuId, defs, counts, selectedSet, { slugLabels = null, labelHtml = null, optionTitle = null } = {}) {
+      const menu = document.getElementById(menuId);
+      const visible = defs.filter(d => counts[d.key]);
+      if (!visible.length) {
+        menu.innerHTML = `<div class="filter-menu-head">No options in catalog</div>`;
+        return;
+      }
+      menu.innerHTML =
+        `<div class="filter-menu-head">${visible.length} option${visible.length === 1 ? "" : "s"}</div>` +
+        visible.map(d => {
+          const label = slugLabels ? slugLabels(d.key) : d.label;
+          const labelContent = labelHtml ? labelHtml(d.key, label) : escapeHtml(label);
+          const checked = selectedSet.has(d.key) ? " checked" : "";
+          const title = optionTitle ? ` title="${escapeHtml(optionTitle(d.key))}"` : "";
+          return `<label class="filter-option"${title}><input type="checkbox" data-key="${d.key}"${checked}><span class="label">${labelContent}</span><span class="count">${counts[d.key]}</span></label>`;
+        }).join("");
+    }
+
+    function syncDropdownButtons() {
+      document.getElementById("cat-btn").classList.toggle("active", categoryFilters.size > 0);
+      document.getElementById("cap-btn").classList.toggle("active", capabilityFilters.size > 0);
+      document.getElementById("fn-btn").classList.toggle("active", fnFilters.size > 0);
+      document.getElementById("eco-btn").classList.toggle("active", ecosystemFilters.size > 0);
+      document.getElementById("ver-btn").classList.toggle("active", verFilters.size > 0);
+    }
+
+    function activeFilterSummaryParts() {
+      const parts = [];
+      for (const slug of categoryFilters) {
+        const sample = TOOLS.find(t => t.category === slug);
+        parts.push({ group: "Category", label: sample?.type || categoryLabelForSlug(slug), key: slug, kind: "category" });
+      }
+      for (const def of CAP_FILTER_DEFS) {
+        if (capabilityFilters.has(def.key)) parts.push({ group: "Capabilities", label: def.label, key: def.key, kind: "cap" });
+      }
+      for (const def of ECO_FILTER_DEFS) {
+        if (ecosystemFilters.has(def.key)) parts.push({ group: "Ecosystem", label: def.label, key: def.key, kind: "eco" });
+      }
+      for (const fn of fnFilters) parts.push({ group: "Functions", label: fn, key: fn, kind: "fn" });
+      for (const lv of verFilters) {
+        parts.push({ group: "Verified", label: verificationLabel(lv), key: lv, kind: "ver" });
+      }
+      const q = document.getElementById("q").value.trim();
+      if (q) parts.push({ group: "Search", label: `"${q}"`, key: q, kind: "q" });
+      return parts;
+    }
+
+    function renderFilterSummary() {
+      const el = document.getElementById("filter-summary");
+      const parts = activeFilterSummaryParts();
+      if (!parts.length) {
+        el.innerHTML = "";
+        return;
+      }
+      el.innerHTML =
+        `<span style="color:var(--faint);font-family:var(--mono);font-size:0.68rem">Active:</span>` +
+        parts.map(p => `<span class="filter-pill">${escapeHtml(p.group)}: ${escapeHtml(p.label)}</span>`).join("") +
+        `<button type="button" class="filter-clear" id="filter-clear">Clear all</button>`;
+      document.getElementById("filter-clear").onclick = () => clearAllFilters();
+    }
+
+    function clearAllFilters() {
+      categoryFilters.clear();
+      capabilityFilters.clear();
+      fnFilters.clear();
+      ecosystemFilters.clear();
+      verFilters.clear();
+      document.getElementById("q").value = "";
+      buildFilters();
+      applyFilterChange();
+    }
+
+    function closeFilterMenus() {
+      for (const menu of document.querySelectorAll(".filter-menu.open")) menu.classList.remove("open");
+      for (const btn of document.querySelectorAll(".filter-btn.open")) {
+        btn.classList.remove("open");
+        btn.setAttribute("aria-expanded", "false");
+      }
+      openFilterMenu = null;
+    }
+
+    function toggleFilterMenu(menuId, btnId) {
+      const menu = document.getElementById(menuId);
+      const btn = document.getElementById(btnId);
+      const willOpen = !menu.classList.contains("open");
+      closeFilterMenus();
+      if (willOpen) {
+        menu.classList.add("open");
+        btn.classList.add("open");
+        btn.setAttribute("aria-expanded", "true");
+        openFilterMenu = menuId;
+      }
+    }
+
+    function buildFilters() {
+      const catCounts = countCategoryOptions(TOOLS);
+      const capCounts = countFilterOptions(TOOLS, CAP_FILTER_DEFS, "filterCapabilities");
+      const ecoCounts = countFilterOptions(TOOLS, ECO_FILTER_DEFS, "filterEcosystem");
+      const verCounts = countVerOptions(TOOLS);
+
+      const catDefs = [];
+      const slugLabels = {};
+      for (const slug of CATEGORY_SLUG_ORDER) {
+        if (!catCounts[slug]) continue;
+        const sample = TOOLS.find(t => t.category === slug);
+        slugLabels[slug] = sample?.type || categoryLabelForSlug(slug);
+        catDefs.push({ key: slug, label: slugLabels[slug] });
+      }
+      for (const slug of Object.keys(catCounts).sort()) {
+        if (CATEGORY_SLUG_ORDER.includes(slug)) continue;
+        const sample = TOOLS.find(t => t.category === slug);
+        slugLabels[slug] = sample?.type || categoryLabelForSlug(slug);
+        catDefs.push({ key: slug, label: slugLabels[slug] });
+      }
+
+      renderDropdownMenu("cat-menu", catDefs, catCounts, categoryFilters, {
+        slugLabels: key => slugLabels[key] || key,
+      });
+      renderDropdownMenu("cap-menu", CAP_FILTER_DEFS, capCounts, capabilityFilters);
+
+      const fnCounts = {};
+      for (const t of TOOLS) {
+        for (const f of t.fns) fnCounts[f] = (fnCounts[f] || 0) + 1;
+      }
+      const fnExtra = Object.keys(fnCounts).filter(f => !FN_ORDER.includes(f)).sort();
+      const fnDefs = [...FN_ORDER, ...fnExtra].filter(f => fnCounts[f]).map(f => ({ key: f, label: f }));
+      renderDropdownMenu("fn-menu", fnDefs, fnCounts, fnFilters);
+
+      renderDropdownMenu("eco-menu", ECO_FILTER_DEFS, ecoCounts, ecosystemFilters);
+      renderDropdownMenu("ver-menu", VER_FILTER_DEFS, verCounts, verFilters, {
+        slugLabels: key => verificationLabel(key),
+        optionTitle: key => verificationTitle(key),
+      });
+
+      syncDropdownButtons();
+      renderFilterSummary();
+    }
+
+    function filteredTools() {
+      const q = document.getElementById("q").value.toLowerCase();
+      return sortTools(TOOLS.filter(t => {
+        if (!matchesFnFilters(t)) return false;
+        if (!matchesCategoryFilters(t)) return false;
+        if (!matchesSetOr(t, capabilityFilters, "filterCapabilities")) return false;
+        if (!matchesSetOr(t, ecosystemFilters, "filterEcosystem")) return false;
+        if (!matchesVerFilters(t)) return false;
+        if (!q) return true;
+        const hay = [t.bin, t.name, t.vendor, t.type, t.id, ...(t.search || []), ...t.fns, ...(t.os || [])].join(" ").toLowerCase();
+        return hay.includes(q);
+      }));
+    }
+
+    function renderRows() {
+      const list = filteredTools();
+      document.getElementById("count").textContent = `Showing ${list.length} of ${TOOLS.length} tools`;
+      if (!list.length) {
+        document.getElementById("rows").innerHTML =
+          `<tr><td colspan="6" style="padding:1.25rem;color:var(--muted)">No tools match these filters.</td></tr>`;
+        return;
+      }
+      document.getElementById("rows").innerHTML = list.map(t => `
+        <tr data-id="${t.id}" class="${t.id === selected ? "selected" : ""}">
+          <td>
+            <div class="bin">${escapeHtml(t.bin)}</div>
+            <div class="vendor">${escapeHtml(t.vendor)}</div>
+            ${catalogDescHtml(t)}
+          </td>
+          <td><div class="tags">${t.fns.map(f => `<span class="tag fn">${f}</span>`).join("")}</div></td>
+          <td>${t.type}</td>
+          <td>${osIconsHtml(t.os)}</td>
+          <td><span class="badge ${verificationBadgeClass(t.verificationLevel)}" title="${escapeHtml(verificationTitle(t.verificationLevel))}">${verificationLabel(t.verificationLevel)}</span></td>
+          <td><span class="grade ${t.grade}" title="${escapeHtml(readinessTitle(t.grade))}" aria-label="Readiness ${escapeHtml((t.grade || "?").toUpperCase())}">${(t.grade || "?").toUpperCase()}</span></td>
+        </tr>
+      `).join("");
+      document.querySelectorAll("#rows tr").forEach(tr => {
+        tr.addEventListener("click", () => {
+          openTool(tr.dataset.id);
+        });
+      });
+    }
+
+    function applyFilterChange({ scroll = true } = {}) {
+      renderRows();
+      if (viewMode === "tool" && selected) {
+        renderDetail();
+      }
+      if (scroll && viewMode === "home") {
+        document.getElementById("catalog").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function renderDetail() {
+      const t = TOOLS.find(x => x.id === selected);
+      const detail = document.getElementById("detail");
+      if (!t) {
+        detail.classList.remove("open");
+        document.getElementById("d-bin").textContent = "—";
+        document.getElementById("d-meta").textContent = "Tool not found";
+        document.getElementById("d-official").innerHTML = "";
+        document.getElementById("d-cli").innerHTML = "";
+        document.getElementById("d-byline").innerHTML = "";
+        document.getElementById("d-tags").innerHTML = "";
+        document.getElementById("d-desc").textContent = "";
+        document.getElementById("d-catalog-meta").textContent = "";
+        applyReadinessGradeBadge(document.getElementById("d-grade"), "?");
+        document.getElementById("d-ver").textContent = "—";
+        document.getElementById("d-ver").className = "badge";
+        document.getElementById("d-ver").title = "";
+        document.getElementById("d-tabs").innerHTML = "";
+        document.getElementById("d-tab-panels").innerHTML = "";
+        return;
+      }
+      detail.classList.add("open");
+      document.getElementById("d-bin").textContent = t.bin;
+      document.getElementById("d-meta").innerHTML = `${t.type} · ${t.vendor} · ${osIconsHtml(t.os)}`;
+      document.getElementById("d-official").innerHTML = officialLinkHtml(t);
+      document.getElementById("d-cli").innerHTML = cliInvokeHtml(t);
+      document.getElementById("d-byline").innerHTML = bylineHtml(t);
+      document.getElementById("d-tags").innerHTML = t.fns.map(f => `<span class="tag fn">${f}</span>`).join("");
+      document.getElementById("d-desc").innerHTML = formatInlineCode(t.description || "");
+      applyReadinessGradeBadge(document.getElementById("d-grade"), t.grade);
+      document.getElementById("d-ver").textContent = verificationLabel(t.verificationLevel);
+      document.getElementById("d-ver").className = "badge " + verificationBadgeClass(t.verificationLevel);
+      document.getElementById("d-ver").title = verificationTitle(t.verificationLevel);
+      document.getElementById("d-catalog-meta").textContent = catalogMetaHtml(t);
+
+      wireToolTabs(t);
+    }
+
+    function wireCopy() {
+      document.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.onclick = async () => {
+          const id = btn.getAttribute("data-copy");
+          const el = document.getElementById(id);
+          if (!el) return;
+          try {
+            await navigator.clipboard.writeText(el.textContent);
+            btn.textContent = "Copied";
+            setTimeout(() => { btn.textContent = "Copy"; }, 1200);
+          } catch (_) {
+            btn.textContent = "Select+copy";
+          }
+        };
+      });
+    }
+
+    function wireFilters() {
+      document.getElementById("q").addEventListener("input", () => {
+        renderFilterSummary();
+        applyFilterChange({ scroll: false });
+      });
+
+      for (const [menuId, btnId, selectedSet] of [
+        ["cat-menu", "cat-btn", categoryFilters],
+        ["cap-menu", "cap-btn", capabilityFilters],
+        ["fn-menu", "fn-btn", fnFilters],
+        ["eco-menu", "eco-btn", ecosystemFilters],
+        ["ver-menu", "ver-btn", verFilters],
+      ]) {
+        document.getElementById(btnId).addEventListener("click", e => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleFilterMenu(menuId, btnId);
+        });
+        document.getElementById(menuId).addEventListener("change", e => {
+          const input = e.target.closest('input[type="checkbox"]');
+          if (!input) return;
+          const key = input.dataset.key;
+          if (input.checked) selectedSet.add(key);
+          else selectedSet.delete(key);
+          syncDropdownButtons();
+          renderFilterSummary();
+          applyFilterChange({ scroll: false });
+        });
+      }
+
+      document.addEventListener("click", e => {
+        if (!e.target.closest(".filter-dropdown")) closeFilterMenus();
+      });
+      document.addEventListener("keydown", e => {
+        if (e.key === "Escape") closeFilterMenus();
+      });
+
+      document.getElementById("sort-alpha").addEventListener("click", () => {
+        sortMode = "alpha";
+        document.getElementById("sort-alpha").classList.add("active");
+        document.getElementById("sort-alpha").setAttribute("aria-pressed", "true");
+        document.getElementById("sort-readiness").classList.remove("active");
+        document.getElementById("sort-readiness").setAttribute("aria-pressed", "false");
+        applyFilterChange({ scroll: false });
+      });
+      document.getElementById("sort-readiness").addEventListener("click", () => {
+        sortMode = "readiness";
+        document.getElementById("sort-readiness").classList.add("active");
+        document.getElementById("sort-readiness").setAttribute("aria-pressed", "true");
+        document.getElementById("sort-alpha").classList.remove("active");
+        document.getElementById("sort-alpha").setAttribute("aria-pressed", "false");
+        applyFilterChange({ scroll: false });
+      });
+    }
+
+    async function loadCatalogData() {
+      const bust = `?v=${Date.now()}`;
+      const canFetch = location.protocol !== "file:";
+      if (canFetch) {
+        try {
+          const [toolsRes, statsRes] = await Promise.all([
+            fetch("public/api/tools.json" + bust),
+            fetch("public/api/stats.json" + bust),
+          ]);
+          if (toolsRes.ok) {
+            return {
+              tools: await toolsRes.json(),
+              stats: statsRes.ok ? await statsRes.json() : null,
+              source: "fetch",
+            };
+          }
+        } catch (err) {
+          console.warn("Catalog fetch failed; trying build-time embed", err);
+        }
+      }
+      const toolsEl = document.getElementById("lolgai-tools-embed");
+      if (toolsEl && toolsEl.textContent.trim()) {
+        const statsEl = document.getElementById("lolgai-stats-embed");
+        return {
+          tools: JSON.parse(toolsEl.textContent),
+          stats: statsEl && statsEl.textContent.trim() ? JSON.parse(statsEl.textContent) : null,
+          source: "embed",
+        };
+      }
+      throw new Error("Catalog data unavailable. Run: python3 bin/site.py && python3 -m http.server 8765");
+    }
+
+    function showOfflineBanner(source) {
+      const el = document.getElementById("offline-banner");
+      if (!el) return;
+      if (source === "embed" || location.protocol === "file:") {
+        el.textContent = "Offline preview: catalog loaded from build-time embed (run bin/site.py to refresh). Preview with: python3 -m http.server 8765 from website/.";
+        el.classList.remove("hidden");
+      } else {
+        el.classList.add("hidden");
+      }
+    }
+
+    async function boot() {
+      wireFilters();
+      wireCopy();
+      window.addEventListener("hashchange", applyRoute);
+      document.getElementById("back-catalog").addEventListener("click", e => {
+        e.preventDefault();
+        openCatalog("catalog");
+      });
+      document.getElementById("back-catalog-lab").addEventListener("click", e => {
+        e.preventDefault();
+        openCatalog("catalog");
+      });
+      document.getElementById("back-catalog-api").addEventListener("click", e => {
+        e.preventDefault();
+        openCatalog("catalog");
+      });
+      try {
+        const { tools: rawTools, stats: s, source } = await loadCatalogData();
+        TOOLS = sortTools(rawTools.map(mapTool));
+        showOfflineBanner(source);
+        if (s) {
+          document.getElementById("stat-tools").textContent = s.tools;
+          document.getElementById("stat-cats").textContent = s.categories;
+        }
+        buildFilters();
+        applyRoute();
+      } catch (err) {
+        document.getElementById("count").textContent = "Failed to load catalog. Run: python3 bin/site.py && cd website && python3 -m http.server 8765";
+        console.error(err);
+      }
+    }
+
+    boot();
+  </script>
+
+<script>
+(function () {
+  var KEY = "lolgai-theme";
+  var btn = document.getElementById("theme-toggle");
+  if (!btn) return;
+  function current() {
+    return document.documentElement.getAttribute("data-theme") || "light";
+  }
+  function apply(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem(KEY, t); } catch (e) {}
+    var next = t === "dark" ? "light" : "dark";
+    btn.setAttribute("aria-label", "Switch to " + next + " mode");
+    btn.title = "Switch to " + next + " mode";
+  }
+  apply(current());
+  btn.addEventListener("click", function () {
+    apply(current() === "dark" ? "light" : "dark");
+  });
+})();
+</script>
+
+</body>
+</html>

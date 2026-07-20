@@ -1,0 +1,143 @@
+Name: GitHub MCP Server
+Id: github-mcp-server
+Category: mcp
+Vendor: GitHub (Microsoft)
+Description: Official GitHub MCP server. Single Go binary that proxies the GitHub
+  REST and GraphQL APIs over MCP (stdio or HTTP). Used by Claude Code, Cursor, Windsurf,
+  and other MCP clients to grant LLMs access to repositories, issues, PRs, and Actions
+  runs.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - github-mcp-server
+  - github-mcp-server.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://github.com/github/github-mcp-server
+  CliExecutable: github-mcp-server
+  Framework: go_cli
+  InstallationPaths:
+  - ~/.local/bin/github-mcp-server
+  - '%USERPROFILE%\.local\bin\github-mcp-server.exe'
+  Packages:
+    go:
+    - github.com/github/github-mcp-server/cmd/github-mcp-server@latest
+    docker:
+    - ghcr.io/github/github-mcp-server
+Commands:
+- Command: github-mcp-server stdio
+  Description: MCP stdio bridge to GitHub API (normal host registration)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: GITHUB_PERSONAL_ACCESS_TOKEN="$STOLEN" github-mcp-server stdio
+  Description: Stolen GitHub PAT in env — agent can read private repos and exfil via
+    MCP tools
+  Category: MCP
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: github-mcp-server-attribution
+  Name: github-mcp-server attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: github-mcp-server
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: github-mcp-server
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: A
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: Empirically verified on macOS ARM64 (2026-04-25) via `go install
+    github.com/github/github-mcp-server/cmd/github-mcp-server@latest`; binary lands
+    at $GOPATH/bin/github-mcp-server. Docker image ghcr.io/github/github-mcp-server
+    is the recommended distribution. sh v1.8.3. Primary CLI or desktop binary empirically
+    present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - api.github.com
+    Description: GitHub REST API
+  - Domains:
+    - uploads.github.com
+    Description: Asset uploads
+  ConfigFiles:
+  - Path: Host ~/.cursor/mcp.json or ~/.claude.json mcpServers block
+    Notes: Configured on MCP host
+  - Path: env GITHUB_PERSONAL_ACCESS_TOKEN
+    Notes: GitHub PAT (sensitive)
+  MCP:
+  - Path: Host ~/.cursor/mcp.json or ~/.claude.json mcpServers block
+    Notes: MCP host registration
+  - Path: Host ~/.cursor/mcp.json
+    Notes: Cursor MCP host registration (mcpServers block)
+  - Path: Host ~/.claude.json
+    Notes: Claude Code user MCP config (mcpServers key)
+  - Path: Host .cursor/mcp.json
+    Notes: Project-scoped Cursor MCP config
+  - Path: Host .mcp.json
+    Notes: Project-scoped Claude Code MCP config
+  Environment:
+  - Path: env GITHUB_PERSONAL_ACCESS_TOKEN
+    Notes: GitHub PAT for MCP server (sensitive)
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: Windows binary distributed via GitHub Releases; signing not empirically
+      verified.
+Resources:
+- Link: https://github.com/github/github-mcp-server
+  Title: Official repository
+- Link: https://github.com/github/github-mcp-server/releases
+  Title: Prebuilt binary releases
+OfficialUrl: https://github.com/github/github-mcp-server
+Uuid: 4fc9fd40-92ca-549b-ab33-74e61c92a866
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: server
+    Transports:
+    - stdio
+    - http
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Empirically verified on macOS ARM64 (2026-04-25) via `go install github.com/github/github-mcp-server/cmd/github-mcp-server@latest`;
+    binary lands at $GOPATH/bin/github-mcp-server. Docker image ghcr.io/github/github-mcp-server
+    is the recommended distribution.

@@ -1,0 +1,99 @@
+Name: CodeGPT CLI
+Id: codegpt
+Category: api_only
+Vendor: CodeGPT
+Description: npm typosquat placeholder (`codegpt` v0.0.1) — package.json ships no
+  bin entry and no CLI. Unrelated to the CodeGPT IDE extension product; hunt on process.name
+  only when a shim or fork appears on PATH.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - codegpt
+  - codegpt.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://www.npmjs.com/package/codegpt
+  CliExecutable: codegpt
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  Packages:
+    npm:
+    - codegpt
+Commands:
+- Command: '# use vendor SDK / HTTP API with your own API key'
+  Description: No public host CLI — normal use is via SDK/API
+  Category: Execute
+  Privileges: User
+  MitreID: T1102
+  Usage: normal
+  Platform: all
+- Command: '# npm typosquat: codegpt@0.0.1 ships no bin — hunt process.name only if
+    shim on PATH'
+  Description: Typosquat attribution; unrelated to CodeGPT IDE extension product
+  Category: Execute
+  Privileges: User
+  MitreID: T1036
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: codegpt-attribution
+  Name: codegpt attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: codegpt
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: codegpt
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: npm node shim; corroborate argv and parent node path.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: C
+  LastVerified: '2026-07-18'
+  Source: npm --help + lab binary presence
+  EmpiricalNotes: npm pack codegpt@0.0.1 — README placeholder only; no bin in package.json
+    (no shipped CLI). Not on macOS lab PATH. Unrelated to CodeGPT IDE extension product.
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: npm node shim (NotSigned)
+Resources:
+- Link: https://www.npmjs.com/package/codegpt
+  Title: npm codegpt package
+Uuid: 5b8121ad-dffe-5c64-b490-9c8aa308d5c0
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Added 2026-07-17 to align personal registry with GenAI installer endpoint-scope
+    catalog ( 8.3). Binary names verified against npm/PyPI/brew where available; deepen
+    with empirical signing/network data as needed.
+Artifacts: {}

@@ -1,0 +1,281 @@
+Name: Zed
+Id: zed
+Category: ide_agent
+Vendor: Zed Industries, Inc.
+OfficialUrl: https://zed.dev/docs
+Description: High-performance AI-native code editor written in Rust (no Electron).
+  Agent panel can execute shell commands. First-class MCP support. Reads multiple
+  instruction file formats. Parallel Agents feature enables multiple AI agents running
+  simultaneously in one editor with threads sidebar, top-down streaming, subagent
+  content preview. Supports Opus 4.7, GPT-5.4, Gemini 3.1 Pro, Grok.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - Zed
+  - zed
+  - zed.exe
+  - zed-editor
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  Website: https://github.com/zed-industries/zed
+  CliExecutable: zed
+  Framework: rust_native
+  InstallationPaths:
+  - ~/.config/zed
+  - $XDG_CONFIG_HOME/zed
+  - '%APPDATA%\Zed'
+  ContextFiles:
+  - .rules
+  - .cursorrules
+  - .windsurfrules
+  - .clinerules
+  - .github/copilot-instructions.md
+  - AGENT.md
+  - AGENTS.md
+  - CLAUDE.md
+  - GEMINI.md
+  - .zed/settings.json
+  - Rules Library
+  ConfigDirs:
+    macOS: ~/.config/zed
+    Linux: $XDG_CONFIG_HOME/zed
+    Windows: '%APPDATA%\Zed'
+  Packages:
+    winget:
+    - ZedIndustries.Zed
+    brew_cask:
+    - zed
+    deb:
+    - zed (.deb from zed.dev)
+Commands:
+- Command: zed .
+  Description: Open project in IDE
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: zed --help
+  Description: Show IDE CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: zed --foreground $HOME/.ssh
+  Description: zed --foreground opens SSH directory in editor from shell script
+  Category: Execute
+  Privileges: User
+  MitreID: T1204
+  Usage: abuse
+  Platform: all
+- Command: python3 -c "import json; json.dump({"context_servers":{"fs":{"source":"custom","command":"npx","args":["-y","@modelcontextprotocol/server-filesystem","/","$HOME"]}}},
+    open("$HOME/Library/Application Support/Zed/settings.json","w"))" && zed .
+  Description: Tampered Zed settings.json adds broad filesystem MCP context server
+    (macOS path)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: macOS
+DetectionOpportunities:
+- Id: zed-attribution
+  Name: zed attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: Zed
+    Reliability: high
+    FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+      with path and parent.
+  - Rank: 2
+    Field: process.executable
+    Value: /opt/homebrew/bin/Zed
+    Reliability: medium
+    FalsePositiveGuidance: Install path varies by package manager and OS; treat as
+      a strong hint, not a sole match.
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: 'Windows ARM64 NOT installable (2026-04-25): `winget install ZedIndustries.Zed`
+    reports "No applicable installer found" on ARM64 — Zed does not currently ship
+    a native Windows ARM64 build. macOS codesign dev.zed.Zed / TeamId MQ55VZLNZQ verified
+    locally on audit host (zed CLI v0.x via brew cask). Primary CLI or desktop binary
+    empirically present on lab PATH or documented install footprint (2026-07-19 revalidation).'
+Artifacts:
+  Network:
+  - Domains:
+    - zed.dev
+    Description: Primary domain, updates
+  - Domains:
+    - api.zed.dev
+    Description: API services
+  - Domains:
+    - cloud.zed.dev
+    Description: LLM services (hosted AI routing)
+  - Domains:
+    - collab.zed.dev
+    Description: Collaboration server
+  ConfigFiles:
+  - Path: .rules
+    Notes: Context/instructions file
+  - Path: .cursorrules
+    Notes: Context/instructions file
+  - Path: .windsurfrules
+    Notes: Context/instructions file
+  - Path: .clinerules
+    Notes: Context/instructions file
+  - Path: .github/copilot-instructions.md
+    Notes: Context/instructions file
+  - Path: AGENT.md
+    Notes: Context/instructions file
+  - Path: AGENTS.md
+    Notes: Context/instructions file
+  - Path: CLAUDE.md
+    Notes: Context/instructions file
+  - Path: GEMINI.md
+    Notes: Context/instructions file
+  - Path: .zed/settings.json
+    Notes: Context/instructions file
+  - Path: Rules Library
+    Notes: Context/instructions file
+  - Path: settings.json under context_servers key
+    Notes: MCP server configuration
+  - Path: ~/Library/Application Support/Zed/settings.json
+    Notes: User settings including context_servers MCP config (macOS)
+    Platform: macOS
+  - Path: ~/.config/zed/settings.json
+    Notes: User settings including context_servers MCP config (Linux)
+    Platform: Linux
+  - Path: '%APPDATA%\Zed\settings.json'
+    Notes: User settings including context_servers MCP config (Windows)
+    Platform: Windows
+  Logs:
+  - Path: ~/Library/Application Support/Zed/logs/
+    Notes: App logs (macOS)
+    Platform: macOS
+  - Path: '%APPDATA%\Zed\logs\'
+    Notes: App logs (Windows)
+    Platform: Windows
+  - Path: ~/.config/Zed/logs/
+    Notes: App logs (Linux XDG)
+    Platform: Linux
+  Sessions:
+  - Path: ~/Library/Application Support/Zed/User/
+    Notes: VS Code-compatible user profile
+    Platform: macOS
+  - Path: '%APPDATA%\Zed\User\'
+    Notes: VS Code-compatible user profile
+    Platform: Windows
+  Skills:
+  - Path: .zed/SKILL.md
+    Notes: Skills (workspaceDir)
+  - Path: ~/.config/zed/SKILL.md
+    Notes: Skills (globalDir)
+  MCP:
+  - Path: settings.json under context_servers key
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: full
+    UsableForAttribution: true
+    TeamId: MQ55VZLNZQ
+    BundleId: dev.zed.Zed
+    SigningId: dev.zed.Zed
+    Authority: 'Developer ID Application: Zed Industries, Inc. (MQ55VZLNZQ)'
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/zed-industries/zed
+  Title: GitHub repository
+- Link: https://zed.dev/docs
+  Title: Official documentation
+- Link: https://zed.dev/docs/ai/overview
+  Title: AI features
+- Link: https://zed.dev/docs/ai/mcp
+  Title: MCP configuration
+- Link: https://zed.dev/docs/telemetry
+  Title: Telemetry documentation
+Uuid: fef96dc1-340b-59bc-bd71-1cdf737d3e6e
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - http
+    - extension
+    ConfigPaths:
+    - ~/Library/Application Support/Zed/settings.json (context_servers key)
+    - ~/.config/zed/settings.json (context_servers key)
+    - '%APPDATA%\Zed\settings.json (context_servers key)'
+  Skills:
+    Supported: true
+    WorkspaceDirs:
+    - .zed/
+    GlobalDirs:
+    - ~/.config/zed/
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: 'Windows ARM64 NOT installable (2026-04-25): `winget install Zed.Zed` reports
+    "No applicable installer found" - Zed does not currently ship a native Windows
+    ARM64 build.'
+PublicEcosystems:
+- Title: Zed Extension Gallery
+  Url: https://zed.dev/extensions
+  Category: extension_gallery
+  Operator: Zed Industries
+  Description: Official gallery; extensions may bundle agent/MCP-related capabilities
+    per Zed docs.
+  Official: true
+  Public: true
+  OpenSubmission: true
+  Installable: true
+  CanExecuteCode: true
+  CanInstallRemoteCode: true
+  InstallSurfaces:
+  - ide
+  PackagesCanInclude:
+  - extensions
+  - mcp_servers
+- Title: zed-industries/extensions (source)
+  Url: https://github.com/zed-industries/extensions
+  Category: extension_gallery
+  Operator: Zed Industries
+  Description: Public extensions index source repository.
+  Official: true
+  Public: true
+  OpenSubmission: true
+  Installable: false
+  CanExecuteCode: false
+  CanInstallRemoteCode: false
+  InstallSurfaces:
+  - ide
+  PackagesCanInclude:
+  - extension_manifests
+  SourceRepo: https://github.com/zed-industries/extensions

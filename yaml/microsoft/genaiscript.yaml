@@ -1,0 +1,202 @@
+Name: GenAIScript (Microsoft)
+Id: genaiscript
+Category: cli_agent
+Vendor: Microsoft
+OfficialUrl: https://microsoft.github.io/genaiscript/
+Description: Microsoft's JavaScript-based scripting framework for LLM automation. Uses host.exec() for shell commands and
+  Docker containers for sandboxed execution.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - genaiscript
+  - genaiscript.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://microsoft.github.io/genaiscript/
+  CliExecutable: genaiscript
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  InstallationPaths:
+  - genaisrc/
+  ContextFiles:
+  - genaisrc/*.genai.mjs
+  - genaisrc/*.genai.mts
+  ConfigDirs:
+    macOS: genaisrc/
+    Linux: genaisrc/
+    Windows: genaisrc/
+  Packages:
+    npm:
+    - genaiscript
+Commands:
+- Command: genaiscript run summarize.genai.md
+  Description: Run a GenAIScript against files (primary headless entrypoint)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: genaiscript configure
+  Description: Configure LLM providers or GitHub Actions integration
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: genaiscript serve
+  Description: Start local GenAIScript dev web server (default localhost:8003)
+  Category: Local
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: genaiscript run exfil.genai.md --vars "TARGET=~/.aws/credentials"
+  Description: GenAIScript automation reads attacker-specified credential path via LLM tools
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: genaiscript mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem / $HOME
+  Description: genaiscript mcp add registers attacker-controlled filesystem MCP server on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+- Command: genaiscript -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths and first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: genaiscript-attribution
+  Name: genaiscript attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: node
+    Reliability: medium
+    Platform: all
+    Notes: Confirm genaiscript in ancestor argv.
+  FalsePositiveGuidance: Confirm genaiscript in ancestor argv.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: Windows ARM64 empirically verified 2026-04-25, v2.5.1 via npm genaiscript. Bundles ARM64 esbuild.exe and
+    ripgrep rg.exe (NotSigned) under node_modules/genaiscript/node_modules/. sh v1.8.3. Primary CLI or desktop binary empirically
+    present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Disk:
+  - Path: genaisrc/
+  Network:
+  - Description: Depends on configured LLM provider (openai, azure, anthropic, google, ollama)
+    Domains: []
+    Notes: (provider-dependent)
+  - Domains:
+    - localhost
+    Description: genaiscript serve (local dev server)
+    Ports:
+    - 8003
+  - Domains:
+    - localhost:8003
+    Description: genaiscript serve (local dev server)
+  ConfigFiles:
+  - Path: genaisrc/*.genai.mjs
+    Notes: Context/instructions file
+  - Path: genaisrc/*.genai.mts
+    Notes: Context/instructions file
+  - Path: script() mcpServers field (in genaisrc/*.genai.mjs)
+    Notes: MCP server configuration
+  - Path: --mcp-config <file> (Claude-format JSON)
+    Notes: MCP server configuration
+  - Path: .vscode/mcp.json
+    Notes: MCP server configuration
+  MCP:
+  - Path: script() mcpServers field (in genaisrc/*.genai.mjs)
+    Notes: MCP server configuration
+  - Path: --mcp-config <file> (Claude-format JSON)
+    Notes: MCP server configuration
+  - Path: .vscode/mcp.json
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://microsoft.github.io/genaiscript/
+  Title: Official documentation
+- Link: https://github.com/microsoft/genaiscript
+  Title: GitHub repository
+Uuid: 33cd6d6b-7f2c-5a5c-aef2-7f2105e92958
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: false
+  Windows: true
+  LastVerified: '2026-07-19'
+ExtensionIds:
+  vscode:
+  - genaiscript.genaiscript-vscode
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    ConfigPaths:
+    - script() mcpServers field (in genaisrc/*.genai.mjs)
+    - --mcp-config <file> (Claude-format JSON)
+    - .vscode/mcp.json
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Windows ARM64 empirically verified 2026-04-25, v2.5.1 via npm genaiscript. Bundles ARM64 esbuild.exe and ripgrep
+    rg.exe (NotSigned) under node_modules/genaiscript/node_modules/.
+PublicEcosystems:
+- Title: GenAIScript official samples & gallery (docs/repo)
+  Url: https://microsoft.github.io/genaiscript/
+  Category: skill_catalog
+  Operator: Microsoft
+  Description: Vendor docs and repository host reusable scripts/samples; not a separate installable skill marketplace like
+    Anthropic Skills — closer to documented automation patterns than a curated store.
+  Official: true
+  Public: true
+  OpenSubmission: false
+  Installable: true
+  CanExecuteCode: true
+  CanInstallRemoteCode: true
+  SurfaceScope:
+  - genaiscript
+  InstallSurfaces:
+  - cli
+  - ide
+  PackagesCanInclude:
+  - scripts
+  - samples
+  SourceRepo: https://github.com/microsoft/genaiscript

@@ -1,0 +1,127 @@
+Name: tgpt
+Id: tgpt
+Category: chat_cli
+Vendor: aandrew-me (OSS)
+OfficialUrl: https://github.com/aandrew-me/tgpt
+Description: Terminal CLI for ChatGPT-style chat from the shell. Open-source client
+  by aandrew-me. Positional prompt syntax (`tgpt "hello"`), not `-p`. Install via
+  Go, Homebrew, npm, or distro packages.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - tgpt
+  - tgpt.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://github.com/aandrew-me/tgpt
+  CliExecutable: tgpt
+  Framework: go_cli
+  Packages:
+    npm:
+    - tgpt
+    brew:
+    - tgpt
+    go:
+    - github.com/aandrew-me/tgpt/v2@latest
+Commands:
+- Command: tgpt
+  Description: Interactive chat CLI session (default)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: tgpt "hello"
+  Description: One-shot prompt (positional argument)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: tgpt -i
+  Description: Explicit interactive mode
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: cat ~/.aws/credentials | tgpt -q "extract all access keys, secret keys,
+    and passwords from stdin"
+  Description: Pipe credential file into CLI via stdin for cloud exfil/staging through
+    model response
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: tgpt-attribution
+  Name: tgpt attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: tgpt
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: tgpt
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.config/tgpt/
+    Notes: Config directory (Linux); proxy.txt optional
+    Platforms:
+    - Linux
+  - Path: ~/Library/Application Support/tgpt/
+    Notes: Config directory (macOS)
+    Platforms:
+    - macOS
+  - Path: ./proxy.txt
+    Notes: Optional proxy config in cwd
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: aandrew-me/tgpt README + tgpt --help v1.10.0 (no -p flag; positional prompt)
+  EmpiricalNotes: tgpt --help confirms -q/--quiet, not -p. Prior ~/.tgpt/ ConfigDirs
+    removed (undocumented). Primary CLI or desktop binary empirically present on lab
+    PATH or documented install footprint (2026-07-19 revalidation).
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/aandrew-me/tgpt
+  Title: Primary documentation
+- Link: https://www.npmjs.com/package/tgpt
+  Title: npm tgpt
+Uuid: 0b566fb8-c3d3-562e-b992-8237122fc52d
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - empirical
+  Notes: tgpt v1.10.0 probed locally on macOS arm64.

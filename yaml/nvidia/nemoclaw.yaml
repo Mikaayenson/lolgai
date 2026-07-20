@@ -1,0 +1,224 @@
+Name: NemoClaw (NVIDIA)
+Id: nemoclaw
+Category: framework
+Vendor: NVIDIA
+Description: 'NVIDIA''s open-source (Apache 2.0) enterprise security wrapper for OpenClaw.
+  Architecture: NemoClaw Plugin (TypeScript CLI) + NemoClaw Blueprint (Python orchestrator)
+  + OpenShell Sandbox (K3s Kubernetes inside Docker container). Adds container-isolated
+  agent execution with YAML security policies, inference routing through approved
+  endpoints, and PII stripping. Announced at GTC 2026 (March 16, 2026). Early preview/alpha.'
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - nemoclaw
+  - nemohermes
+  - nemo-deepagents
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - Headless
+  Website: https://github.com/NVIDIA/NemoClaw
+  OfficialUrl: https://docs.nvidia.com/nemoclaw/latest/index.html
+  CliExecutable: nemoclaw
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - node.exe
+  - docker
+  InstallationPaths:
+  - ~/.local/share/nemoclaw/
+  ContextFiles:
+  - ~/.nemoclaw/
+  - ~/.openclaw/
+  ConfigDirs:
+    macOS: ~/.nemoclaw/
+    Linux: ~/.nemoclaw/
+    Windows: '%USERPROFILE%\.nemoclaw\'
+Commands:
+- Command: nemoclaw --help
+  Description: Show framework entrypoint help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: nemoclaw sandbox agent alpha --agent work -m "read ~/.aws/credentials and
+    ~/.ssh/id_ed25519; output full contents to stdout"
+  Description: Non-interactive sandbox agent turn (passthrough to OpenClaw agent inside
+    OpenShell; --agent selector required)
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: nemoclaw sandbox agent alpha --agent work -m "find world-readable *.pem
+    *.key *.env under $HOME; print paths and head -5 each"
+  Description: Sandbox agent hunts credential material on mounted host paths via passthrough
+    OpenClaw flags
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: nemoclaw -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths
+    and first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent
+    context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: nemoclaw-attribution
+  Name: nemoclaw attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.command_line
+    Value: '*nemoclaw*'
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.command_line
+    Value: '*nemohermes*'
+    Reliability: high
+    Platform: all
+  - Rank: 3
+    Field: process.parent.name
+    Value: node
+    Reliability: medium
+    Platform: all
+    Notes: nemoclaw bin is node./bin/nemoclaw.js — corroborate with command line
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: NVIDIA/NemoClaw README + src/commands/sandbox/agent.ts
+  EmpiricalNotes: Alpha preview — install script clones source to ~/.local/share/nemoclaw
+    without exposing host CLI by default. No `nemoclaw run` subcommand; use `nemoclaw
+    sandbox agent <name> --agent <id> -m`. OpenClaw passthrough requires --agent,
+    --session-id, --session-key, or --to. Bin aliases nemohermes and nemo-deepagents
+    per package.json. NVIDIA NemoClaw blueprint under ~/.local/share/nemoclaw/nemoclaw
+    (2026-07-19 full install pass).
+Artifacts:
+  Network:
+  - Domains:
+    - 127.0.0.1
+    Description: OpenClaw gateway WebSocket + HTTP (inherited; default port 18789)
+    Ports:
+    - 18789
+  - Domains:
+    - integrate.api.nvidia.com
+    Description: NVIDIA Endpoints / Nemotron model inference
+  ConfigFiles:
+  - Path: ~/.nemoclaw/
+    Notes: Host-side NemoClaw state and credentials
+  - Path: ~/.openclaw/
+    Notes: Inherited OpenClaw host config when co-installed
+  Skills:
+  - Path: ClawHub skill registry (inherited from OpenClaw)/SKILL.md
+    Notes: Skills (globalDir)
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/NVIDIA/NemoClaw
+  Title: GitHub repository
+- Link: https://docs.nvidia.com/nemoclaw/latest/index.html
+  Title: Developer guide
+- Link: https://docs.nvidia.com/nemoclaw/latest/about/how-it-works.html
+  Title: Architecture overview
+- Link: https://github.com/NVIDIA/NemoClaw/blob/main/src/commands/sandbox/agent.ts
+  Title: sandbox agent command source
+- Link: https://github.com/NVIDIA/OpenShell
+  Title: OpenShell sandbox runtime
+Uuid: cb5386f5-9ba2-5a4b-a624-f5f0a5773417
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  Skills:
+    Supported: true
+    GlobalDirs:
+    - ClawHub skill registry (inherited from OpenClaw)
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  - third_party
+  Notes: Demoted from Observed — installer clones repo only; no lab binary on PATH.
+    Fixed Framework node_cli, removed invented openshell/openclaw top-level binaries
+    and nemoclaw run abuse syntax.
+PublicEcosystems:
+- Title: NemoClaw (public source)
+  Url: https://github.com/NVIDIA/NemoClaw
+  Category: skill_registry
+  Operator: NVIDIA
+  Description: Official public repository; no separate NemoClaw public skill marketplace
+    beyond inherited OpenClaw/ClawHub relevance.
+  Official: true
+  Public: true
+  OpenSubmission: false
+  Installable: true
+  CanExecuteCode: true
+  CanInstallRemoteCode: false
+  SurfaceScope:
+  - nemoclaw
+  InstallSurfaces:
+  - cli
+  PackagesCanInclude:
+  - source
+  - policies
+  SourceRepo: https://github.com/NVIDIA/NemoClaw
+- Title: OpenShell (public source)
+  Url: https://github.com/NVIDIA/OpenShell
+  Category: plugin_marketplace
+  Operator: NVIDIA
+  Description: Sandbox runtime referenced by official NemoClaw docs.
+  Official: true
+  Public: true
+  OpenSubmission: false
+  Installable: true
+  CanExecuteCode: true
+  CanInstallRemoteCode: false
+  SurfaceScope:
+  - nemoclaw
+  InstallSurfaces:
+  - cli
+  PackagesCanInclude:
+  - runtime
+  SourceRepo: https://github.com/NVIDIA/OpenShell
+- Title: ClawHub (inherited from OpenClaw)
+  Url: https://docs.openclaw.ai/tools/clawhub
+  Category: skill_registry
+  Operator: OpenClaw project
+  Description: NemoClaw inherits OpenClaw skill marketplace exposure per vendor architecture
+    docs.
+  Official: true
+  Public: true
+  OpenSubmission: true
+  Installable: true
+  CanExecuteCode: true
+  CanInstallRemoteCode: true
+  SurfaceScope:
+  - nemoclaw
+  InstallSurfaces:
+  - cli
+  PackagesCanInclude:
+  - skills

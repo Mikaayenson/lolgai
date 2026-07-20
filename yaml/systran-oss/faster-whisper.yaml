@@ -1,0 +1,103 @@
+Name: faster-whisper
+Id: faster-whisper
+Category: speech
+Vendor: SYSTRAN (OSS)
+Description: Faster Whisper — a CTranslate2 reimplementation of OpenAI Whisper for efficient speech-to-text transcription.
+  PyPI package `faster-whisper` is a Python library only (`from faster_whisper import WhisperModel`); there is no standalone
+  `faster-whisper` console script on PyPI.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - python
+  - python3
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities: []
+  Website: https://github.com/SYSTRAN/faster-whisper
+  OfficialUrl: https://github.com/SYSTRAN/faster-whisper
+  CliExecutable: python
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths: []
+  Packages:
+    pip:
+    - faster-whisper
+Commands:
+- Command: python -c "from faster_whisper import WhisperModel; m=WhisperModel('base'); print('ok')"
+  Description: faster-whisper is a Python library; no standalone faster-whisper CLI on PyPI
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: python -c "from faster_whisper import WhisperModel; m=WhisperModel('base'); segs,_=m.transcribe('audio.wav');
+    open('/tmp/out.txt','w').write('\\n'.join(s.text for s in segs))"
+  Description: Local batch transcription to disk via library API
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: faster-whisper-attribution
+  Name: faster-whisper attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.command_line
+    Value: '*from faster_whisper import*'
+    Reliability: medium
+    Platform: all
+    Notes: Library invoked via python -c or script; no faster-whisper process name
+  - Rank: 2
+    Field: process.command_line
+    Value: '*import faster_whisper*'
+    Reliability: medium
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts running local ASR pipelines. Corroborate with GPU usage and Hugging Face model downloads.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: github.com/SYSTRAN/faster-whisper README + PyPI wheel metadata
+  EmpiricalNotes: PyPI faster-whisper v1.2.1 wheel has no console_scripts entry point. Prior `faster-whisper` binary and
+    `~/.faster-whisper/` paths removed as inaccurate.
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://github.com/SYSTRAN/faster-whisper
+  Title: Primary documentation
+- Link: https://pypi.org/project/faster-whisper/
+  Title: PyPI faster-whisper
+Uuid: 46824b54-2a45-5075-8b1c-faecb46b4639
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: PyPI wheel entry_points verified 2026-07-19; library-only surface per upstream README.
+Artifacts:
+  Network:
+  - Domains:
+    - huggingface.co
+    Description: Model weight downloads (Systran/faster-whisper-* on HF Hub)

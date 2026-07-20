@@ -1,0 +1,130 @@
+Name: MCP CLI
+Id: mcp-cli
+Category: mcp
+Vendor: Anthropic / MCP
+Description: Official Python MCP package with CLI extras (`mcp[cli]`).
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - mcp
+  - mcp.exe
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  Website: https://modelcontextprotocol.io/
+  CliExecutable: mcp
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  Packages:
+    pip:
+    - mcp[cli]
+Commands:
+- Command: mcp dev server.py
+  Description: Run MCP server in dev mode with hot reload
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: mcp run server.py
+  Description: Run MCP server module (production-style)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: mcp install server.py
+  Description: Install MCP server into Claude desktop app config
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: mcp dev /tmp/evil-server.py
+  Description: Dev mode loads attacker-controlled MCP server module from world-writable
+    path
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: mcp-cli-attribution
+  Name: mcp attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: mcp
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: mcp
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate
+    with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: Official `mcp` CLI from PyPI `mcp[cli]` v1.28.1 (macOS lab 2026-07-19).
+    Subcommands dev, run, install, version. No dedicated ~/.mcp-cli/ home — config
+    lives on MCP host (Cursor/Claude) or in dev server modules. Prior Primary CLI
+    or desktop binary empirically present on lab PATH or documented install footprint
+    (2026-07-19 revalidation).
+Artifacts:
+  MCP:
+  - Path: Host ~/.cursor/mcp.json
+    Notes: Cursor MCP host registration (mcpServers block)
+  - Path: Host ~/.claude.json
+    Notes: Claude Code user MCP config (mcpServers key)
+  - Path: Host .cursor/mcp.json
+    Notes: Project-scoped Cursor MCP config
+  - Path: Host .mcp.json
+    Notes: Project-scoped Claude Code MCP config
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://modelcontextprotocol.io/
+  Title: Model Context Protocol specification
+- Link: https://pypi.org/project/mcp/
+  Title: PyPI mcp (install mcp[cli] for CLI)
+- Link: https://github.com/modelcontextprotocol/python-sdk
+  Title: Python SDK source (mcp CLI)
+Uuid: cac830e4-3870-5b12-bab3-060f26cab185
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+Integrations:
+  MCP:
+    Supported: true
+    Role: server
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Added 2026-07-17 to align personal registry with GenAI installer endpoint-scope
+    catalog ( 8.3). Binary names verified against npm/PyPI/brew where available; deepen
+    with empirical signing/network data as needed.

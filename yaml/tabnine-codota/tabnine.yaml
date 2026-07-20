@@ -1,0 +1,185 @@
+Name: Tabnine
+Id: tabnine
+Category: ide_extension
+Vendor: Tabnine (Codota)
+Description: AI code completion and agent engine with MCP support (Tabnine Agent +
+  Tabnine CLI). Runs as local TabNine* subprocesses within IDEs. Tabnine CLI (`tabnine`)
+  manages MCP via settings.json and `tabnine mcp` commands.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - TabNine
+  - TabNine.exe
+  - TabNine-deep-local
+  - TabNine-deep-cloud
+  - WD-TabNine
+  - tabnine
+  - tabnine.exe
+  Agentic: true
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - MCP
+  - Headless
+  Website: https://docs.tabnine.com
+  OfficialUrl: https://www.tabnine.com/
+  CliExecutable: tabnine
+  Framework: native_binary
+  InstallationPaths:
+  - ~/Library/Preferences/TabNine/
+  - ~/Library/Application Support/TabNine/
+  - ~/.config/TabNine/
+  - ~/.tabnine/
+  - '%APPDATA%\\TabNine\\'
+  ConfigDirs:
+    macOS: ~/Library/Preferences/TabNine/
+    Linux: ~/.config/TabNine/
+    Windows: '%APPDATA%\\TabNine\\'
+  Packages:
+    npm:
+    - tabnine
+Commands:
+- Command: tabnine --help
+  Description: Show Tabnine CLI help when installed
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: tabnine mcp list
+  Description: List configured MCP servers (Tabnine CLI)
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: normal
+  Platform: all
+- Command: '# completion engine — no standalone abuse CLI; abuse via malicious workspace
+    context or stolen Tabnine auth'
+  Description: Paste secrets into editor for cloud completion, or tamper with Tabnine
+    MCP config under.tabnine/
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: tabnine -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths
+    and first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent
+    context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: tabnine-attribution
+  Name: TabNine attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: TabNine
+    Reliability: high
+    FalsePositiveGuidance: Expected on hosts where Tabnine IDE extension is installed.
+  - Rank: 2
+    Field: process.executable
+    Value: '*TabNine*'
+    Reliability: medium
+    Platform: all
+    Notes: Local TabNine binary path varies by IDE integration and install method
+  - Rank: 3
+    Field: process.name
+    Value: tabnine
+    Reliability: medium
+    Platform: all
+    Notes: Tabnine CLI when used outside IDE
+  FalsePositiveGuidance: Expected on hosts where Tabnine is installed. Corroborate
+    with api.tabnine.com network and IDE parent process.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: docs.tabnine.com client requirements + MCP docs
+  EmpiricalNotes: Official docs list macOS paths under Library/Preferences and Application
+    Support; Linux ~/.config and ~/.tabnine. MCP via.tabnine/mcp_servers.json (Agent)
+    or tabnine CLI settings.json. npm tabnine is a dev shim (stardrop), not primary
+    install. Primary CLI or desktop binary empirically present on lab PATH or documented
+    install footprint (2026-07-19 revalidation).
+Artifacts:
+  Network:
+  - Domains:
+    - api.tabnine.com
+    Description: Primary API
+  - Domains:
+    - cloud.tabnine.com
+    Description: Cloud completions
+  - Domains:
+    - update.tabnine.com
+    Description: Binary updates and version checks
+  - Domains:
+    - sa.tabnine.com
+    Description: Analytics/telemetry
+  ConfigFiles:
+  - Path: .tabnine/mcp_servers.json
+    Notes: Tabnine Agent MCP server configuration (project scope)
+  - Path: ~/.tabnine/
+    Notes: Linux config directory per official requirements
+  MCP:
+  - Path: .tabnine/mcp_servers.json
+    Notes: MCP server configuration for Tabnine Agent
+  - Path: settings.json
+    Notes: Tabnine CLI mcpServers key (user/project scopes)
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: TabNine binaries may be signed; npm tabnine shim is NotSigned
+Resources:
+- Link: https://docs.tabnine.com
+  Title: Official documentation
+- Link: https://docs.tabnine.com/main/welcome/readme/system-requirements/tabnine-client-and-deployment-requirements
+  Title: Client requirements and network domains
+- Link: https://docs.tabnine.com/main/getting-started/tabnine-agent/mcp-intro-and-setup
+  Title: Tabnine Agent MCP setup
+- Link: https://docs.tabnine.com/main/getting-started/tabnine-cli/features/mcp-server-config
+  Title: Tabnine CLI MCP server config
+Uuid: 20099f6c-4889-5688-b0b9-758d3d4b7dbf
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+ExtensionIds:
+  vscode:
+  - tabnine.tabnine-vscode
+  - tabnine.tabnine-vscode-self-hosted-updater
+  jetbrains:
+  - com.tabnine.TabNine
+Integrations:
+  MCP:
+    Supported: true
+    Role: host
+    Transports:
+    - stdio
+    - sse
+    - http
+    ConfigPaths:
+    - .tabnine/mcp_servers.json
+    - settings.json
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Config paths corrected from official Tabnine client requirements + MCP docs
+    2026-07-19.

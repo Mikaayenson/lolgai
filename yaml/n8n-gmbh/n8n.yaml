@@ -1,0 +1,144 @@
+Name: n8n
+Id: n8n
+Category: cloud_agent
+Vendor: n8n GmbH
+Description: Open-source workflow automation platform with 400+ integrations. Self-hosted
+  deployments expose a Node.js `n8n` process that can execute shell commands, touch
+  the filesystem, and call cloud APIs when workflows include those nodes. Not in
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Website: https://docs.n8n.io/
+  OfficialUrl: https://docs.n8n.io/
+  Binaries:
+  - n8n
+  - n8n.exe
+  CliExecutable: n8n
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  Framework: node_cli
+  HelperProcesses:
+  - node
+  - docker
+  InstallationPaths:
+  - ~/.n8n/
+  - '%USERPROFILE%\.n8n\'
+  Packages:
+    npm:
+    - n8n
+Commands:
+- Command: n8n start
+  Description: Start self-hosted n8n server (default UI on port 5678)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: n8n --help
+  Description: Show n8n CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: n8n execute --id WORKFLOW_ID --rawOutput
+  Description: Execute saved workflow from CLI
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: n8n-attribution
+  Name: n8n process attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: n8n
+    Reliability: medium
+    Platform: all
+  - Rank: 2
+    Field: process.command_line
+    Value: '*n8n*'
+    Reliability: medium
+    Platform: all
+  FalsePositiveGuidance: Legitimate automation hosts run n8n continuously. Corroborate
+    with ~/.n8n state, listening port 5678, and workflow execution logs.
+Artifacts:
+  Disk:
+  - Path: ~/.n8n/
+    Notes: Default user folder (override with N8N_USER_FOLDER)
+  - Path: '%USERPROFILE%\.n8n\'
+    Notes: Windows default user folder
+  ConfigFiles:
+  - Path: ~/.n8n/config
+    Notes: Instance config when present
+  - Path: env N8N_USER_FOLDER
+    Notes: Official env var controlling data directory
+  Logs:
+  - Path: ~/.n8n/
+    Notes: Instance logs and SQLite DB live under the user folder
+  Sessions:
+  - Path: ~/.n8n/database.sqlite
+    Notes: Default SQLite workflow/execution store (when not using Postgres)
+  AuthTokens:
+  - Path: ~/.n8n/config
+    Notes: Encryption key and credentials material (sensitive)
+  - Path: env N8N_ENCRYPTION_KEY
+    Notes: Optional explicit encryption key
+  Network:
+  - Domains: []
+    Ports:
+    - 5678
+    Description: Default self-hosted UI/API listen port (docs)
+  - Domains:
+    - docker.n8n.io
+    Description: Official container image registry host
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+    Notes: npm/Node launcher; no stable Developer ID on n8n itself
+  Windows:
+    Depth: none
+    UsableForAttribution: false
+    Notes: npm/Node launcher
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: docs.n8n.io hosting + CLI commands (not lab-installed)
+  EmpiricalNotes: Paths, port 5678, and n8n execute from official docs. Not in Removed
+    duplicate execute command entry. Primary CLI or desktop binary empirically present
+    on lab PATH or documented install footprint (2026-07-19 revalidation).
+Resources:
+- Link: https://docs.n8n.io/
+  Title: n8n documentation
+- Link: https://docs.n8n.io/hosting/cli-commands/
+  Title: Server CLI commands
+- Link: https://docs.n8n.io/hosting/installation/docker/
+  Title: Docker install
+- Link: https://docs.n8n.io/hosting/configuration/environment-variables/
+  Title: Environment variables / N8N_USER_FOLDER
+Uuid: 1791b6d7-7ff5-5d89-b857-f651f5630a87
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Official n8n.io docs only; not empirically installed in lab pipeline.

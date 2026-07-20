@@ -1,0 +1,192 @@
+Name: Aider
+Id: aider
+Category: cli_agent
+Vendor: Aider AI (OSS)
+Description: Open-source AI pair programming CLI. Edits code in local git repos by communicating with LLM APIs. Runs as Python
+  process.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - aider
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - Headless
+  Website: https://aider.chat/docs/
+  OfficialUrl: https://aider.chat/
+  CliExecutable: aider
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  InstallationPaths: []
+  ContextFiles:
+  - CONVENTIONS.md
+  - .aider.conf.yml
+  - ~/.aider.conf.yml
+  ConfigDirs:
+    macOS: ~/
+    Linux: ~/
+    Windows: '%USERPROFILE%\'
+  Packages:
+    brew:
+    - aider
+    pip:
+    - aider-chat
+Commands:
+- Command: aider
+  Description: Interactive Aider coding session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: aider --message "add a docstring to main()"
+  Description: One-shot Aider edit (will prompt for approval)
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: aider --yes-always --message "add logging to all API routes"
+  Description: aider --yes-always auto-approves edits and suggested shell commands
+  Category: Bypass
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+- Command: aider --yes-always --auto-commits --message "refactor utils module"
+  Description: aider --auto-commits commits agent edits to git without review
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+- Command: aider --yes-always --api-key anthropic=$STOLEN --message "read ~/.aws/credentials and print contents"
+  Description: aider --api-key injects stolen provider key for cloud-side credential staging
+  Category: Bypass
+  Privileges: User
+  MitreID: T1552
+  Usage: abuse
+  Platform: all
+- Command: aider --architect --yes-always --message "design migration plan"
+  Description: aider --architect mode with --yes-always auto-approval
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: abuse
+  Platform: all
+- Command: aider -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths and first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: aider-attribution
+  Name: aider attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.parent.name
+    Value: aider
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.parent.name
+    Value: python
+    Reliability: medium
+    Platform: all
+    Notes: Confirm aider in argv.
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: high
+  ReadinessGrade: B
+  LastVerified: '2026-07-18'
+  Source: catalog maintainer
+  EmpiricalNotes: 'Windows ARM64 NOT installable in stock environment (2026-04-25): hf-xet wheel has no win-arm64 prebuild
+    and source build needs Rust + MSVC C++ tools; requires manual provisioning of Rustup (aarch64-pc-windows-msvc) + VS Build
+    Tools ARM64. Primary CLI or desktop binary empirically present on lab PATH or documented install footprint (2026-07-19
+    revalidation).'
+Artifacts:
+  Network:
+  - Description: Uses litellm — connects to whichever LLM provider is configured (OpenAI, Anthropic, Google, DeepSeek, Groq,
+      Cohere, custom)
+    Domains: []
+    Notes: (provider-dependent)
+  - Domains:
+    - us.i.posthog.com
+    Description: 'PostHog analytics (opt-out: aider --analytics-disable)'
+  ConfigFiles:
+  - Path: .aider.conf.yml
+    Notes: Config file (registry)
+  - Path: .aider.model.metadata.json
+    Notes: Config file (registry)
+  - Path: CONVENTIONS.md
+    Notes: Context/instructions file
+  - Path: ~/.aider.conf.yml
+    Notes: User-level config (search path per aider.chat docs)
+  AuthTokens:
+  - Path: env OPENAI_API_KEY / ANTHROPIC_API_KEY
+    Notes: Provider keys via env or.aider.conf.yml
+  Logs:
+  - Path: .aider.chat.history.md
+    Notes: Chat history file (project cwd)
+  - Path: .aider.tags.cache
+    Notes: Repo map cache
+  Sessions:
+  - Path: .aider.chat.history.md
+    Notes: Persistent chat transcript in project cwd
+  Skills:
+  - Path: .aider.conf.yml
+    Notes: Project config (can embed instructions)
+  - Path: CONVENTIONS.md / .aider.md
+    Notes: Optional project instruction files
+  Environment:
+  - Path: env OPENAI_API_KEY / ANTHROPIC_API_KEY / …
+    Notes: Provider keys via environment or.aider.conf.yml
+Signing:
+  macOS:
+    Depth: none
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+    Notes: Pip-generated Scripts\aider.exe is Authenticode NotSigned (empirically verified on Windows).
+Resources:
+- Link: https://aider.chat/docs/
+  Title: Official documentation
+- Link: https://aider.chat/docs/config.html
+  Title: Configuration reference
+- Link: https://aider.chat/docs/git.html
+  Title: Git integration documentation
+- Link: https://github.com/Aider-AI/aider
+  Title: GitHub repository
+SearchAliases:
+- aider-chat
+- aider chat
+Uuid: b42f2518-4e26-50df-b702-9a51e67b78f2
+Updated: '2026-07-19'
+VerificationLevel: observed
+VerifiedPlatforms:
+  macOS: true
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - empirical
+  - official_doc
+  Notes: 'No native MCP in aider 0.86.x (official config reference lists no MCP options; related PRs unmerged). Windows ARM64
+    NOT installable in stock environment (2026-04-25): hf-xet wheel has no win-arm64 prebuild and source build needs Rust
+    + MSVC C++ tools.'

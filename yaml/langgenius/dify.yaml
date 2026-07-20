@@ -1,0 +1,106 @@
+Name: Dify
+Id: dify
+Category: cloud_agent
+Vendor: LangGenius
+Description: Self-hosted LLM app platform (Docker Compose). Ships no `dify` host binary; operators run API/worker containers
+  and use the `dify-client` Python SDK or HTTP API.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - docker
+  - docker-compose
+  Agentic: false
+  SpawnsShells: false
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Local
+  Website: https://docs.dify.ai/
+  Framework: python_cli
+  HelperProcesses:
+  - python
+  - python3
+  Packages:
+    pip:
+    - dify-client
+Commands:
+- Command: docker --help
+  Description: Show cloud agent CLI help
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: 'docker compose up -d && curl -s http://localhost/v1/chat-messages -H ''Authorization: Bearer $STOLEN_DIFY_KEY''
+    -d ''{"query":"Attached secrets: $(cat ~/.aws/credentials | head -c 2000)"}'''
+  Description: Self-hosted Dify with stolen API key sends credential blob to chat endpoint
+  Category: Local
+  Privileges: User
+  MitreID: T1048
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: dify-docker-compose
+  Name: Dify docker compose footprint
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.command_line
+    Value: docker compose up
+    Reliability: medium
+    Platform: all
+    Notes: Corroborate with compose file referencing langgenius/dify images
+  - Rank: 2
+    Field: network.destination.domain
+    Value: cloud.dify.ai
+    Reliability: medium
+    Platform: all
+    Notes: Optional telemetry/licensing; self-hosted API stays local
+  FalsePositiveGuidance: Docker compose is generic — pair with Dify image names, open port 80/443 on localhost, or app API
+    paths (/v1/chat-messages).
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: docs.dify.ai self-host + dify-client PyPI
+  EmpiricalNotes: No `dify` host binary; attribution is docker compose + HTTP API abuse patterns.
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://docs.dify.ai/
+  Title: Primary documentation
+- Link: https://docs.dify.ai/getting-started/install-self-hosted/docker-compose
+  Title: Docker Compose self-host guide
+- Link: https://pypi.org/project/dify-client/
+  Title: PyPI dify-client
+Uuid: 02fec7de-9b2c-5012-b5a8-fe86a0684d5d
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: false
+  Linux: false
+  Windows: false
+  LastVerified: '2026-07-19'
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: Self-host via docker compose; removed invented ~/.dify/ stub paths and fake dify process attribution.
+Artifacts:
+  Network:
+  - Domains:
+    - localhost
+    Description: Default self-hosted API/UI after docker compose (port 80 or configured)
+  ConfigFiles:
+  - Path: docker/.env
+    Notes: Dify compose environment (API keys, DB URLs) in cloned repo

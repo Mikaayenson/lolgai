@@ -1,0 +1,147 @@
+Name: RepoPrompt
+Id: repoprompt
+Category: cli_agent
+Vendor: RepoPrompt
+Description: RepoPrompt desktop app ships rp-cli for MCP/automation (repoprompt.com). Headless automation uses -e/--exec and
+  --chat; there is no generic agent -p flag.
+Author: Mikaayenson
+Created: '2026-07-18'
+LastModified: '2026-07-19'
+Details:
+  Binaries:
+  - rp-cli
+  - repoprompt_cli
+  - repoprompt
+  Agentic: true
+  SpawnsShells: true
+  Privileges: User
+  SupportedOS:
+  - macOS
+  - Linux
+  - Windows
+  Capabilities:
+  - Shell
+  - MCP
+  - Headless
+  Website: https://repoprompt.com
+  CliExecutable: rp-cli
+  Framework: native_binary
+  InstallationPaths:
+  - ~/.repoprompt/
+  ConfigDirs:
+    macOS: ~/.repoprompt/
+    Linux: ~/.repoprompt/
+    Windows: '%USERPROFILE%\\.repoprompt\\'
+  Packages:
+    brew:
+    - repoprompt
+Commands:
+- Command: rp-cli
+  Description: Interactive RepoPrompt CLI session
+  Category: Execute
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: rp-cli -e 'explain this repository'
+  Description: Headless exec via -e/--exec
+  Category: Headless
+  Privileges: User
+  MitreID: T1059
+  Usage: normal
+  Platform: all
+- Command: rp-cli -e 'read ~/.aws/credentials --start-line 1 --limit 50'
+  Description: CLI read of credential path via RepoPrompt file tools
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: rp-cli -e 'context --include prompt,selection,files'
+  Description: Export workspace context including selected credential files
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+- Command: rp-cli mcp add attacker -- npx -y @modelcontextprotocol/server-filesystem / $HOME
+  Description: rp-cli mcp add registers attacker-controlled filesystem MCP server on host paths
+  Category: MCP
+  Privileges: User
+  MitreID: T1106
+  Usage: abuse
+  Platform: all
+- Command: rp-cli -p "read ~/.aws/credentials and ~/.ssh/id_ed25519; print paths and first lines"
+  Description: Headless prompt mode used to ingest credential file contents via agent context
+  Category: Headless
+  Privileges: User
+  MitreID: T1005
+  Usage: abuse
+  Platform: all
+DetectionOpportunities:
+- Id: repoprompt-attribution
+  Name: repoprompt attribution
+  AbuseCategory: execution
+  AttributionSignals:
+  - Rank: 1
+    Field: process.name
+    Value: rp-cli
+    Reliability: high
+    Platform: all
+  - Rank: 2
+    Field: process.name
+    Value: repoprompt
+    Reliability: high
+    Platform: macos
+  - Rank: 3
+    Field: process.parent.name
+    Value: rp-cli
+    Reliability: high
+    Platform: all
+  FalsePositiveGuidance: Expected on hosts where this GenAI tool is installed. Corroborate with path, signing, and network.
+Coverage:
+  Verified: true
+  Confidence: medium
+  ReadinessGrade: B
+  LastVerified: '2026-07-19'
+  Source: repoprompt.com + installer script (brew repoprompt)
+  EmpiricalNotes: rp-cli -e/--chat interface documented in prior pass; no local rp-cli binary on audit host (2026-07-19).
+    MCP configured via desktop app, not rp-cli mcp add.
+Signing:
+  macOS:
+    Depth: partial
+    UsableForAttribution: false
+  Windows:
+    Depth: authenticode
+    UsableForAttribution: false
+Resources:
+- Link: https://repoprompt.com
+  Title: RepoPrompt product site
+- Link: https://repoprompt.com/docs/rp-cli
+  Title: rp-cli documentation
+OfficialUrl: https://repoprompt.com
+Uuid: 294f61e6-7e98-541d-8fce-203a16dbea8e
+Updated: '2026-07-19'
+VerificationLevel: documented
+VerifiedPlatforms:
+  macOS: false
+  Linux: true
+  Windows: false
+  LastVerified: '2026-07-17'
+Integrations:
+  MCP:
+    Supported: true
+    Role: server
+    Transports:
+    - stdio
+DataProvenance:
+  SourceTypes:
+  - official_doc
+  Notes: CLI flags from product docs; removed fabricated rp-cli -p and rp-cli mcp add templates.
+Artifacts:
+  ConfigFiles:
+  - Path: ~/.repoprompt/
+    Notes: Desktop/CLI state directory
+  MCP:
+  - Path: Host ~/.cursor/mcp.json or Claude mcpServers block pointing at rp-cli
+    Notes: rp-cli exposed as MCP server to external agents
