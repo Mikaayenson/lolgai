@@ -8,7 +8,7 @@
 
 <p align="center">
   <b>Living Off Legitimate GenAI</b><br/>
-  A <em>living-off-the-land</em> catalog — deliberate play on LOLBins — for GenAI tools on<br/>
+  A <em>living-off-the-land</em> catalog (deliberate play on LOLBins) for GenAI tools on<br/>
   developer workstations and endpoints.
 </p>
 
@@ -43,7 +43,7 @@
   </a>
 </p>
 
-<p align="center"><sub>Static JSON/CSV API — curl it, jq it, wire it into detections.</sub></p>
+<p align="center"><sub>Static JSON/CSV API: curl it, jq it, wire it into detections.</sub></p>
 
 <br/>
 
@@ -89,7 +89,7 @@ curl -sS https://lolgai.io/public/api/tools/claude.json \
 | [`domains.csv`](https://lolgai.io/public/api/domains.csv) | Network destinations → tool IDs |
 | [`stats.json`](https://lolgai.io/public/api/stats.json) | Summary counters |
 
-Local preview: `make serve` → `http://127.0.0.1:8765/public/api/…`
+Local preview: `make serve` then `http://127.0.0.1:8765/public/api/...`
 
 ## Lab installer
 
@@ -126,7 +126,7 @@ Grades (A/B/C) = **catalog completeness**, not severity.
 
 ## Contributing
 
-PRs welcome — one YAML file per tool.
+PRs welcome. One YAML file per tool.
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [lolgai.io/#contribute](https://lolgai.io/#contribute).
 
 <p align="center">
