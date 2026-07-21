@@ -21,6 +21,8 @@ Details:
   Capabilities:
   - Local
   Website: https://docs.dify.ai/
+  OfficialUrl: https://docs.dify.ai/
+  OfficialUrlLabel: Official documentation ↗
   Framework: python_cli
   HelperProcesses:
   - python
@@ -29,8 +31,8 @@ Details:
     pip:
     - dify-client
 Commands:
-- Command: docker --help
-  Description: Show cloud agent CLI help
+- Command: docker compose up -d
+  Description: Start self-hosted Dify (Docker Compose)
   Category: Execute
   Privileges: User
   MitreID: T1059

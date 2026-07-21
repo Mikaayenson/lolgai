@@ -130,6 +130,12 @@ PRs welcome. One YAML file per tool.
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [lolgai.io/#contribute](https://lolgai.io/#contribute).
 
 <p align="center">
+  <a href="https://github.com/sponsors/Mikaayenson">
+    <img src="https://img.shields.io/badge/Sponsor-%E2%9D%A4-ea4aaa?style=for-the-badge&logo=githubsponsors&logoColor=white&labelColor=141312" alt="Sponsor Mikaayenson" />
+  </a>
+</p>
+
+<p align="center">
   <a href="https://lolgai.io"><img src="docs/assets/mark.png" width="56" alt="LOL-GAI" /></a><br/>
   <sub><a href="https://lolgai.io">lolgai.io</a> · Apache-2.0</sub>
 </p>

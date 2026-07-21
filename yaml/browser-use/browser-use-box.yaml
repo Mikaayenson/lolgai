@@ -29,7 +29,7 @@ Details:
   - Bypass
   Website: https://github.com/browser-use/bux
   OfficialUrl: https://browser-use.com/bux
-  CliExecutable: claude
+  OfficialUrlLabel: Official project ↗
   Framework: python_daemon
   HelperProcesses:
   - python

@@ -23,7 +23,6 @@ Details:
   - Windows
   Capabilities: []
   Website: https://replicate.com/docs
-  CliExecutable: python3
   Framework: python_library
   HelperProcesses:
   - python

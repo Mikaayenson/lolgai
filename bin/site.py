@@ -23,9 +23,10 @@ API_DIR = ROOT / "website" / "public" / "api"
 FN_ALLOW = {"Shell", "Headless", "MCP", "Tunnel", "Bypass", "Local", "Creds"}
 
 # When YAML omits Capabilities, derive filter chips from catalog category.
+# Do not default Shell here — that comes from SpawnsShells / Capabilities / Shell commands.
 CATEGORY_DEFAULT_FNS: dict[str, set[str]] = {
-    "cli_agent": {"Shell", "Headless"},
-    "ide_agent": {"Shell", "Headless"},
+    "cli_agent": {"Headless"},
+    "ide_agent": {"Headless"},
     "ide_extension": {"Headless"},
     "tunnel": {"Tunnel"},
     "local_llm": {"Local"},
@@ -33,7 +34,7 @@ CATEGORY_DEFAULT_FNS: dict[str, set[str]] = {
     "speech": {"Headless"},
     "image_gen": {"Headless"},
     "cloud_mlops": {"Headless"},
-    "cloud_agent": {"Shell", "Headless"},
+    "cloud_agent": {"Headless"},
     "mcp": {"MCP"},
     "desktop": {"Headless"},
     "framework": {"Headless"},
@@ -61,6 +62,8 @@ GENERIC_BINARIES = {
     "python3.exe",
     "node",
     "node.exe",
+    "npm",
+    "npx",
     "electron",
     "electron.exe",
     "bash",
@@ -70,6 +73,18 @@ GENERIC_BINARIES = {
     "powershell.exe",
     "pwsh",
     "pwsh.exe",
+    "docker",
+    "docker.exe",
+    "docker-compose",
+    "docker-compose.exe",
+    "chromium",
+    "chromium.exe",
+    "chrome",
+    "chrome.exe",
+    "curl",
+    "curl.exe",
+    "git",
+    "git.exe",
     "code",
     "code.exe",
     "code helper",
@@ -911,7 +926,8 @@ def _ecosystem_kind_to_filter(kind: str) -> set[str]:
     elif kind == "plugin_marketplace":
         eco.add("plugin_marketplace")
     elif kind in {"mcp_registry", "mcp_directory"}:
-        eco.add("mcp_registry")
+        # UI filter key is mcp_directory (see ECO_FILTER_DEFS).
+        eco.add("mcp_directory")
     elif kind == "extension_gallery":
         eco.add("extension_gallery")
     elif kind == "prompt_library":
@@ -929,7 +945,7 @@ def derive_filter_ecosystem(
     resources: list[dict],
     public_ecosystems: list[dict] | None = None,
 ) -> list[str]:
-    """Ecosystem filters from PublicEcosystems data; URL heuristics as fallback."""
+    """Ecosystem filters from PublicEcosystems only (matches the Public ecosystems tab)."""
     eco: set[str] = set()
     ecosystems = public_ecosystems if public_ecosystems is not None else flatten_public_ecosystems(tool)
 
@@ -945,32 +961,6 @@ def derive_filter_ecosystem(
                 all_official = False
         if all_official:
             eco.add("official_only")
-
-    # Fallback heuristics when PublicEcosystems absent (legacy Resources links)
-    if not ecosystems:
-        for resource in resources:
-            text = f"{resource.get('title', '')} {resource.get('link', '')}".lower()
-            if "marketplace" in text:
-                eco.add("plugin_marketplace")
-            if "extension" in text and any(
-                token in text for token in ("gallery", "marketplace", "vscode", "jetbrains", "open-vsx")
-            ):
-                eco.add("extension_gallery")
-            if "mcp" in text and any(
-                token in text for token in ("registry", "directory", "servers", "hub", "catalog")
-            ):
-                eco.add("mcp_registry")
-            if "skill" in text and any(token in text for token in ("catalog", "registry", "marketplace")):
-                eco.add("skill_catalog")
-
-    framework = str(details.get("Framework") or "")
-    category = str(tool.get("Category") or "")
-    if framework in {"vscode_extension", "electron"} or category in {
-        "ide_extension",
-        "desktop",
-        "ide_agent",
-    }:
-        eco.add("installable_surface")
 
     return sorted(eco)
 

@@ -25,7 +25,6 @@ Details:
   - Local
   Website: https://www.librechat.ai/
   OfficialUrl: https://www.librechat.ai/
-  CliExecutable: docker
   Framework: node_cli
   HelperProcesses:
   - node

@@ -27,7 +27,7 @@ Details:
   - Local
   Website: https://github.com/open-webui/open-webui
   OfficialUrl: https://docs.openwebui.com/
-  CliExecutable: docker
+  CliExecutable: open-webui
   Framework: python_daemon
   HelperProcesses:
   - python

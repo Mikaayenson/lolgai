@@ -22,7 +22,6 @@ Details:
   Capabilities: []
   Website: https://github.com/SYSTRAN/faster-whisper
   OfficialUrl: https://github.com/SYSTRAN/faster-whisper
-  CliExecutable: python
   Framework: python_cli
   HelperProcesses:
   - python
